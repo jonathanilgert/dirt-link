@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DirtLink — Connect Earth Material Sites</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header id="app-header">
+    <div class="header-left">
+      <div class="logo">
+        <span class="logo-icon">&#9650;</span>
+        <span class="logo-text">Dirt<strong>Link</strong></span>
+      </div>
+    </div>
+    <nav class="header-nav">
+      <button class="nav-btn active" data-view="map">Map</button>
+      <button class="nav-btn" data-view="my-pins">My Pins</button>
+      <button class="nav-btn" data-view="messages">
+        Messages
+        <span class="badge" id="unread-badge" style="display:none">0</span>
+      </button>
+    </nav>
+    <div class="header-right">
+      <div id="auth-area">
+        <button class="btn btn-outline" id="btn-login">Log In</button>
+        <button class="btn btn-primary" id="btn-register">Sign Up</button>
+      </div>
+      <div id="user-area" style="display:none">
+        <span id="user-company"></span>
+        <button class="btn btn-outline btn-sm" id="btn-logout">Log Out</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Map View -->
+    <div id="view-map" class="view active">
+      <!-- Sidebar filters -->
+      <aside id="map-sidebar">
+        <h3>Filter Pins</h3>
+        <div class="filter-group">
+          <label>Pin Type</label>
+          <div class="filter-buttons">
+            <button class="filter-btn active" data-filter-type="all">All</button>
+            <button class="filter-btn have" data-filter-type="have">Have Material</button>
+            <button class="filter-btn need" data-filter-type="need">Need Material</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <label>Material Category</label>
+          <select id="filter-material">
+            <option value="">All Categories</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label><input type="checkbox" id="filter-tested"> Tested Only</label>
+        </div>
+        <div class="filter-group" id="filter-company-group" style="display:none">
+          <label><input type="checkbox" id="filter-my-company"> My Company Only</label>
+        </div>
+        <hr>
+        <h3>Legend</h3>
+        <div id="legend-have">
+          <h4 class="legend-header have-header">&#9650; HAVE Material</h4>
+          <div id="legend-have-items"></div>
+        </div>
+        <div id="legend-need">
+          <h4 class="legend-header need-header">&#9660; NEED Material</h4>
+          <div id="legend-need-items"></div>
+        </div>
+        <hr>
+        <button class="btn btn-primary btn-full" id="btn-drop-pin">
+          + Drop a Pin
+        </button>
+      </aside>
+
+      <!-- Map container -->
+      <div id="map">
+        <!-- Crosshair overlay for aiming -->
+        <div id="map-crosshair" style="display:none">
+          <div class="crosshair-v"></div>
+          <div class="crosshair-h"></div>
+          <div class="crosshair-dot"></div>
+        </div>
+        <!-- Floating instruction bar for pin dropping -->
+        <div id="drop-instruction" style="display:none">
+          <span id="drop-instruction-text">Move the map to position the crosshair, then tap Place Pin</span>
+          <button class="btn btn-sm" id="btn-place-pin" onclick="DirtLink.placePinAtCrosshair()" style="background:white;color:var(--primary);font-weight:700;">Place Pin</button>
+          <button class="btn btn-sm" id="btn-confirm-pin" onclick="DirtLink.confirmPinLocation()" style="display:none;background:white;color:var(--primary);font-weight:700;">Continue</button>
+          <button class="btn btn-sm btn-outline" onclick="DirtLink.cancelPinDrop()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- My Pins View -->
+    <div id="view-my-pins" class="view">
+      <div class="panel-content">
+        <h2>My Pins</h2>
+        <div id="my-pins-list" class="card-list">
+          <p class="empty-state">Log in to see your pins.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages View -->
+    <div id="view-messages" class="view">
+      <div class="messages-layout">
+        <div class="conversations-list" id="conversations-list">
+          <h3>Conversations</h3>
+          <div id="conv-list-items">
+            <p class="empty-state">No conversations yet.</p>
+          </div>
+        </div>
+        <div class="message-thread" id="message-thread">
+          <div class="thread-header" id="thread-header">
+            <p class="empty-state">Select a conversation</p>
+          </div>
+          <div class="thread-messages" id="thread-messages"></div>
+          <div class="thread-input" id="thread-input" style="display:none">
+            <textarea id="msg-input" placeholder="Type a message..." rows="2"></textarea>
+            <button class="btn btn-primary" id="btn-send-msg">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal: Welcome / Location -->
+  <div class="modal-overlay" id="modal-location" style="display:none">
+    <div class="modal">
+      <div class="welcome-logo">
+        <span class="logo-icon" style="font-size:36px">&#9650;</span>
+        <h2>Welcome to Dirt<strong style="color:var(--primary)">Link</strong></h2>
+      </div>
+      <p style="text-align:center; color:var(--text-muted); margin-bottom:20px;">
+        Connect with nearby sites that have or need earth materials.
+      </p>
+      <form id="form-location">
+        <div class="form-group">
+          <label for="location-input">Enter your city and province/state</label>
+          <input type="text" id="location-input" placeholder="e.g. Calgary, AB" required autofocus>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Go to My Area</button>
+        <button type="button" class="btn btn-outline btn-full" id="btn-skip-location" style="margin-top:8px">Skip &mdash; use my current location</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Auth -->
+  <div class="modal-overlay" id="modal-auth" style="display:none">
+    <div class="modal">
+      <button class="modal-close" onclick="document.getElementById('modal-auth').style.display='none'">&times;</button>
+      <div id="auth-tabs">
+        <button class="tab active" data-tab="login">Log In</button>
+        <button class="tab" data-tab="register">Sign Up</button>
+      </div>
+      <form id="form-login" class="auth-form">
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit" class="btn btn-primary btn-full">Log In</button>
+        <p class="auth-error" id="login-error"></p>
+      </form>
+      <form id="form-register" class="auth-form" style="display:none">
+        <input type="text" name="company_name" placeholder="Company Name" required>
+        <input type="text" name="contact_name" placeholder="Your Name" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="tel" name="phone" placeholder="Phone (optional)">
+        <input type="password" name="password" placeholder="Password (min 6 chars)" required minlength="6">
+        <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+        <p class="auth-error" id="register-error"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Drop Pin -->
+  <div class="modal-overlay" id="modal-pin" style="display:none">
+    <div class="modal modal-lg">
+      <button class="modal-close" onclick="document.getElementById('modal-pin').style.display='none'; window.DirtLink.cancelPinDrop(); window.DirtLink._editingPinId=null; document.getElementById('pin-modal-title').textContent='Drop a Pin';">&times;</button>
+      <h2 id="pin-modal-title">Drop a Pin</h2>
+      <p id="pin-location-hint" class="hint">Click on the map to set the location</p>
+      <form id="form-pin">
+        <input type="hidden" name="latitude" id="pin-lat">
+        <input type="hidden" name="longitude" id="pin-lng">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>I...</label>
+            <div class="pin-type-select">
+              <label class="radio-card have-card">
+                <input type="radio" name="pin_type" value="have" required>
+                <span>&#9650; HAVE material to get rid of</span>
+              </label>
+              <label class="radio-card need-card">
+                <input type="radio" name="pin_type" value="need" required>
+                <span>&#9660; NEED material delivered</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pin-material">Material Type</label>
+            <select name="material_type" id="pin-material" required>
+              <option value="">Select material...</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pin-title">Title / Site Name</label>
+            <input type="text" name="title" id="pin-title" placeholder="e.g. Downtown condo excavation" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pin-desc">Description</label>
+            <textarea name="description" id="pin-desc" rows="3" placeholder="Describe the material, access conditions, availability timeline..."></textarea>
+          </div>
+        </div>
+
+        <div class="form-row two-col">
+          <div class="form-group">
+            <label for="pin-qty">Estimated Quantity</label>
+            <input type="text" name="quantity_estimate" id="pin-qty" placeholder="e.g. 500">
+          </div>
+          <div class="form-group">
+            <label for="pin-unit">Unit</label>
+            <select name="quantity_unit" id="pin-unit">
+              <option value="cubic_yards">Cubic Yards</option>
+              <option value="cubic_meters">Cubic Meters</option>
+              <option value="tonnes">Tonnes</option>
+              <option value="loads">Truck Loads</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pin-address">Address (optional)</label>
+            <input type="text" name="address" id="pin-address" placeholder="123 Main St, City">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" name="is_tested" id="pin-tested" value="true">
+              Material has been tested
+            </label>
+          </div>
+        </div>
+
+        <div class="form-row" id="test-report-row" style="display:none">
+          <div class="form-group">
+            <label for="pin-report">Upload Test Report (PDF, JPG, PNG, DOC - max 10MB)</label>
+            <input type="file" name="test_report" id="pin-report" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pin-photos">Photos of Material (up to 5 images)</label>
+            <input type="file" name="photos" id="pin-photos" accept=".jpg,.jpeg,.png,.webp,.heic" multiple>
+            <div id="photo-preview" class="photo-preview"></div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full" id="btn-submit-pin" disabled>
+          Set Location on Map First
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Pin Detail -->
+  <div class="modal-overlay" id="modal-pin-detail" style="display:none">
+    <div class="modal modal-lg">
+      <button class="modal-close" onclick="document.getElementById('modal-pin-detail').style.display='none'">&times;</button>
+      <div id="pin-detail-content"></div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/js/materials.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/map.js"></script>
+  <script src="/js/messaging.js"></script>
+</body>
+</html>
