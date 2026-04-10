@@ -22,10 +22,10 @@ window.CATEGORIES = {
     haveColor: '#e67e22',
     needColor: '#3498db',    // light blue
     subcategories: {
-      concrete_crush:   { label: 'Concrete Crush',       description: 'Recycled crushed concrete aggregate' },
-      asphalt_millings: { label: 'Asphalt Millings',     description: 'Recycled ground asphalt, good for base/driveways' },
-      gravel:           { label: 'Gravel / Crushed Stone',description: 'Drainage material, base course aggregate' },
-      sand:             { label: 'Sand',                  description: 'Bedding sand, backfill, concrete mix sand' }
+      concrete_crush:   { label: 'Concrete Crush',        description: 'Recycled crushed concrete aggregate' },
+      asphalt_millings: { label: 'Asphalt Millings',      description: 'Recycled ground asphalt, good for base/driveways' },
+      gravel:           { label: 'Gravel / Crushed Stone', description: 'Drainage material, base course aggregate' },
+      sand:             { label: 'Sand',                   description: 'Bedding sand, backfill, concrete mix sand' }
     }
   },
   organic: {
@@ -41,8 +41,8 @@ window.CATEGORIES = {
     haveColor: '#d35400',    // dark orange
     needColor: '#2c3e50',    // dark navy
     subcategories: {
-      rock_boulders:      { label: 'Rock / Boulders',    description: 'Large rock, rip-rap, erosion control material' },
-      demolition_rubble:  { label: 'Demolition Rubble',  description: 'Mixed demolition material (may require special handling)' }
+      rock_boulders:     { label: 'Rock / Boulders',   description: 'Large rock, rip-rap, erosion control material' },
+      demolition_rubble: { label: 'Demolition Rubble', description: 'Mixed demolition material (may require special handling)' }
     }
   }
 };

@@ -1,5 +1,10 @@
 node_modules/
 data/
-uploads/reports/
-uploads/photos/
+uploads/reports/*
+uploads/photos/*
+!uploads/reports/.gitkeep
+!uploads/photos/.gitkeep
 .env
+.DS_Store
+.claude/
+Claude Skills/

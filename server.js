@@ -8,6 +8,10 @@ const { getDb } = require('./database/init');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const isProd = process.env.NODE_ENV === 'production';
+
+// Trust Fly.io / reverse-proxy so secure cookies work over HTTPS
+if (isProd) app.set('trust proxy', 1);
 
 // Ensure uploads directories exist
 fs.mkdirSync(path.join(__dirname, 'uploads', 'reports'), { recursive: true });
@@ -21,7 +25,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'dev-secret',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false, maxAge: 7 * 24 * 60 * 60 * 1000 } // 7 days
+  cookie: { secure: isProd, maxAge: 7 * 24 * 60 * 60 * 1000 } // 7 days
 }));
 
 // Static files

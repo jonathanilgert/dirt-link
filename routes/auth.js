@@ -10,8 +10,8 @@ const router = express.Router();
 router.post('/register', (req, res) => {
   const { email, password, company_name, contact_name, phone } = req.body;
 
-  if (!email || !password || !company_name || !contact_name) {
-    return res.status(400).json({ error: 'Email, password, company name, and contact name are required' });
+  if (!email || !password || !company_name || !contact_name || !phone) {
+    return res.status(400).json({ error: 'All fields including phone number are required' });
   }
 
   const existing = get('SELECT id FROM users WHERE email = ?', [email]);
@@ -24,7 +24,7 @@ router.post('/register', (req, res) => {
 
   run(
     `INSERT INTO users (id, email, password_hash, company_name, contact_name, phone) VALUES (?, ?, ?, ?, ?, ?)`,
-    [id, email, password_hash, company_name, contact_name, phone || null]
+    [id, email, password_hash, company_name, contact_name, phone]
   );
 
   req.session.userId = id;
@@ -77,6 +77,26 @@ router.put('/me', requireAuth, (req, res) => {
 
   const user = get('SELECT id, email, company_name, contact_name, phone, user_type FROM users WHERE id = ?', [req.session.userId]);
   res.json(user);
+});
+
+// Change password
+router.put('/password', requireAuth, (req, res) => {
+  const { current_password, new_password } = req.body;
+  if (!current_password || !new_password) {
+    return res.status(400).json({ error: 'Current and new password are required' });
+  }
+  if (new_password.length < 6) {
+    return res.status(400).json({ error: 'New password must be at least 6 characters' });
+  }
+
+  const user = get('SELECT * FROM users WHERE id = ?', [req.session.userId]);
+  if (!user || !bcrypt.compareSync(current_password, user.password_hash)) {
+    return res.status(401).json({ error: 'Current password is incorrect' });
+  }
+
+  const password_hash = bcrypt.hashSync(new_password, 10);
+  run(`UPDATE users SET password_hash = ?, updated_at = datetime('now') WHERE id = ?`, [password_hash, req.session.userId]);
+  res.json({ message: 'Password updated' });
 });
 
 module.exports = router;

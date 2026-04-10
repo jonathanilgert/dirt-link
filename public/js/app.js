@@ -39,13 +39,45 @@ window.DirtLink = {
     });
   },
 
-  // Build the color legend — just 4 categories, clean and simple
+  // Build the color legend — clickable to filter by category
   buildLegend() {
     const haveContainer = document.getElementById('legend-have-items');
     const needContainer = document.getElementById('legend-need-items');
+
     Object.entries(CATEGORIES).forEach(([key, cat]) => {
-      haveContainer.innerHTML += `<div class="legend-item"><span class="legend-dot" style="background:${cat.haveColor}"></span>${cat.label}</div>`;
-      needContainer.innerHTML += `<div class="legend-item"><span class="legend-dot" style="background:${cat.needColor}"></span>${cat.label}</div>`;
+      const haveItem = document.createElement('div');
+      haveItem.className = 'legend-item';
+      haveItem.dataset.cat = key;
+      haveItem.innerHTML = `<span class="legend-dot" style="background:${cat.haveColor}"></span>${cat.label}`;
+      haveContainer.appendChild(haveItem);
+
+      const needItem = document.createElement('div');
+      needItem.className = 'legend-item';
+      needItem.dataset.cat = key;
+      needItem.innerHTML = `<span class="legend-dot" style="background:${cat.needColor}"></span>${cat.label}`;
+      needContainer.appendChild(needItem);
+    });
+
+    document.querySelectorAll('.legend-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const cat = item.dataset.cat;
+        const select = document.getElementById('filter-material');
+        const isActive = item.classList.contains('active');
+
+        // Clear all active states
+        document.querySelectorAll('.legend-item').forEach(i => i.classList.remove('active'));
+
+        if (isActive) {
+          // Toggle off — reset filter
+          select.value = '';
+        } else {
+          // Activate this category — highlight both have + need rows
+          document.querySelectorAll(`.legend-item[data-cat="${cat}"]`).forEach(i => i.classList.add('active'));
+          select.value = 'cat:' + cat;
+        }
+
+        this.applyFilters();
+      });
     });
   },
 
@@ -68,6 +100,68 @@ window.DirtLink = {
     document.getElementById('btn-login').addEventListener('click', () => this.showAuthModal('login'));
     document.getElementById('btn-register').addEventListener('click', () => this.showAuthModal('register'));
     document.getElementById('btn-logout').addEventListener('click', () => this.logout());
+    document.getElementById('btn-profile').addEventListener('click', () => this.showProfileModal());
+
+    // Profile tabs
+    document.querySelectorAll('.profile-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('form-profile').style.display = tab.dataset.ptab === 'details' ? 'flex' : 'none';
+        document.getElementById('form-password').style.display = tab.dataset.ptab === 'password' ? 'flex' : 'none';
+        document.getElementById('profile-error').textContent = '';
+        document.getElementById('profile-success').textContent = '';
+        document.getElementById('password-error').textContent = '';
+        document.getElementById('password-success').textContent = '';
+      });
+    });
+
+    // Profile form
+    document.getElementById('form-profile').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const res = await fetch('/api/auth/me', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          company_name: document.getElementById('profile-company').value,
+          contact_name: document.getElementById('profile-contact').value,
+          phone:        document.getElementById('profile-phone').value
+        })
+      });
+      if (res.ok) {
+        this.user = await res.json();
+        this.updateAuthUI();
+        document.getElementById('profile-success').textContent = 'Changes saved.';
+        document.getElementById('profile-error').textContent = '';
+      } else {
+        const err = await res.json();
+        document.getElementById('profile-error').textContent = err.error;
+      }
+    });
+
+    // Password form
+    document.getElementById('form-password').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const newPw  = document.getElementById('pw-new').value;
+      const confPw = document.getElementById('pw-confirm').value;
+      if (newPw !== confPw) {
+        document.getElementById('password-error').textContent = 'Passwords do not match.';
+        return;
+      }
+      const res = await fetch('/api/auth/password', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ current_password: document.getElementById('pw-current').value, new_password: newPw })
+      });
+      if (res.ok) {
+        document.getElementById('password-success').textContent = 'Password updated.';
+        document.getElementById('password-error').textContent = '';
+        document.getElementById('form-password').reset();
+      } else {
+        const err = await res.json();
+        document.getElementById('password-error').textContent = err.error;
+      }
+    });
 
     // Auth tabs
     document.querySelectorAll('#auth-tabs .tab').forEach(tab => {
@@ -85,6 +179,15 @@ window.DirtLink = {
 
     // Drop pin
     document.getElementById('btn-drop-pin').addEventListener('click', () => this.startPinDrop());
+    document.getElementById('btn-add-pin-quick').addEventListener('click', () => {
+      // Switch to map view then start pin drop
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelector('[data-view="map"]').classList.add('active');
+      document.getElementById('view-map').classList.add('active');
+      window.map.invalidateSize();
+      this.startPinDrop();
+    });
 
     // Pin form
     document.getElementById('form-pin').addEventListener('submit', e => this.handlePinSubmit(e));
@@ -116,7 +219,10 @@ window.DirtLink = {
         this.applyFilters();
       });
     });
-    document.getElementById('filter-material').addEventListener('change', () => this.applyFilters());
+    document.getElementById('filter-material').addEventListener('change', () => {
+      document.querySelectorAll('.legend-item').forEach(i => i.classList.remove('active'));
+      this.applyFilters();
+    });
     document.getElementById('filter-tested').addEventListener('change', () => this.applyFilters());
     document.getElementById('filter-my-company').addEventListener('change', () => this.applyFilters());
   },
@@ -146,12 +252,31 @@ window.DirtLink = {
       document.getElementById('auth-area').style.display = 'none';
       document.getElementById('user-area').style.display = 'flex';
       document.getElementById('user-company').textContent = this.user.company_name;
+      const initial = (this.user.company_name || '?')[0].toUpperCase();
+      document.querySelectorAll('#profile-avatar, #profile-avatar-lg').forEach(el => el.textContent = initial);
       document.getElementById('filter-company-group').style.display = 'block';
     } else {
       document.getElementById('auth-area').style.display = 'flex';
       document.getElementById('user-area').style.display = 'none';
       document.getElementById('filter-company-group').style.display = 'none';
     }
+  },
+
+  showProfileModal() {
+    document.getElementById('profile-company').value  = this.user.company_name || '';
+    document.getElementById('profile-contact').value  = this.user.contact_name || '';
+    document.getElementById('profile-phone').value    = this.user.phone || '';
+    document.getElementById('profile-email').value    = this.user.email || '';
+    document.getElementById('profile-heading').textContent = this.user.company_name;
+    const joined = this.user.created_at ? new Date(this.user.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : '';
+    document.getElementById('profile-member-since').textContent = joined ? `Member since ${joined}` : '';
+    // Reset tabs to details
+    document.querySelectorAll('.profile-tab').forEach(t => t.classList.toggle('active', t.dataset.ptab === 'details'));
+    document.getElementById('form-profile').style.display = 'flex';
+    document.getElementById('form-password').style.display = 'none';
+    document.getElementById('profile-error').textContent = '';
+    document.getElementById('profile-success').textContent = '';
+    document.getElementById('modal-profile').style.display = 'flex';
   },
 
   async handleLogin(e) {

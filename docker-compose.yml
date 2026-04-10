@@ -1,0 +1,13 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    env_file: .env
+    volumes:
+      - dirtlink_data:/app/data
+      - dirtlink_uploads:/app/uploads
+
+volumes:
+  dirtlink_data:
+  dirtlink_uploads:
