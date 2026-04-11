@@ -65,6 +65,8 @@ app.get('/api/geocode', async (req, res) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/pins', require('./routes/pins'));
 app.use('/api/messages', require('./routes/messages'));
+app.use('/api/keys', require('./routes/apiKeys'));
+app.use('/api/external', require('./routes/externalApi'));
 
 // SPA fallback
 app.get('*', (req, res) => {

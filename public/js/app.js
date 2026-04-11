@@ -11,6 +11,7 @@ window.DirtLink = {
     this.bindEvents();
     await this.checkAuth();
     await this.loadPins();
+    await this.loadExternalPins();
     this.pollUnread();
   },
 
@@ -323,6 +324,23 @@ window.DirtLink = {
     await fetch('/api/auth/logout', { method: 'POST' });
     this.user = null;
     this.updateAuthUI();
+  },
+
+  // Load external pins (permit + permanent) from API
+  async loadExternalPins() {
+    try {
+      const [permitRes, permanentRes] = await Promise.all([
+        fetch('/api/pins/permits'),
+        fetch('/api/pins/permanent')
+      ]);
+      window._permitPins = permitRes.ok ? await permitRes.json() : [];
+      window._permanentPins = permanentRes.ok ? await permanentRes.json() : [];
+      // Re-render to include them
+      if (window._permitPins.length || window._permanentPins.length) {
+        window._permitPins.forEach(p => window.addPermitPinToMap(p));
+        window._permanentPins.forEach(p => window.addPermanentPinToMap(p));
+      }
+    } catch (e) { console.error('Failed to load external pins', e); }
   },
 
   // Pins

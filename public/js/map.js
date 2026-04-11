@@ -167,10 +167,95 @@ function createPinIcon(pinType, materialType, isTested) {
   });
 }
 
-// Render all pins on the map
+// Create icon for opaque (unclaimed) permit pins — semi-transparent upright triangle
+function createPermitPinIcon() {
+  const size = 38;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="filter:drop-shadow(0 2px 4px rgba(0,0,0,0.2));display:block;">
+    <polygon points="19,4 35,34 3,34" fill="rgba(120,120,120,0.45)" stroke="rgba(80,80,80,0.6)" stroke-width="2" stroke-linejoin="round"/>
+    <text x="19" y="26" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="rgba(60,60,60,0.7)" font-weight="700" font-family="Inter,sans-serif">?</text>
+  </svg>`;
+  return L.divIcon({
+    className: 'custom-pin permit-pin',
+    html: svg,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size],
+    popupAnchor: [0, -size]
+  });
+}
+
+// Create icon for permanent site pins — square with distinct color
+function createPermanentPinIcon(siteType) {
+  const size = 34;
+  const color = siteType === 'landfill' ? '#6B4C9A' : siteType === 'transfer_station' ? '#2C7A7B' : '#8B5E3C';
+  const label = siteType === 'landfill' ? 'LF' : siteType === 'transfer_station' ? 'TS' : 'PS';
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));display:block;">
+    <rect x="2" y="2" width="30" height="30" rx="5" fill="${color}" stroke="white" stroke-width="2.5"/>
+    <text x="17" y="19" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="white" font-weight="700" font-family="Inter,sans-serif">${label}</text>
+  </svg>`;
+  return L.divIcon({
+    className: 'custom-pin permanent-pin',
+    html: svg,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size],
+    popupAnchor: [0, -size]
+  });
+}
+
+// Render all pins on the map (includes standard, permit, and permanent)
 window.renderPins = function(pins) {
   pinMarkers.clearLayers();
   pins.forEach(pin => addPinToMap(pin));
+  // Also render permit and permanent pins
+  if (window._permitPins) window._permitPins.forEach(p => addPermitPinToMap(p));
+  if (window._permanentPins) window._permanentPins.forEach(p => addPermanentPinToMap(p));
+};
+
+// Add permit pin to map
+window.addPermitPinToMap = function(pin) {
+  const icon = createPermitPinIcon();
+  const marker = L.marker([pin.latitude, pin.longitude], { icon });
+  marker.bindPopup(`
+    <div class="pin-popup">
+      <div class="pp-header" style="background:#888">
+        <span class="pp-type">&#9650; PERMIT</span>
+        <span class="pp-material">${pin.permit_type}</span>
+      </div>
+      <div class="pp-body">
+        <div class="pp-title">${DirtLink.escapeHtml(pin.address)}</div>
+        <div class="pp-company">Permit #${DirtLink.escapeHtml(pin.permit_number)}</div>
+        <div class="pp-qty">${DirtLink.escapeHtml(pin.permit_date)}</div>
+        ${pin.project_description ? `<div class="pp-qty">${DirtLink.escapeHtml(pin.project_description)}</div>` : ''}
+        <div style="margin-top:6px;font-size:11px;color:#888;">Unclaimed — verify to claim this site</div>
+      </div>
+    </div>
+  `, { maxWidth: 260, className: 'dl-popup' });
+  pinMarkers.addLayer(marker);
+};
+
+// Add permanent site pin to map
+window.addPermanentPinToMap = function(pin) {
+  const icon = createPermanentPinIcon(pin.site_type);
+  const marker = L.marker([pin.latitude, pin.longitude], { icon });
+  const typeLabel = (pin.site_type || '').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  marker.bindPopup(`
+    <div class="pin-popup">
+      <div class="pp-header" style="background:${pin.site_type === 'landfill' ? '#6B4C9A' : pin.site_type === 'transfer_station' ? '#2C7A7B' : '#8B5E3C'}">
+        <span class="pp-type">&#9632; ${typeLabel}</span>
+      </div>
+      <div class="pp-body">
+        <div class="pp-title">${DirtLink.escapeHtml(pin.site_name)}</div>
+        <div class="pp-company">${DirtLink.escapeHtml(pin.address)}</div>
+        ${pin.hours_of_operation ? `<div class="pp-qty">Hours: ${DirtLink.escapeHtml(pin.hours_of_operation)}</div>` : ''}
+        ${pin.accepted_materials ? `<div class="pp-qty">Accepts: ${DirtLink.escapeHtml(pin.accepted_materials)}</div>` : ''}
+        ${pin.rates_fees ? `<div class="pp-qty">Rates: ${DirtLink.escapeHtml(pin.rates_fees)}</div>` : ''}
+        ${pin.contact_phone ? `<div class="pp-qty">Phone: ${DirtLink.escapeHtml(pin.contact_phone)}</div>` : ''}
+        ${pin.website_url ? `<div class="pp-qty"><a href="${DirtLink.escapeHtml(pin.website_url)}" target="_blank" rel="noopener">Website</a></div>` : ''}
+        ${pin.notes ? `<div class="pp-qty">${DirtLink.escapeHtml(pin.notes)}</div>` : ''}
+        <div style="margin-top:6px;font-size:11px;color:#888;">Permanent site</div>
+      </div>
+    </div>
+  `, { maxWidth: 280, className: 'dl-popup' });
+  pinMarkers.addLayer(marker);
 };
 
 // Add a single pin to the map

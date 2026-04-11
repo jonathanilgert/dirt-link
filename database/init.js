@@ -93,6 +93,79 @@ async function getDb() {
     )
   `);
 
+  // API keys for external integrations (e.g. Hubert AI agent)
+  db.run(`
+    CREATE TABLE IF NOT EXISTS api_keys (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      key_hash TEXT UNIQUE NOT NULL,
+      created_by TEXT NOT NULL,
+      is_active INTEGER NOT NULL DEFAULT 1,
+      last_used_at TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      revoked_at TEXT
+    )
+  `);
+
+  // Development permit pins (opaque/unclaimed)
+  db.run(`
+    CREATE TABLE IF NOT EXISTS permit_pins (
+      id TEXT PRIMARY KEY,
+      latitude REAL NOT NULL,
+      longitude REAL NOT NULL,
+      address TEXT NOT NULL,
+      permit_number TEXT NOT NULL,
+      permit_type TEXT NOT NULL,
+      permit_date TEXT NOT NULL,
+      project_description TEXT,
+      estimated_project_size TEXT,
+      status TEXT NOT NULL DEFAULT 'unclaimed',
+      is_active INTEGER NOT NULL DEFAULT 1,
+      created_by_key TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `);
+
+  // Permanent site pins (landfills, transfer stations)
+  db.run(`
+    CREATE TABLE IF NOT EXISTS permanent_pins (
+      id TEXT PRIMARY KEY,
+      latitude REAL NOT NULL,
+      longitude REAL NOT NULL,
+      site_name TEXT NOT NULL,
+      site_type TEXT NOT NULL,
+      address TEXT NOT NULL,
+      contact_phone TEXT,
+      contact_email TEXT,
+      hours_of_operation TEXT,
+      accepted_materials TEXT,
+      rates_fees TEXT,
+      website_url TEXT,
+      notes TEXT,
+      is_active INTEGER NOT NULL DEFAULT 1,
+      created_by_key TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `);
+
+  // Audit log for API calls
+  db.run(`
+    CREATE TABLE IF NOT EXISTS audit_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      api_key_id TEXT,
+      api_key_name TEXT,
+      method TEXT NOT NULL,
+      path TEXT NOT NULL,
+      status_code INTEGER,
+      duration_ms INTEGER,
+      request_body TEXT,
+      ip_address TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `);
+
   // Create indexes (IF NOT EXISTS not supported for indexes in all versions, use try/catch)
   const indexes = [
     'CREATE INDEX IF NOT EXISTS idx_pins_active ON pins(is_active)',
@@ -102,7 +175,15 @@ async function getDb() {
     'CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(conversation_id)',
     'CREATE INDEX IF NOT EXISTS idx_conversations_initiator ON conversations(initiator_id)',
     'CREATE INDEX IF NOT EXISTS idx_conversations_owner ON conversations(owner_id)',
-    'CREATE INDEX IF NOT EXISTS idx_pin_photos ON pin_photos(pin_id)'
+    'CREATE INDEX IF NOT EXISTS idx_pin_photos ON pin_photos(pin_id)',
+    'CREATE INDEX IF NOT EXISTS idx_api_keys_hash ON api_keys(key_hash)',
+    'CREATE INDEX IF NOT EXISTS idx_permit_pins_status ON permit_pins(status)',
+    'CREATE INDEX IF NOT EXISTS idx_permit_pins_active ON permit_pins(is_active)',
+    'CREATE INDEX IF NOT EXISTS idx_permit_pins_permit ON permit_pins(permit_number)',
+    'CREATE INDEX IF NOT EXISTS idx_permanent_pins_active ON permanent_pins(is_active)',
+    'CREATE INDEX IF NOT EXISTS idx_permanent_pins_type ON permanent_pins(site_type)',
+    'CREATE INDEX IF NOT EXISTS idx_audit_log_key ON audit_log(api_key_id)',
+    'CREATE INDEX IF NOT EXISTS idx_audit_log_created ON audit_log(created_at)'
   ];
   indexes.forEach(sql => { try { db.run(sql); } catch(e) {} });
 

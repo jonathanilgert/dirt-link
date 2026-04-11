@@ -39,6 +39,18 @@ const pinUpload = upload.fields([
   { name: 'photos', maxCount: 5 }
 ]);
 
+// Get all active permit pins (public — for map display)
+router.get('/permits', (req, res) => {
+  const pins = all(`SELECT * FROM permit_pins WHERE is_active = 1 ORDER BY created_at DESC`);
+  res.json(pins);
+});
+
+// Get all active permanent pins (public — for map display)
+router.get('/permanent', (req, res) => {
+  const pins = all(`SELECT * FROM permanent_pins WHERE is_active = 1 ORDER BY created_at DESC`);
+  res.json(pins);
+});
+
 // Get my pins (must be before /:id to avoid route conflict)
 router.get('/user/mine', requireAuth, (req, res) => {
   const pins = all(
