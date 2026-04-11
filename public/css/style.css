@@ -2286,6 +2286,14 @@ main {
   opacity: 0.9;
 }
 
+.filter-tier-hint {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  padding-left: 22px;
+}
+
 /* ---- Map popup timeline rows ---- */
 .pp-now {
   display: flex;
