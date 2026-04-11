@@ -144,7 +144,7 @@ async function geocodeAndCenter(query) {
 }
 
 // Create a custom colored marker — polished SVG triangles
-function createPinIcon(pinType, materialType, isTested) {
+function createPinIcon(pinType, materialType, isTested, isNow) {
   const color = getPinColor(pinType, materialType);
   const isHave = pinType === 'have';
   const size = 38;
@@ -153,13 +153,24 @@ function createPinIcon(pinType, materialType, isTested) {
   const points = isHave ? '19,4 35,34 3,34' : '19,34 35,4 3,4';
   const checkY  = isHave ? '26' : '14';
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="filter:drop-shadow(0 2px 5px rgba(0,0,0,0.35)) drop-shadow(0 1px 2px rgba(0,0,0,0.18));display:block;">
+  // Urgent glow for "now" pins
+  const glowFilter = isNow
+    ? 'filter:drop-shadow(0 0 6px rgba(239,68,68,0.7)) drop-shadow(0 0 12px rgba(239,68,68,0.4)) drop-shadow(0 2px 5px rgba(0,0,0,0.35));display:block;'
+    : 'filter:drop-shadow(0 2px 5px rgba(0,0,0,0.35)) drop-shadow(0 1px 2px rgba(0,0,0,0.18));display:block;';
+
+  // "Now" badge — small pulsing dot at the top
+  const nowBadge = isNow
+    ? `<circle cx="30" cy="8" r="5" fill="#ef4444" stroke="white" stroke-width="1.5"><animate attributeName="r" values="4;6;4" dur="1.5s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0.7;1" dur="1.5s" repeatCount="indefinite"/></circle>`
+    : '';
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="${glowFilter}">
     <polygon points="${points}" fill="${color}" stroke="white" stroke-width="2.5" stroke-linejoin="round"/>
     ${isTested ? `<text x="19" y="${checkY}" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="white" font-weight="700" font-family="Inter,sans-serif">✓</text>` : ''}
+    ${nowBadge}
   </svg>`;
 
   return L.divIcon({
-    className: 'custom-pin',
+    className: 'custom-pin' + (isNow ? ' pin-now' : ''),
     html: svg,
     iconSize:    [size, size],
     iconAnchor:  [size / 2, isHave ? size : 0],
@@ -249,7 +260,8 @@ window.addPermanentPinToMap = function(pin) {
 
 // Add a single pin to the map
 window.addPinToMap = function(pin) {
-  const icon = createPinIcon(pin.pin_type, pin.material_type, pin.is_tested);
+  const isNow = pin.timeline_date === 'now';
+  const icon = createPinIcon(pin.pin_type, pin.material_type, pin.is_tested, isNow);
   const marker = L.marker([pin.latitude, pin.longitude], { icon });
 
   const color = getPinColor(pin.pin_type, pin.material_type);
@@ -258,6 +270,17 @@ window.addPinToMap = function(pin) {
   const qty = pin.quantity_estimate
     ? `~${pin.quantity_estimate} ${(pin.quantity_unit || '').replace('_', ' ')}`
     : null;
+
+  // Timeline display in popup
+  let timelinePopup = '';
+  if (isNow) {
+    timelinePopup = '<div class="pp-now"><span class="pp-now-dot"></span>Active Now</div>';
+  } else if (pin.timeline_date) {
+    const d = new Date(pin.timeline_date + 'T00:00');
+    const today = new Date(); today.setHours(0,0,0,0);
+    const isPast = d < today;
+    timelinePopup = `<div class="pp-timeline ${isPast ? 'pp-stale' : ''}">${isPast ? '⚠ ' : ''}${isHave ? 'Remove by' : 'Need by'}: ${d.toLocaleDateString()}</div>`;
+  }
 
   marker.bindPopup(`
     <div class="pin-popup">
@@ -270,6 +293,7 @@ window.addPinToMap = function(pin) {
         <div class="pp-title">${DirtLink.escapeHtml(pin.title)}</div>
         <div class="pp-company">${DirtLink.escapeHtml(pin.company_name)}</div>
         ${qty ? `<div class="pp-qty">${qty}</div>` : ''}
+        ${timelinePopup}
         <a class="pp-action" href="#" onclick="event.preventDefault(); DirtLink.showPinDetail('${pin.id}')" style="color:${color}">View Details &#8594;</a>
       </div>
     </div>

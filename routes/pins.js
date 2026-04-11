@@ -105,7 +105,7 @@ router.get('/:id', (req, res) => {
 
 // Create pin
 router.post('/', requireAuth, pinUpload, (req, res) => {
-  const { pin_type, material_type, latitude, longitude, address, title, description, quantity_estimate, quantity_unit, is_tested } = req.body;
+  const { pin_type, material_type, latitude, longitude, address, title, description, quantity_estimate, quantity_unit, is_tested, timeline_date } = req.body;
 
   if (!pin_type || !material_type || !latitude || !longitude || !title) {
     return res.status(400).json({ error: 'pin_type, material_type, latitude, longitude, and title are required' });
@@ -116,14 +116,15 @@ router.post('/', requireAuth, pinUpload, (req, res) => {
   const test_report_path = reportFile ? `/uploads/reports/${reportFile.filename}` : null;
 
   run(
-    `INSERT INTO pins (id, user_id, pin_type, material_type, latitude, longitude, address, title, description, quantity_estimate, quantity_unit, is_tested, test_report_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO pins (id, user_id, pin_type, material_type, latitude, longitude, address, title, description, quantity_estimate, quantity_unit, is_tested, test_report_path, timeline_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       id, req.session.userId, pin_type, material_type,
       parseFloat(latitude), parseFloat(longitude),
       address || null, title, description || null,
       quantity_estimate || null, quantity_unit || 'cubic_yards',
       is_tested === 'true' || is_tested === '1' ? 1 : 0,
-      test_report_path
+      test_report_path,
+      timeline_date || null
     ]
   );
 
@@ -149,18 +150,22 @@ router.put('/:id', requireAuth, pinUpload, (req, res) => {
   const pin = get('SELECT * FROM pins WHERE id = ? AND user_id = ?', [req.params.id, req.session.userId]);
   if (!pin) return res.status(404).json({ error: 'Pin not found or not yours' });
 
-  const { title, description, quantity_estimate, quantity_unit, is_tested, is_active, material_type, latitude, longitude, pin_type, address } = req.body;
+  const { title, description, quantity_estimate, quantity_unit, is_tested, is_active, material_type, latitude, longitude, pin_type, address, timeline_date } = req.body;
   const reportFile = req.files?.test_report?.[0];
   const test_report_path = reportFile ? `/uploads/reports/${reportFile.filename}` : pin.test_report_path;
 
+  // timeline_date: allow setting to 'now', a date string, or clearing with empty string
+  const timelineValue = timeline_date === '' ? null : (timeline_date !== undefined ? timeline_date : undefined);
+
   run(
-    `UPDATE pins SET title = COALESCE(?, title), description = COALESCE(?, description), quantity_estimate = COALESCE(?, quantity_estimate), quantity_unit = COALESCE(?, quantity_unit), material_type = COALESCE(?, material_type), is_tested = COALESCE(?, is_tested), test_report_path = COALESCE(?, test_report_path), is_active = COALESCE(?, is_active), latitude = COALESCE(?, latitude), longitude = COALESCE(?, longitude), pin_type = COALESCE(?, pin_type), address = COALESCE(?, address), updated_at = datetime('now') WHERE id = ?`,
+    `UPDATE pins SET title = COALESCE(?, title), description = COALESCE(?, description), quantity_estimate = COALESCE(?, quantity_estimate), quantity_unit = COALESCE(?, quantity_unit), material_type = COALESCE(?, material_type), is_tested = COALESCE(?, is_tested), test_report_path = COALESCE(?, test_report_path), is_active = COALESCE(?, is_active), latitude = COALESCE(?, latitude), longitude = COALESCE(?, longitude), pin_type = COALESCE(?, pin_type), address = COALESCE(?, address), timeline_date = CASE WHEN ? = 1 THEN ? ELSE timeline_date END, updated_at = datetime('now') WHERE id = ?`,
     [
       title, description, quantity_estimate, quantity_unit, material_type,
       is_tested !== undefined ? (is_tested === 'true' || is_tested === '1' ? 1 : 0) : null,
       test_report_path, is_active !== undefined ? parseInt(is_active) : null,
       latitude ? parseFloat(latitude) : null, longitude ? parseFloat(longitude) : null,
       pin_type || null, address,
+      timelineValue !== undefined ? 1 : 0, timelineValue !== undefined ? timelineValue : null,
       req.params.id
     ]
   );
@@ -187,14 +192,18 @@ router.patch('/:id', requireAuth, (req, res) => {
   const pin = get('SELECT * FROM pins WHERE id = ? AND user_id = ?', [req.params.id, req.session.userId]);
   if (!pin) return res.status(404).json({ error: 'Pin not found or not yours' });
 
-  const { is_active, latitude, longitude } = req.body;
+  const { is_active, latitude, longitude, timeline_date } = req.body;
+
+  // timeline_date: allow setting to 'now', a date string, or clearing with empty string/null
+  const timelineValue = timeline_date === '' ? null : (timeline_date !== undefined ? timeline_date : undefined);
 
   run(
-    `UPDATE pins SET is_active = COALESCE(?, is_active), latitude = COALESCE(?, latitude), longitude = COALESCE(?, longitude), updated_at = datetime('now') WHERE id = ?`,
+    `UPDATE pins SET is_active = COALESCE(?, is_active), latitude = COALESCE(?, latitude), longitude = COALESCE(?, longitude), timeline_date = CASE WHEN ? = 1 THEN ? ELSE timeline_date END, updated_at = datetime('now') WHERE id = ?`,
     [
       is_active !== undefined ? parseInt(is_active) : null,
       latitude !== undefined ? parseFloat(latitude) : null,
       longitude !== undefined ? parseFloat(longitude) : null,
+      timelineValue !== undefined ? 1 : 0, timelineValue !== undefined ? timelineValue : null,
       req.params.id
     ]
   );

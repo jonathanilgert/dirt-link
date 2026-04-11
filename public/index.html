@@ -67,6 +67,12 @@
           <div class="filter-group">
             <label><input type="checkbox" id="filter-tested"> Tested materials only</label>
           </div>
+          <div class="filter-group">
+            <button class="filter-now-btn" id="filter-active-now">
+              <span class="now-pulse"></span>
+              Active Now
+            </button>
+          </div>
           <div class="filter-group" id="filter-company-group" style="display:none">
             <label><input type="checkbox" id="filter-my-company"> My company only</label>
           </div>
@@ -261,6 +267,17 @@
           <div class="form-group">
             <label for="pin-address">Address (optional)</label>
             <input type="text" name="address" id="pin-address" placeholder="123 Main St, City">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Project Timeline</label>
+            <div class="timeline-row">
+              <button type="button" class="btn btn-now" id="btn-pin-timeline-now">Now</button>
+              <input type="date" id="pin-timeline" name="timeline_date">
+            </div>
+            <p class="hint" id="pin-timeline-hint" style="display:none"></p>
           </div>
         </div>
 

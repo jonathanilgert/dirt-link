@@ -233,6 +233,27 @@ window.DirtLink = {
       });
     });
 
+    // Pin form timeline "Now" button
+    document.getElementById('btn-pin-timeline-now').addEventListener('click', () => {
+      document.getElementById('pin-timeline').value = 'now';
+      document.getElementById('pin-timeline-hint').style.display = 'block';
+      document.getElementById('pin-timeline-hint').textContent = 'Timeline set to: Immediate / Active';
+      document.getElementById('btn-pin-timeline-now').classList.add('active');
+    });
+    document.getElementById('pin-timeline').addEventListener('input', (e) => {
+      if (e.target.value && e.target.value !== 'now') {
+        document.getElementById('pin-timeline-hint').style.display = 'block';
+        document.getElementById('pin-timeline-hint').textContent = `Timeline: ${new Date(e.target.value + 'T00:00').toLocaleDateString()}`;
+        document.getElementById('btn-pin-timeline-now').classList.remove('active');
+      }
+    });
+
+    // Active Now filter
+    document.getElementById('filter-active-now').addEventListener('click', () => {
+      document.getElementById('filter-active-now').classList.toggle('active');
+      this.applyFilters();
+    });
+
     // Permit modal buttons
     document.getElementById('btn-permit-claim').addEventListener('click', () => this.startClaim());
     document.getElementById('btn-permit-inquire').addEventListener('click', () => this.startInquiry());
@@ -518,6 +539,8 @@ window.DirtLink = {
       document.getElementById('test-report-row').style.display = 'none';
       document.getElementById('photo-preview').innerHTML = '';
       document.getElementById('pin-modal-title').textContent = 'Drop a Pin';
+      document.getElementById('pin-timeline-hint').style.display = 'none';
+      document.getElementById('btn-pin-timeline-now').classList.remove('active');
       // Reload all pins to reflect changes
       await this.loadPins();
       this.loadMyPins();
@@ -533,6 +556,7 @@ window.DirtLink = {
     const materialFilter = document.getElementById('filter-material').value;
     const testedOnly = document.getElementById('filter-tested').checked;
     const myCompanyOnly = document.getElementById('filter-my-company').checked;
+    const activeNowOnly = document.getElementById('filter-active-now').classList.contains('active');
 
     const filtered = this.pins.filter(p => {
       if (pinType !== 'all' && p.pin_type !== pinType) return false;
@@ -547,6 +571,7 @@ window.DirtLink = {
       }
       if (testedOnly && !p.is_tested) return false;
       if (myCompanyOnly && this.user && p.company_name !== this.user.company_name) return false;
+      if (activeNowOnly && p.timeline_date !== 'now') return false;
       return true;
     });
 
@@ -567,7 +592,10 @@ window.DirtLink = {
       container.innerHTML = '<p class="empty-state">You haven\'t dropped any pins yet.</p>';
       return;
     }
-    container.innerHTML = pins.map(p => `
+    container.innerHTML = pins.map(p => {
+      const timelineHtml = this._getTimelineBadgeHtml(p);
+      const staleHtml = this._getStaleBadgeHtml(p);
+      return `
       <div class="pin-card ${p.pin_type}">
         <div class="pin-card-header">
           <span class="pin-type-badge" style="background:${getPinColor(p.pin_type, p.material_type)}">
@@ -575,8 +603,10 @@ window.DirtLink = {
           </span>
           <span class="pin-material">${MATERIALS[p.material_type]?.label || p.material_type}</span>
           ${p.is_tested ? '<span class="tested-badge">Tested</span>' : ''}
+          ${timelineHtml}
           <span class="pin-status ${p.is_active ? 'active' : 'inactive'}">${p.is_active ? 'Active' : 'Closed'}</span>
         </div>
+        ${staleHtml}
         <h4>${this.escapeHtml(p.title)}</h4>
         <p>${this.escapeHtml(p.description || '')}</p>
         ${p.quantity_estimate ? `<p class="pin-qty">${p.quantity_estimate} ${p.quantity_unit?.replace('_', ' ')}</p>` : ''}
@@ -596,7 +626,7 @@ window.DirtLink = {
           <button class="btn btn-sm btn-danger" onclick="DirtLink.deletePin('${p.id}')">Delete</button>
         </div>
       </div>
-    `).join('');
+    `}).join('');
   },
 
   // Edit pin — open form pre-filled with existing data
@@ -626,6 +656,23 @@ window.DirtLink = {
     document.getElementById('pin-address').value = pin.address || '';
     document.getElementById('pin-tested').checked = !!pin.is_tested;
     document.getElementById('test-report-row').style.display = pin.is_tested ? 'block' : 'none';
+
+    // Pre-fill timeline
+    if (pin.timeline_date === 'now') {
+      document.getElementById('pin-timeline').value = 'now';
+      document.getElementById('pin-timeline-hint').style.display = 'block';
+      document.getElementById('pin-timeline-hint').textContent = 'Timeline set to: Immediate / Active';
+      document.getElementById('btn-pin-timeline-now').classList.add('active');
+    } else if (pin.timeline_date) {
+      document.getElementById('pin-timeline').value = pin.timeline_date;
+      document.getElementById('pin-timeline-hint').style.display = 'block';
+      document.getElementById('pin-timeline-hint').textContent = `Timeline: ${new Date(pin.timeline_date + 'T00:00').toLocaleDateString()}`;
+      document.getElementById('btn-pin-timeline-now').classList.remove('active');
+    } else {
+      document.getElementById('pin-timeline').value = '';
+      document.getElementById('pin-timeline-hint').style.display = 'none';
+      document.getElementById('btn-pin-timeline-now').classList.remove('active');
+    }
 
     // Set submit to update mode
     document.getElementById('btn-submit-pin').disabled = false;
@@ -737,6 +784,7 @@ window.DirtLink = {
     const pin = await res.json();
     const color = getPinColor(pin.pin_type, pin.material_type);
 
+    const timelineDetailHtml = this._getTimelineDetailHtml(pin);
     document.getElementById('pin-detail-content').innerHTML = `
       <div class="pin-detail">
         <div class="pin-detail-header" style="border-left: 4px solid ${color}">
@@ -745,9 +793,11 @@ window.DirtLink = {
           </span>
           <span class="pin-material-lg">${MATERIALS[pin.material_type]?.label || pin.material_type}</span>
           ${pin.is_tested ? '<span class="tested-badge">Tested</span>' : ''}
+          ${pin.timeline_date === 'now' ? '<span class="now-badge">Active Now</span>' : ''}
         </div>
         <h2>${this.escapeHtml(pin.title)}</h2>
         <p class="pin-company">${this.escapeHtml(pin.company_name)} &mdash; ${this.escapeHtml(pin.contact_name)}</p>
+        ${timelineDetailHtml}
         ${pin.description ? `<p class="pin-description">${this.escapeHtml(pin.description)}</p>` : ''}
         ${pin.quantity_estimate ? `<p><strong>Quantity:</strong> ~${pin.quantity_estimate} ${pin.quantity_unit?.replace('_', ' ')}</p>` : ''}
         ${pin.address ? `<p><strong>Address:</strong> ${this.escapeHtml(pin.address)}</p>` : ''}
@@ -1228,6 +1278,44 @@ window.DirtLink = {
 
     this._buildRevealGateOptions(document.getElementById('modal-reveal-gate-options'), { ...reveals, overageRate: rate, plan });
     document.getElementById('modal-reveal-gate').style.display = 'flex';
+  },
+
+  // Timeline helpers
+  _getTimelineBadgeHtml(pin) {
+    if (pin.timeline_date === 'now') {
+      return '<span class="now-badge">Active Now</span>';
+    }
+    if (pin.timeline_date && pin.timeline_date !== 'now') {
+      const d = new Date(pin.timeline_date + 'T00:00');
+      return `<span class="timeline-badge">${d.toLocaleDateString()}</span>`;
+    }
+    return '';
+  },
+
+  _getStaleBadgeHtml(pin) {
+    if (!pin.timeline_date || pin.timeline_date === 'now' || !pin.is_active) return '';
+    const d = new Date(pin.timeline_date + 'T00:00');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (d < today) {
+      return '<div class="stale-warning">Timeline date has passed — please update or mark as complete.</div>';
+    }
+    return '';
+  },
+
+  _getTimelineDetailHtml(pin) {
+    if (pin.timeline_date === 'now') {
+      return `<p class="timeline-detail now"><span class="now-pulse-inline"></span><strong>Active Now</strong> — material needs to be moved immediately</p>`;
+    }
+    if (pin.timeline_date) {
+      const d = new Date(pin.timeline_date + 'T00:00');
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const isPast = d < today;
+      const label = pin.pin_type === 'have' ? 'Material removal by' : 'Material needed by';
+      return `<p class="timeline-detail ${isPast ? 'stale' : ''}"><strong>${label}:</strong> ${d.toLocaleDateString()}${isPast ? ' <span class="stale-tag">Past due</span>' : ''}</p>`;
+    }
+    return '';
   },
 
   escapeHtml(str) {
