@@ -2277,6 +2277,9 @@ main {
   height: 8px;
   border-radius: 50%;
   background: #ef4444;
+}
+
+.filter-now-btn.active .now-pulse {
   animation: pulse-dot 1.5s ease-in-out infinite;
 }
 

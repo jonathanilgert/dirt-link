@@ -273,9 +273,10 @@
         <div class="form-row">
           <div class="form-group">
             <label>Project Timeline</label>
+            <input type="hidden" id="pin-timeline-value" name="timeline_date">
             <div class="timeline-row">
               <button type="button" class="btn btn-now" id="btn-pin-timeline-now">Now</button>
-              <input type="date" id="pin-timeline" name="timeline_date">
+              <input type="date" id="pin-timeline">
             </div>
             <p class="hint" id="pin-timeline-hint" style="display:none"></p>
           </div>
@@ -486,9 +487,10 @@
 
           <div class="form-group">
             <label>Project Timeline</label>
+            <input type="hidden" id="claim-timeline-value" name="timeline_date">
             <div class="timeline-row">
               <button type="button" class="btn btn-now" id="btn-timeline-now">Now</button>
-              <input type="date" id="claim-timeline" name="timeline_date">
+              <input type="date" id="claim-timeline">
             </div>
             <p class="hint" id="timeline-hint" style="display:none">Timeline set to: Immediate / Active</p>
           </div>

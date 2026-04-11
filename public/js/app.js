@@ -235,13 +235,15 @@ window.DirtLink = {
 
     // Pin form timeline "Now" button
     document.getElementById('btn-pin-timeline-now').addEventListener('click', () => {
-      document.getElementById('pin-timeline').value = 'now';
+      document.getElementById('pin-timeline').value = '';
+      document.getElementById('pin-timeline-value').value = 'now';
       document.getElementById('pin-timeline-hint').style.display = 'block';
       document.getElementById('pin-timeline-hint').textContent = 'Timeline set to: Immediate / Active';
       document.getElementById('btn-pin-timeline-now').classList.add('active');
     });
     document.getElementById('pin-timeline').addEventListener('input', (e) => {
-      if (e.target.value && e.target.value !== 'now') {
+      if (e.target.value) {
+        document.getElementById('pin-timeline-value').value = e.target.value;
         document.getElementById('pin-timeline-hint').style.display = 'block';
         document.getElementById('pin-timeline-hint').textContent = `Timeline: ${new Date(e.target.value + 'T00:00').toLocaleDateString()}`;
         document.getElementById('btn-pin-timeline-now').classList.remove('active');
@@ -260,21 +262,20 @@ window.DirtLink = {
     document.getElementById('btn-confirm-inquiry').addEventListener('click', () => this.submitInquiry());
     document.getElementById('form-claim').addEventListener('submit', e => this.submitClaim(e));
 
-    // Timeline "Now" button
+    // Timeline "Now" button (claim form)
     document.getElementById('btn-timeline-now').addEventListener('click', () => {
       document.getElementById('claim-timeline').value = '';
-      const formData = document.getElementById('form-claim');
-      // Set a hidden indicator
-      document.getElementById('claim-timeline').dataset.now = 'true';
+      document.getElementById('claim-timeline-value').value = 'now';
       document.getElementById('timeline-hint').style.display = 'block';
       document.getElementById('timeline-hint').textContent = 'Timeline set to: Immediate / Active';
-      // Set the actual value that gets submitted
-      document.getElementById('claim-timeline').value = 'now';
+      document.getElementById('btn-timeline-now').classList.add('active');
     });
     document.getElementById('claim-timeline').addEventListener('change', (e) => {
-      if (e.target.value && e.target.value !== 'now') {
+      if (e.target.value) {
+        document.getElementById('claim-timeline-value').value = e.target.value;
         document.getElementById('timeline-hint').style.display = 'block';
-        document.getElementById('timeline-hint').textContent = `Timeline: ${new Date(e.target.value).toLocaleDateString()}`;
+        document.getElementById('timeline-hint').textContent = `Timeline: ${new Date(e.target.value + 'T00:00').toLocaleDateString()}`;
+        document.getElementById('btn-timeline-now').classList.remove('active');
       }
     });
 
@@ -540,6 +541,7 @@ window.DirtLink = {
       document.getElementById('photo-preview').innerHTML = '';
       document.getElementById('pin-modal-title').textContent = 'Drop a Pin';
       document.getElementById('pin-timeline-hint').style.display = 'none';
+      document.getElementById('pin-timeline-value').value = '';
       document.getElementById('btn-pin-timeline-now').classList.remove('active');
       // Reload all pins to reflect changes
       await this.loadPins();
@@ -659,17 +661,20 @@ window.DirtLink = {
 
     // Pre-fill timeline
     if (pin.timeline_date === 'now') {
-      document.getElementById('pin-timeline').value = 'now';
+      document.getElementById('pin-timeline').value = '';
+      document.getElementById('pin-timeline-value').value = 'now';
       document.getElementById('pin-timeline-hint').style.display = 'block';
       document.getElementById('pin-timeline-hint').textContent = 'Timeline set to: Immediate / Active';
       document.getElementById('btn-pin-timeline-now').classList.add('active');
     } else if (pin.timeline_date) {
       document.getElementById('pin-timeline').value = pin.timeline_date;
+      document.getElementById('pin-timeline-value').value = pin.timeline_date;
       document.getElementById('pin-timeline-hint').style.display = 'block';
       document.getElementById('pin-timeline-hint').textContent = `Timeline: ${new Date(pin.timeline_date + 'T00:00').toLocaleDateString()}`;
       document.getElementById('btn-pin-timeline-now').classList.remove('active');
     } else {
       document.getElementById('pin-timeline').value = '';
+      document.getElementById('pin-timeline-value').value = '';
       document.getElementById('pin-timeline-hint').style.display = 'none';
       document.getElementById('btn-pin-timeline-now').classList.remove('active');
     }
@@ -898,6 +903,8 @@ window.DirtLink = {
     document.getElementById('claim-photo-preview').innerHTML = '';
     document.getElementById('timeline-hint').style.display = 'none';
     document.getElementById('claim-timeline').value = '';
+    document.getElementById('claim-timeline-value').value = '';
+    document.getElementById('btn-timeline-now').classList.remove('active');
   },
 
   // Called when user clicks "This Is My Site"
