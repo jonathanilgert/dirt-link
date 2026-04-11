@@ -254,8 +254,9 @@ window.DirtLink = {
     document.getElementById('filter-active-now').addEventListener('click', () => {
       const btn = document.getElementById('filter-active-now');
       btn.classList.toggle('active');
-      const dot = btn.querySelector('.now-pulse');
-      dot.style.display = btn.classList.contains('active') ? 'inline-block' : 'none';
+      const isOn = btn.classList.contains('active');
+      btn.querySelector('.filter-now-label').textContent = isOn ? 'Sites Now Active' : 'Show All Active Sites';
+      btn.querySelector('.filter-now-status').textContent = isOn ? 'on' : 'off';
       this.applyFilters();
     });
 

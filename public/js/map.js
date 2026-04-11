@@ -153,20 +153,11 @@ function createPinIcon(pinType, materialType, isTested, isNow) {
   const points = isHave ? '19,4 35,34 3,34' : '19,34 35,4 3,4';
   const checkY  = isHave ? '26' : '14';
 
-  // Urgent glow for "now" pins
-  const glowFilter = isNow
-    ? 'filter:drop-shadow(0 0 6px rgba(239,68,68,0.7)) drop-shadow(0 0 12px rgba(239,68,68,0.4)) drop-shadow(0 2px 5px rgba(0,0,0,0.35));display:block;'
-    : 'filter:drop-shadow(0 2px 5px rgba(0,0,0,0.35)) drop-shadow(0 1px 2px rgba(0,0,0,0.18));display:block;';
+  const baseFilter = 'drop-shadow(0 2px 5px rgba(0,0,0,0.35)) drop-shadow(0 1px 2px rgba(0,0,0,0.18))';
 
-  // "Now" badge — small pulsing dot at the top
-  const nowBadge = isNow
-    ? `<circle cx="30" cy="8" r="5" fill="#ef4444" stroke="white" stroke-width="1.5"><animate attributeName="r" values="4;6;4" dur="1.5s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0.7;1" dur="1.5s" repeatCount="indefinite"/></circle>`
-    : '';
-
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="${glowFilter}">
-    <polygon points="${points}" fill="${color}" stroke="white" stroke-width="2.5" stroke-linejoin="round"/>
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="filter:${baseFilter};display:block;">
+    <polygon points="${points}" fill="${color}" stroke="white" stroke-width="2.5" stroke-linejoin="round">${isNow ? `<animate attributeName="opacity" values="1;0.55;1" dur="1.8s" repeatCount="indefinite"/>` : ''}</polygon>
     ${isTested ? `<text x="19" y="${checkY}" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="white" font-weight="700" font-family="Inter,sans-serif">✓</text>` : ''}
-    ${nowBadge}
   </svg>`;
 
   return L.divIcon({
