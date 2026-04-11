@@ -364,6 +364,154 @@
     </div>
   </div>
 
+  <!-- Modal: Permit Pin (Claim or Inquire) -->
+  <div class="modal-overlay" id="modal-permit" style="display:none">
+    <div class="modal modal-lg">
+      <button class="modal-close" onclick="DirtLink.closePermitModal()">&times;</button>
+
+      <!-- Step 1: Permit info + two options -->
+      <div id="permit-step-options">
+        <div class="permit-info-header">
+          <span class="permit-badge">Development Permit</span>
+          <span class="permit-status-badge" id="permit-status-badge">Unclaimed</span>
+        </div>
+        <div id="permit-info-details" class="permit-info-details"></div>
+        <div class="permit-options">
+          <button class="permit-option-btn claim-btn" id="btn-permit-claim">
+            <span class="option-icon">&#9650;</span>
+            <span class="option-label">This Is My Site</span>
+            <span class="option-desc">Claim ownership and list your material</span>
+          </button>
+          <button class="permit-option-btn inquire-btn" id="btn-permit-inquire">
+            <span class="option-icon">&#128279;</span>
+            <span class="option-label">I'd Like to Connect With This Site</span>
+            <span class="option-desc">Request an introduction to the permit holder</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2a: Claim Form -->
+      <div id="permit-step-claim" style="display:none">
+        <h2>Claim This Site</h2>
+        <p class="hint" id="claim-address-hint"></p>
+        <form id="form-claim">
+          <input type="hidden" id="claim-permit-id">
+
+          <div class="form-group">
+            <label for="claim-address">Site Address</label>
+            <input type="text" id="claim-address" name="address" required>
+          </div>
+
+          <div class="form-group">
+            <label>I...</label>
+            <div class="pin-type-select">
+              <label class="radio-card have-card">
+                <input type="radio" name="claim_pin_type" value="have" required>
+                <span>&#9650; HAVE material to get rid of</span>
+              </label>
+              <label class="radio-card need-card">
+                <input type="radio" name="claim_pin_type" value="need" required>
+                <span>&#9660; NEED material delivered</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="claim-material">Material Category</label>
+            <select id="claim-material" name="material_type" required>
+              <option value="">Select material...</option>
+            </select>
+          </div>
+
+          <div class="form-row two-col">
+            <div class="form-group">
+              <label for="claim-qty">Estimated Volume</label>
+              <input type="text" id="claim-qty" name="quantity_estimate" placeholder="e.g. 500">
+            </div>
+            <div class="form-group">
+              <label for="claim-unit">Unit</label>
+              <select id="claim-unit" name="quantity_unit">
+                <option value="cubic_yards">Cubic Yards</option>
+                <option value="cubic_meters">Cubic Meters</option>
+                <option value="tonnes">Tonnes</option>
+                <option value="loads">Truck Loads</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Project Timeline</label>
+            <div class="timeline-row">
+              <button type="button" class="btn btn-now" id="btn-timeline-now">Now</button>
+              <input type="date" id="claim-timeline" name="timeline_date">
+            </div>
+            <p class="hint" id="timeline-hint" style="display:none">Timeline set to: Immediate / Active</p>
+          </div>
+
+          <div class="form-group">
+            <label for="claim-report">Soil / Geotech Report (optional)</label>
+            <input type="file" id="claim-report" name="test_report" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+          </div>
+
+          <div class="form-group">
+            <label for="claim-photos">Site Photos (optional, up to 5)</label>
+            <input type="file" id="claim-photos" name="photos" accept=".jpg,.jpeg,.png,.webp,.heic" multiple>
+            <div id="claim-photo-preview" class="photo-preview"></div>
+          </div>
+
+          <div class="form-row two-col">
+            <div class="form-group">
+              <label for="claim-phone">Phone</label>
+              <input type="tel" id="claim-phone" name="contact_phone" placeholder="Your phone number">
+            </div>
+            <div class="form-group">
+              <label for="claim-email">Email</label>
+              <input type="email" id="claim-email" name="contact_email" placeholder="Your email">
+            </div>
+          </div>
+
+          <p class="auth-error" id="claim-error"></p>
+          <button type="submit" class="btn btn-primary btn-full">Claim & Activate Listing</button>
+        </form>
+      </div>
+
+      <!-- Step 2b: Inquiry Confirmation -->
+      <div id="permit-step-inquire" style="display:none">
+        <h2>Connect With This Site</h2>
+        <div id="inquiry-permit-summary" class="permit-info-details"></div>
+
+        <div id="inquiry-confirm" class="inquiry-confirm">
+          <div class="reveal-counter" id="reveal-counter"></div>
+          <p>We'll reach out to the site owner on your behalf and notify you when we hear back.</p>
+          <p class="auth-error" id="inquiry-error"></p>
+          <button class="btn btn-primary btn-full" id="btn-confirm-inquiry">Confirm &mdash; Use 1 Reveal</button>
+          <button class="btn btn-outline btn-full" onclick="DirtLink.showPermitOptions()" style="margin-top:8px">Back</button>
+        </div>
+
+        <div id="inquiry-no-reveals" class="inquiry-no-reveals" style="display:none">
+          <p class="no-reveals-msg">You've used all your reveals this month.</p>
+          <div class="upgrade-options">
+            <div class="upgrade-card">
+              <h4>Pro Plan</h4>
+              <p class="upgrade-price">$79/month</p>
+              <p>Unlimited connections, priority listings, radius alerts</p>
+            </div>
+          </div>
+          <button class="btn btn-outline btn-full" onclick="DirtLink.showPermitOptions()" style="margin-top:12px">Back</button>
+        </div>
+
+        <div id="inquiry-success" style="display:none">
+          <div class="inquiry-success-content">
+            <div class="success-icon">&#10003;</div>
+            <h3>Inquiry Submitted</h3>
+            <p>We'll reach out to the site owner and notify you when we hear back.</p>
+            <button class="btn btn-primary btn-full" onclick="DirtLink.closePermitModal()" style="margin-top:16px">Done</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="/js/materials.js"></script>
   <script src="/js/app.js"></script>

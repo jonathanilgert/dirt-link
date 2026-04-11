@@ -150,6 +150,47 @@ async function getDb() {
     )
   `);
 
+  // Inquiries — users requesting to connect with permit pin owners
+  db.run(`
+    CREATE TABLE IF NOT EXISTS inquiries (
+      id TEXT PRIMARY KEY,
+      permit_pin_id TEXT NOT NULL,
+      user_id TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pending',
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (permit_pin_id) REFERENCES permit_pins(id),
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )
+  `);
+
+  // Add reveals tracking columns to users (safe — IF NOT EXISTS handled by ALTER failing silently)
+  const userCols = all(`PRAGMA table_info(users)`).map(c => c.name);
+  if (!userCols.includes('reveals_used')) {
+    db.run(`ALTER TABLE users ADD COLUMN reveals_used INTEGER NOT NULL DEFAULT 0`);
+  }
+  if (!userCols.includes('reveals_reset_at')) {
+    db.run(`ALTER TABLE users ADD COLUMN reveals_reset_at TEXT`);
+  }
+
+  // Add timeline_date and source_permit_id to pins
+  const pinCols = all(`PRAGMA table_info(pins)`).map(c => c.name);
+  if (!pinCols.includes('timeline_date')) {
+    db.run(`ALTER TABLE pins ADD COLUMN timeline_date TEXT`);
+  }
+  if (!pinCols.includes('source_permit_id')) {
+    db.run(`ALTER TABLE pins ADD COLUMN source_permit_id TEXT`);
+  }
+
+  // Add claimed_by and claimed_at to permit_pins
+  const permitCols = all(`PRAGMA table_info(permit_pins)`).map(c => c.name);
+  if (!permitCols.includes('claimed_by')) {
+    db.run(`ALTER TABLE permit_pins ADD COLUMN claimed_by TEXT`);
+  }
+  if (!permitCols.includes('claimed_at')) {
+    db.run(`ALTER TABLE permit_pins ADD COLUMN claimed_at TEXT`);
+  }
+
   // Audit log for API calls
   db.run(`
     CREATE TABLE IF NOT EXISTS audit_log (
@@ -183,7 +224,10 @@ async function getDb() {
     'CREATE INDEX IF NOT EXISTS idx_permanent_pins_active ON permanent_pins(is_active)',
     'CREATE INDEX IF NOT EXISTS idx_permanent_pins_type ON permanent_pins(site_type)',
     'CREATE INDEX IF NOT EXISTS idx_audit_log_key ON audit_log(api_key_id)',
-    'CREATE INDEX IF NOT EXISTS idx_audit_log_created ON audit_log(created_at)'
+    'CREATE INDEX IF NOT EXISTS idx_audit_log_created ON audit_log(created_at)',
+    'CREATE INDEX IF NOT EXISTS idx_inquiries_permit ON inquiries(permit_pin_id)',
+    'CREATE INDEX IF NOT EXISTS idx_inquiries_user ON inquiries(user_id)',
+    'CREATE INDEX IF NOT EXISTS idx_permit_pins_claimed ON permit_pins(claimed_by)'
   ];
   indexes.forEach(sql => { try { db.run(sql); } catch(e) {} });
 

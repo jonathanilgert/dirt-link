@@ -39,6 +39,25 @@ const pinUpload = upload.fields([
   { name: 'photos', maxCount: 5 }
 ]);
 
+// Reveal limits by plan
+const REVEAL_LIMITS = { free: 3, pro: -1, enterprise: -1 }; // -1 = unlimited
+
+function getRevealsRemaining(user) {
+  const limit = REVEAL_LIMITS[user.user_type] || 3;
+  if (limit === -1) return { limit: -1, used: 0, remaining: -1 }; // unlimited
+  // Reset monthly
+  const now = new Date();
+  const resetAt = user.reveals_reset_at ? new Date(user.reveals_reset_at) : null;
+  if (!resetAt || now >= resetAt) {
+    // Reset counter
+    const nextReset = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
+    run(`UPDATE users SET reveals_used = 0, reveals_reset_at = ? WHERE id = ?`, [nextReset, user.id]);
+    return { limit, used: 0, remaining: limit };
+  }
+  const used = user.reveals_used || 0;
+  return { limit, used, remaining: Math.max(0, limit - used) };
+}
+
 // Get all active permit pins (public — for map display)
 router.get('/permits', (req, res) => {
   const pins = all(`SELECT * FROM permit_pins WHERE is_active = 1 ORDER BY created_at DESC`);
@@ -210,6 +229,126 @@ router.delete('/:id', requireAuth, (req, res) => {
   const result = run("UPDATE pins SET is_active = 0, updated_at = datetime('now') WHERE id = ? AND user_id = ?", [req.params.id, req.session.userId]);
   if (result.changes === 0) return res.status(404).json({ error: 'Pin not found or not yours' });
   res.json({ message: 'Pin removed' });
+});
+
+// ============================================================
+// CLAIM FLOW — convert a permit pin into a full owned pin
+// ============================================================
+router.post('/claim/:permitId', requireAuth, pinUpload, (req, res) => {
+  const permit = get('SELECT * FROM permit_pins WHERE id = ? AND is_active = 1', [req.params.permitId]);
+  if (!permit) return res.status(404).json({ error: 'Permit pin not found' });
+  if (permit.claimed_by) return res.status(409).json({ error: 'This site has already been claimed' });
+
+  const { pin_type, material_type, address, quantity_estimate, quantity_unit, timeline_date, contact_phone, contact_email } = req.body;
+
+  if (!pin_type || !material_type) {
+    return res.status(400).json({ error: 'pin_type and material_type are required' });
+  }
+
+  // Create the real pin from permit data
+  const id = uuidv4();
+  const title = address || permit.address;
+  const reportFile = req.files?.test_report?.[0];
+  const test_report_path = reportFile ? `/uploads/reports/${reportFile.filename}` : null;
+
+  run(
+    `INSERT INTO pins (id, user_id, pin_type, material_type, latitude, longitude, address, title, description, quantity_estimate, quantity_unit, is_tested, test_report_path, timeline_date, source_permit_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      id, req.session.userId, pin_type, material_type,
+      permit.latitude, permit.longitude,
+      address || permit.address,
+      title,
+      permit.project_description || null,
+      quantity_estimate || null,
+      quantity_unit || 'cubic_yards',
+      reportFile ? 1 : 0,
+      test_report_path,
+      timeline_date || null,
+      permit.id
+    ]
+  );
+
+  // Save photos
+  const photoFiles = req.files?.photos || [];
+  photoFiles.forEach(f => {
+    run(
+      `INSERT INTO pin_photos (id, pin_id, file_path) VALUES (?, ?, ?)`,
+      [uuidv4(), id, `/uploads/photos/${f.filename}`]
+    );
+  });
+
+  // Update user contact info if provided
+  if (contact_phone || contact_email) {
+    const updates = [];
+    const params = [];
+    if (contact_phone) { updates.push('phone = ?'); params.push(contact_phone); }
+    params.push(req.session.userId);
+    if (updates.length) run(`UPDATE users SET ${updates.join(', ')}, updated_at = datetime('now') WHERE id = ?`, params);
+  }
+
+  // Mark permit pin as claimed
+  run(
+    `UPDATE permit_pins SET status = 'claimed', claimed_by = ?, claimed_at = datetime('now'), updated_at = datetime('now') WHERE id = ?`,
+    [req.session.userId, permit.id]
+  );
+
+  const pin = get(
+    `SELECT p.*, u.company_name, u.contact_name FROM pins p JOIN users u ON p.user_id = u.id WHERE p.id = ?`,
+    [id]
+  );
+  pin.photos = all('SELECT id, file_path FROM pin_photos WHERE pin_id = ?', [id]);
+  res.status(201).json(pin);
+});
+
+// ============================================================
+// INQUIRY FLOW — request to connect with a permit site
+// ============================================================
+router.get('/reveals', requireAuth, (req, res) => {
+  const user = get('SELECT * FROM users WHERE id = ?', [req.session.userId]);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  res.json(getRevealsRemaining(user));
+});
+
+router.post('/inquire/:permitId', requireAuth, (req, res) => {
+  const permit = get('SELECT * FROM permit_pins WHERE id = ? AND is_active = 1', [req.params.permitId]);
+  if (!permit) return res.status(404).json({ error: 'Permit pin not found' });
+
+  // Check if user already inquired on this permit
+  const existing = get('SELECT id FROM inquiries WHERE permit_pin_id = ? AND user_id = ?', [permit.id, req.session.userId]);
+  if (existing) return res.status(409).json({ error: 'You have already submitted an inquiry for this site' });
+
+  // Check reveal credits
+  const user = get('SELECT * FROM users WHERE id = ?', [req.session.userId]);
+  const reveals = getRevealsRemaining(user);
+  if (reveals.remaining === 0) {
+    return res.status(403).json({
+      error: 'No reveals remaining this month',
+      reveals,
+      upgrade_needed: true
+    });
+  }
+
+  // Consume a reveal (if not unlimited)
+  if (reveals.limit !== -1) {
+    run(`UPDATE users SET reveals_used = reveals_used + 1 WHERE id = ?`, [req.session.userId]);
+  }
+
+  // Create the inquiry
+  const id = uuidv4();
+  run(
+    `INSERT INTO inquiries (id, permit_pin_id, user_id) VALUES (?, ?, ?)`,
+    [id, permit.id, req.session.userId]
+  );
+
+  // Return updated reveal count
+  const updatedUser = get('SELECT * FROM users WHERE id = ?', [req.session.userId]);
+  const updatedReveals = getRevealsRemaining(updatedUser);
+
+  res.status(201).json({
+    inquiry_id: id,
+    message: "We'll reach out to the site owner and notify you when we hear back.",
+    reveals: updatedReveals
+  });
 });
 
 module.exports = router;

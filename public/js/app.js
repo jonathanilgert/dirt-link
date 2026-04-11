@@ -5,14 +5,33 @@ window.DirtLink = {
   dropping: false,
   tempMarker: null,
 
+  _currentPermit: null,
+  _pendingPermitAction: null, // 'claim' or 'inquire' — set before auth redirect
+
   async init() {
     this.populateMaterialSelects();
+    this.populateClaimMaterialSelect();
     this.buildLegend();
     this.bindEvents();
     await this.checkAuth();
     await this.loadPins();
     await this.loadExternalPins();
     this.pollUnread();
+  },
+
+  populateClaimMaterialSelect() {
+    const sel = document.getElementById('claim-material');
+    Object.entries(CATEGORIES).forEach(([catKey, cat]) => {
+      const group = document.createElement('optgroup');
+      group.label = cat.label;
+      Object.entries(cat.subcategories).forEach(([subKey, sub]) => {
+        const opt = document.createElement('option');
+        opt.value = subKey;
+        opt.textContent = sub.label;
+        group.appendChild(opt);
+      });
+      sel.appendChild(group);
+    });
   },
 
   // Populate material dropdowns with category > subcategory grouping
@@ -212,6 +231,45 @@ window.DirtLink = {
       });
     });
 
+    // Permit modal buttons
+    document.getElementById('btn-permit-claim').addEventListener('click', () => this.startClaim());
+    document.getElementById('btn-permit-inquire').addEventListener('click', () => this.startInquiry());
+    document.getElementById('btn-confirm-inquiry').addEventListener('click', () => this.submitInquiry());
+    document.getElementById('form-claim').addEventListener('submit', e => this.submitClaim(e));
+
+    // Timeline "Now" button
+    document.getElementById('btn-timeline-now').addEventListener('click', () => {
+      document.getElementById('claim-timeline').value = '';
+      const formData = document.getElementById('form-claim');
+      // Set a hidden indicator
+      document.getElementById('claim-timeline').dataset.now = 'true';
+      document.getElementById('timeline-hint').style.display = 'block';
+      document.getElementById('timeline-hint').textContent = 'Timeline set to: Immediate / Active';
+      // Set the actual value that gets submitted
+      document.getElementById('claim-timeline').value = 'now';
+    });
+    document.getElementById('claim-timeline').addEventListener('change', (e) => {
+      if (e.target.value && e.target.value !== 'now') {
+        document.getElementById('timeline-hint').style.display = 'block';
+        document.getElementById('timeline-hint').textContent = `Timeline: ${new Date(e.target.value).toLocaleDateString()}`;
+      }
+    });
+
+    // Claim photo preview
+    document.getElementById('claim-photos').addEventListener('change', e => {
+      const preview = document.getElementById('claim-photo-preview');
+      preview.innerHTML = '';
+      Array.from(e.target.files).slice(0, 5).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = document.createElement('img');
+          img.src = ev.target.result;
+          preview.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+
     // Filters
     document.querySelectorAll('.filter-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -292,6 +350,7 @@ window.DirtLink = {
       this.updateAuthUI();
       document.getElementById('modal-auth').style.display = 'none';
       form.reset();
+      this._resumePendingPermitAction();
     } else {
       const err = await res.json();
       document.getElementById('login-error').textContent = err.error;
@@ -314,9 +373,21 @@ window.DirtLink = {
       this.updateAuthUI();
       document.getElementById('modal-auth').style.display = 'none';
       form.reset();
+      this._resumePendingPermitAction();
     } else {
       const err = await res.json();
       document.getElementById('register-error').textContent = err.error;
+    }
+  },
+
+  _resumePendingPermitAction() {
+    if (!this._pendingPermitAction || !this._currentPermit) return;
+    const action = this._pendingPermitAction;
+    this._pendingPermitAction = null;
+    if (action === 'claim') {
+      this._showClaimForm();
+    } else if (action === 'inquire') {
+      this._showInquiryStep();
     }
   },
 
@@ -736,6 +807,191 @@ window.DirtLink = {
   async loadConversations() {
     if (!this.user) return;
     await window.Messaging.loadConversations();
+  },
+
+  // ============================================================
+  // PERMIT PIN — Claim & Inquiry Flows
+  // ============================================================
+
+  openPermitModal(permit) {
+    this._currentPermit = permit;
+    this.showPermitOptions();
+    // Fill permit info
+    const details = document.getElementById('permit-info-details');
+    details.innerHTML = `
+      <div class="permit-detail-row"><strong>Address:</strong> ${this.escapeHtml(permit.address)}</div>
+      ${permit.permit_number ? `<div class="permit-detail-row"><strong>Permit #:</strong> ${this.escapeHtml(permit.permit_number)}</div>` : ''}
+      ${permit.permit_type ? `<div class="permit-detail-row"><strong>Type:</strong> ${this.escapeHtml(permit.permit_type)}</div>` : ''}
+      ${permit.permit_date ? `<div class="permit-detail-row"><strong>Date:</strong> ${this.escapeHtml(permit.permit_date)}</div>` : ''}
+      ${permit.project_description ? `<div class="permit-detail-row"><strong>Description:</strong> ${this.escapeHtml(permit.project_description)}</div>` : ''}
+      ${permit.estimated_project_size ? `<div class="permit-detail-row"><strong>Est. Size:</strong> ${this.escapeHtml(permit.estimated_project_size)}</div>` : ''}
+    `;
+    document.getElementById('modal-permit').style.display = 'flex';
+  },
+
+  showPermitOptions() {
+    document.getElementById('permit-step-options').style.display = 'block';
+    document.getElementById('permit-step-claim').style.display = 'none';
+    document.getElementById('permit-step-inquire').style.display = 'none';
+  },
+
+  closePermitModal() {
+    document.getElementById('modal-permit').style.display = 'none';
+    this._currentPermit = null;
+    this._pendingPermitAction = null;
+    document.getElementById('claim-error').textContent = '';
+    document.getElementById('inquiry-error').textContent = '';
+    document.getElementById('form-claim').reset();
+    document.getElementById('claim-photo-preview').innerHTML = '';
+    document.getElementById('timeline-hint').style.display = 'none';
+    document.getElementById('claim-timeline').value = '';
+  },
+
+  // Called when user clicks "This Is My Site"
+  startClaim() {
+    if (!this.user) {
+      this._pendingPermitAction = 'claim';
+      this.showAuthModal('register');
+      return;
+    }
+    this._showClaimForm();
+  },
+
+  _showClaimForm() {
+    const permit = this._currentPermit;
+    if (!permit) return;
+    document.getElementById('permit-step-options').style.display = 'none';
+    document.getElementById('permit-step-claim').style.display = 'block';
+    document.getElementById('claim-permit-id').value = permit.id;
+    document.getElementById('claim-address').value = permit.address || '';
+    document.getElementById('claim-address-hint').textContent = `Permit #${permit.permit_number} — ${permit.address}`;
+    // Pre-fill contact from user profile
+    if (this.user) {
+      document.getElementById('claim-phone').value = this.user.phone || '';
+      document.getElementById('claim-email').value = this.user.email || '';
+    }
+  },
+
+  // Called when user clicks "I'd Like to Connect"
+  startInquiry() {
+    if (!this.user) {
+      this._pendingPermitAction = 'inquire';
+      this.showAuthModal('register');
+      return;
+    }
+    this._showInquiryStep();
+  },
+
+  async _showInquiryStep() {
+    const permit = this._currentPermit;
+    if (!permit) return;
+    document.getElementById('permit-step-options').style.display = 'none';
+    document.getElementById('permit-step-inquire').style.display = 'block';
+    document.getElementById('inquiry-confirm').style.display = 'block';
+    document.getElementById('inquiry-no-reveals').style.display = 'none';
+    document.getElementById('inquiry-success').style.display = 'none';
+    document.getElementById('inquiry-error').textContent = '';
+
+    // Show permit summary
+    document.getElementById('inquiry-permit-summary').innerHTML = `
+      <div class="permit-detail-row"><strong>Address:</strong> ${this.escapeHtml(permit.address)}</div>
+      ${permit.permit_number ? `<div class="permit-detail-row"><strong>Permit #:</strong> ${this.escapeHtml(permit.permit_number)}</div>` : ''}
+    `;
+
+    // Check reveals
+    try {
+      const res = await fetch('/api/pins/reveals');
+      if (res.ok) {
+        const reveals = await res.json();
+        const counter = document.getElementById('reveal-counter');
+        if (reveals.remaining === -1) {
+          counter.innerHTML = '<span class="reveals-unlimited">Unlimited connections (Pro)</span>';
+        } else if (reveals.remaining > 0) {
+          counter.innerHTML = `This will use <strong>1</strong> of your <strong>${reveals.remaining}</strong> remaining reveals this month.`;
+        } else {
+          // No reveals left
+          document.getElementById('inquiry-confirm').style.display = 'none';
+          document.getElementById('inquiry-no-reveals').style.display = 'block';
+          return;
+        }
+      }
+    } catch (e) { /* proceed anyway */ }
+  },
+
+  async submitInquiry() {
+    const permit = this._currentPermit;
+    if (!permit) return;
+    const btn = document.getElementById('btn-confirm-inquiry');
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+    document.getElementById('inquiry-error').textContent = '';
+
+    try {
+      const res = await fetch(`/api/pins/inquire/${permit.id}`, { method: 'POST' });
+      if (res.ok) {
+        document.getElementById('inquiry-confirm').style.display = 'none';
+        document.getElementById('inquiry-success').style.display = 'block';
+      } else {
+        const err = await res.json();
+        if (err.upgrade_needed) {
+          document.getElementById('inquiry-confirm').style.display = 'none';
+          document.getElementById('inquiry-no-reveals').style.display = 'block';
+        } else {
+          document.getElementById('inquiry-error').textContent = err.error || 'Failed to submit inquiry';
+        }
+      }
+    } catch (e) {
+      document.getElementById('inquiry-error').textContent = 'Network error. Please try again.';
+    }
+    btn.disabled = false;
+    btn.textContent = 'Confirm — Use 1 Reveal';
+  },
+
+  async submitClaim(e) {
+    e.preventDefault();
+    const form = e.target;
+    const permitId = document.getElementById('claim-permit-id').value;
+    const formData = new FormData(form);
+    // Add pin_type from radio
+    const pinType = form.querySelector('input[name="claim_pin_type"]:checked')?.value;
+    if (!pinType) {
+      document.getElementById('claim-error').textContent = 'Please select Have or Need.';
+      return;
+    }
+    formData.set('pin_type', pinType);
+    formData.delete('claim_pin_type');
+
+    // Handle timeline
+    const timelineVal = document.getElementById('claim-timeline').value;
+    if (!timelineVal && !formData.get('timeline_date')) {
+      // No date set — that's ok, it's optional
+    }
+
+    document.getElementById('claim-error').textContent = '';
+    const btn = form.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.textContent = 'Claiming...';
+
+    try {
+      const res = await fetch(`/api/pins/claim/${permitId}`, {
+        method: 'POST',
+        body: formData
+      });
+      if (res.ok) {
+        this.closePermitModal();
+        // Reload all pins — the permit pin is now a regular pin
+        await this.loadPins();
+        await this.loadExternalPins();
+        this.loadMyPins();
+      } else {
+        const err = await res.json();
+        document.getElementById('claim-error').textContent = err.error || 'Failed to claim site';
+      }
+    } catch (e) {
+      document.getElementById('claim-error').textContent = 'Network error. Please try again.';
+    }
+    btn.disabled = false;
+    btn.textContent = 'Claim & Activate Listing';
   },
 
   escapeHtml(str) {

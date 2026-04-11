@@ -210,25 +210,14 @@ window.renderPins = function(pins) {
   if (window._permanentPins) window._permanentPins.forEach(p => addPermanentPinToMap(p));
 };
 
-// Add permit pin to map
+// Add permit pin to map — click opens the claim/inquire modal
 window.addPermitPinToMap = function(pin) {
+  if (pin.status === 'claimed') return;
   const icon = createPermitPinIcon();
   const marker = L.marker([pin.latitude, pin.longitude], { icon });
-  marker.bindPopup(`
-    <div class="pin-popup">
-      <div class="pp-header" style="background:#888">
-        <span class="pp-type">&#9650; PERMIT</span>
-        <span class="pp-material">${pin.permit_type}</span>
-      </div>
-      <div class="pp-body">
-        <div class="pp-title">${DirtLink.escapeHtml(pin.address)}</div>
-        <div class="pp-company">Permit #${DirtLink.escapeHtml(pin.permit_number)}</div>
-        <div class="pp-qty">${DirtLink.escapeHtml(pin.permit_date)}</div>
-        ${pin.project_description ? `<div class="pp-qty">${DirtLink.escapeHtml(pin.project_description)}</div>` : ''}
-        <div style="margin-top:6px;font-size:11px;color:#888;">Unclaimed — verify to claim this site</div>
-      </div>
-    </div>
-  `, { maxWidth: 260, className: 'dl-popup' });
+  marker.on('click', () => {
+    DirtLink.openPermitModal(pin);
+  });
   pinMarkers.addLayer(marker);
 };
 
