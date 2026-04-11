@@ -250,9 +250,12 @@ window.DirtLink = {
       }
     });
 
-    // Active Now filter
+    // Sites Now Active filter
     document.getElementById('filter-active-now').addEventListener('click', () => {
-      document.getElementById('filter-active-now').classList.toggle('active');
+      const btn = document.getElementById('filter-active-now');
+      btn.classList.toggle('active');
+      const dot = btn.querySelector('.now-pulse');
+      dot.style.display = btn.classList.contains('active') ? 'inline-block' : 'none';
       this.applyFilters();
     });
 
