@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 const { get, run, all } = require('../database/init');
 const { requireAuth } = require('../middleware/auth');
+const { PLANS, getRevealStatus } = require('../config/pricing');
 
 const router = express.Router();
 
@@ -60,27 +61,18 @@ router.post('/logout', (req, res) => {
   res.json({ message: 'Logged out' });
 });
 
-// Get current user (includes reveal credits)
+// Get current user (includes reveal credits and plan info)
 router.get('/me', requireAuth, (req, res) => {
-  const user = get('SELECT id, email, company_name, contact_name, phone, user_type, reveals_used, reveals_reset_at, created_at FROM users WHERE id = ?', [req.session.userId]);
+  const user = get('SELECT id, email, company_name, contact_name, phone, user_type, reveals_used, reveals_reset_at, priority_notifications, created_at FROM users WHERE id = ?', [req.session.userId]);
   if (!user) return res.status(404).json({ error: 'User not found' });
-  // Calculate reveals remaining
-  const REVEAL_LIMITS = { free: 3, pro: -1, enterprise: -1 };
-  const limit = REVEAL_LIMITS[user.user_type] || 3;
-  if (limit === -1) {
-    user.reveals = { limit: -1, used: 0, remaining: -1 };
-  } else {
-    const now = new Date();
-    const resetAt = user.reveals_reset_at ? new Date(user.reveals_reset_at) : null;
-    if (!resetAt || now >= resetAt) {
-      const nextReset = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
-      run(`UPDATE users SET reveals_used = 0, reveals_reset_at = ? WHERE id = ?`, [nextReset, user.id]);
-      user.reveals = { limit, used: 0, remaining: limit };
-    } else {
-      const used = user.reveals_used || 0;
-      user.reveals = { limit, used, remaining: Math.max(0, limit - used) };
-    }
-  }
+
+  const reveals = getRevealStatus(user, { all, run });
+  const plan = PLANS[user.user_type] || PLANS.free;
+
+  user.reveals = reveals;
+  user.planName = plan.name;
+  user.planPrice = plan.price;
+  user.overageRate = plan.overageRate;
   res.json(user);
 });
 

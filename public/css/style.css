@@ -1850,3 +1850,292 @@ main {
     font-size: 18px;
   }
 }
+
+/* ============================================================
+   BILLING & PLAN MANAGEMENT
+   ============================================================ */
+
+/* Current plan card */
+.billing-plan-card {
+  background: var(--primary-light);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.billing-plan-badge {
+  background: var(--primary);
+  color: #1A1410;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.billing-plan-price {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.billing-plan-card .btn-danger {
+  margin-left: auto;
+}
+
+/* Reveal usage */
+.billing-reveal-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.billing-reveal-detail {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.billing-progress-track {
+  height: 8px;
+  background: var(--bg);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.billing-progress-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.billing-overage-spent {
+  font-size: 12px;
+  color: var(--primary-dark);
+  font-weight: 500;
+  margin-top: 6px;
+}
+
+/* Smart nudge */
+.nudge-card {
+  background: #FEF3C7;
+  border: 1px solid #FDE68A;
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.nudge-card p {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text);
+  min-width: 200px;
+}
+
+/* Reveal nudge inline (in inquiry modal) */
+.reveal-nudge {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: #FEF3C7;
+  border: 1px solid #FDE68A;
+  border-radius: var(--radius);
+  font-size: 13px;
+  color: var(--text);
+}
+
+.reveal-nudge a {
+  color: var(--primary-dark);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* Plan cards grid */
+.plan-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.plan-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.plan-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow);
+}
+
+.plan-card.plan-current {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.plan-card.plan-recommended {
+  border-color: var(--primary);
+}
+
+.plan-recommended-badge {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary);
+  color: #1A1410;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 12px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.plan-card h4 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.plan-price {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.plan-price span {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.plan-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+  flex: 1;
+}
+
+.plan-features li {
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 3px 0;
+  padding-left: 16px;
+  position: relative;
+}
+
+.plan-features li::before {
+  content: '\2713';
+  position: absolute;
+  left: 0;
+  color: var(--success);
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.plan-card .btn {
+  margin-top: auto;
+}
+
+/* Billing history */
+.billing-history-section h4 {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.billing-history-list {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.billing-history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.billing-history-item:last-child { border-bottom: none; }
+
+.billing-history-desc {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.billing-history-date {
+  font-size: 11px;
+  color: var(--text-subtle);
+}
+
+.billing-history-amount {
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+/* Reveal gate modal */
+#modal-reveal-gate h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.reveal-gate-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.reveal-gate-buy {
+  font-size: 15px;
+  padding: 14px;
+}
+
+.reveal-gate-upgrade {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  text-align: center;
+}
+
+.reveal-gate-upgrade p {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+@media (max-width: 600px) {
+  .plan-cards-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

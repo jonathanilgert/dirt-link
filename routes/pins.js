@@ -39,24 +39,7 @@ const pinUpload = upload.fields([
   { name: 'photos', maxCount: 5 }
 ]);
 
-// Reveal limits by plan
-const REVEAL_LIMITS = { free: 3, pro: -1, enterprise: -1 }; // -1 = unlimited
-
-function getRevealsRemaining(user) {
-  const limit = REVEAL_LIMITS[user.user_type] || 3;
-  if (limit === -1) return { limit: -1, used: 0, remaining: -1 }; // unlimited
-  // Reset monthly
-  const now = new Date();
-  const resetAt = user.reveals_reset_at ? new Date(user.reveals_reset_at) : null;
-  if (!resetAt || now >= resetAt) {
-    // Reset counter
-    const nextReset = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
-    run(`UPDATE users SET reveals_used = 0, reveals_reset_at = ? WHERE id = ?`, [nextReset, user.id]);
-    return { limit, used: 0, remaining: limit };
-  }
-  const used = user.reveals_used || 0;
-  return { limit, used, remaining: Math.max(0, limit - used) };
-}
+const { PLANS, getRevealStatus, calculateSavings } = require('../config/pricing');
 
 // Get all active permit pins (public — for map display)
 router.get('/permits', (req, res) => {
@@ -306,7 +289,22 @@ router.post('/claim/:permitId', requireAuth, pinUpload, (req, res) => {
 router.get('/reveals', requireAuth, (req, res) => {
   const user = get('SELECT * FROM users WHERE id = ?', [req.session.userId]);
   if (!user) return res.status(404).json({ error: 'User not found' });
-  res.json(getRevealsRemaining(user));
+  const reveals = getRevealStatus(user, { all, run });
+
+  // Add smart nudge if applicable
+  let nudge = null;
+  if ((user.user_type === 'free') && reveals.overageSpentThisCycle > 0) {
+    const savings = calculateSavings('free', 'pro', reveals.overagePurchasedThisCycle);
+    if (savings > 0) {
+      nudge = {
+        message: `You've spent $${reveals.overageSpentThisCycle.toFixed(2)} on reveals this month — the Pro plan would save you $${savings.toFixed(2)}.`,
+        targetPlan: 'pro',
+        savings
+      };
+    }
+  }
+
+  res.json({ ...reveals, nudge });
 });
 
 router.post('/inquire/:permitId', requireAuth, (req, res) => {
@@ -319,11 +317,14 @@ router.post('/inquire/:permitId', requireAuth, (req, res) => {
 
   // Check reveal credits
   const user = get('SELECT * FROM users WHERE id = ?', [req.session.userId]);
-  const reveals = getRevealsRemaining(user);
-  if (reveals.remaining === 0) {
+  const reveals = getRevealStatus(user, { all, run });
+
+  if (reveals.remaining === 0 && reveals.limit !== -1) {
+    const plan = PLANS[user.user_type] || PLANS.free;
     return res.status(403).json({
       error: 'No reveals remaining this month',
       reveals,
+      overageRate: plan.overageRate,
       upgrade_needed: true
     });
   }
@@ -342,7 +343,7 @@ router.post('/inquire/:permitId', requireAuth, (req, res) => {
 
   // Return updated reveal count
   const updatedUser = get('SELECT * FROM users WHERE id = ?', [req.session.userId]);
-  const updatedReveals = getRevealsRemaining(updatedUser);
+  const updatedReveals = getRevealStatus(updatedUser, { all, run });
 
   res.status(201).json({
     inquiry_id: id,

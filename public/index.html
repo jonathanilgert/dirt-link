@@ -317,6 +317,7 @@
 
       <div class="profile-tabs">
         <button class="profile-tab active" data-ptab="details">Company Details</button>
+        <button class="profile-tab" data-ptab="billing">Plan &amp; Billing</button>
         <button class="profile-tab" data-ptab="password">Change Password</button>
       </div>
 
@@ -343,6 +344,25 @@
         <button type="submit" class="btn btn-primary">Save Changes</button>
       </form>
 
+      <!-- Billing tab -->
+      <div id="billing-tab" class="profile-form" style="display:none; flex-direction:column; gap:16px;">
+        <!-- Current Plan -->
+        <div class="billing-current-plan" id="billing-current-plan"></div>
+        <!-- Reveal Usage -->
+        <div class="billing-reveals" id="billing-reveals"></div>
+        <!-- Smart Nudge -->
+        <div class="billing-nudge" id="billing-nudge" style="display:none"></div>
+        <!-- Plan Cards -->
+        <div class="billing-plans" id="billing-plans"></div>
+        <!-- Billing History -->
+        <div class="billing-history-section">
+          <h4>Billing History</h4>
+          <div id="billing-history-list" class="billing-history-list">
+            <p class="empty-state" style="padding:12px">No billing history yet.</p>
+          </div>
+        </div>
+      </div>
+
       <!-- Password tab -->
       <form id="form-password" class="profile-form" style="display:none">
         <div class="form-group">
@@ -361,6 +381,14 @@
         <p class="profile-success" id="password-success"></p>
         <button type="submit" class="btn btn-primary">Update Password</button>
       </form>
+    </div>
+  </div>
+
+  <!-- Modal: Reveal Gate (shown when user has no reveals left) -->
+  <div class="modal-overlay" id="modal-reveal-gate" style="display:none">
+    <div class="modal modal-lg">
+      <button class="modal-close" onclick="document.getElementById('modal-reveal-gate').style.display='none'">&times;</button>
+      <div id="reveal-gate-content"></div>
     </div>
   </div>
 
@@ -489,14 +517,8 @@
         </div>
 
         <div id="inquiry-no-reveals" class="inquiry-no-reveals" style="display:none">
-          <p class="no-reveals-msg">You've used all your reveals this month.</p>
-          <div class="upgrade-options">
-            <div class="upgrade-card">
-              <h4>Pro Plan</h4>
-              <p class="upgrade-price">$79/month</p>
-              <p>Unlimited connections, priority listings, radius alerts</p>
-            </div>
-          </div>
+          <p class="no-reveals-msg">You've used all your included reveals this month.</p>
+          <div class="reveal-gate-options" id="inquiry-reveal-gate-options"></div>
           <button class="btn btn-outline btn-full" onclick="DirtLink.showPermitOptions()" style="margin-top:12px">Back</button>
         </div>
 

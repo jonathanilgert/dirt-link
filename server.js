@@ -17,6 +17,9 @@ if (isProd) app.set('trust proxy', 1);
 fs.mkdirSync(path.join(__dirname, 'uploads', 'reports'), { recursive: true });
 fs.mkdirSync(path.join(__dirname, 'uploads', 'photos'), { recursive: true });
 
+// Stripe webhook needs raw body — must be before express.json()
+app.use('/api/billing/webhook', express.raw({ type: 'application/json' }));
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -65,6 +68,7 @@ app.get('/api/geocode', async (req, res) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/pins', require('./routes/pins'));
 app.use('/api/messages', require('./routes/messages'));
+app.use('/api/billing', require('./routes/billing'));
 app.use('/api/keys', require('./routes/apiKeys'));
 app.use('/api/external', require('./routes/externalApi'));
 

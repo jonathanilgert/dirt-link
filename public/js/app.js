@@ -128,11 +128,13 @@ window.DirtLink = {
         document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
         document.getElementById('form-profile').style.display = tab.dataset.ptab === 'details' ? 'flex' : 'none';
+        document.getElementById('billing-tab').style.display = tab.dataset.ptab === 'billing' ? 'flex' : 'none';
         document.getElementById('form-password').style.display = tab.dataset.ptab === 'password' ? 'flex' : 'none';
         document.getElementById('profile-error').textContent = '';
         document.getElementById('profile-success').textContent = '';
         document.getElementById('password-error').textContent = '';
         document.getElementById('password-success').textContent = '';
+        if (tab.dataset.ptab === 'billing') this.loadBillingTab();
       });
     });
 
@@ -332,6 +334,7 @@ window.DirtLink = {
     // Reset tabs to details
     document.querySelectorAll('.profile-tab').forEach(t => t.classList.toggle('active', t.dataset.ptab === 'details'));
     document.getElementById('form-profile').style.display = 'flex';
+    document.getElementById('billing-tab').style.display = 'none';
     document.getElementById('form-password').style.display = 'none';
     document.getElementById('profile-error').textContent = '';
     document.getElementById('profile-success').textContent = '';
@@ -905,13 +908,18 @@ window.DirtLink = {
         const reveals = await res.json();
         const counter = document.getElementById('reveal-counter');
         if (reveals.remaining === -1) {
-          counter.innerHTML = '<span class="reveals-unlimited">Unlimited connections (Pro)</span>';
+          counter.innerHTML = '<span class="reveals-unlimited">Unlimited reveals (Enterprise)</span>';
         } else if (reveals.remaining > 0) {
           counter.innerHTML = `This will use <strong>1</strong> of your <strong>${reveals.remaining}</strong> remaining reveals this month.`;
+          // Show nudge if applicable
+          if (reveals.nudge) {
+            counter.innerHTML += `<div class="reveal-nudge">${reveals.nudge.message} <a href="#" onclick="event.preventDefault(); DirtLink.showBillingFromInquiry()">View plans</a></div>`;
+          }
         } else {
-          // No reveals left
+          // No reveals left — show overage/upgrade options
           document.getElementById('inquiry-confirm').style.display = 'none';
           document.getElementById('inquiry-no-reveals').style.display = 'block';
+          this._buildRevealGateOptions(document.getElementById('inquiry-reveal-gate-options'), reveals);
           return;
         }
       }
@@ -992,6 +1000,234 @@ window.DirtLink = {
     }
     btn.disabled = false;
     btn.textContent = 'Claim & Activate Listing';
+  },
+
+  // ============================================================
+  // BILLING & PLAN MANAGEMENT
+  // ============================================================
+
+  async loadBillingTab() {
+    const [statusRes, historyRes] = await Promise.all([
+      fetch('/api/billing/status'),
+      fetch('/api/billing/history')
+    ]);
+
+    if (!statusRes.ok) return;
+    const status = await statusRes.json();
+    const history = historyRes.ok ? await historyRes.json() : [];
+
+    // Current Plan card
+    document.getElementById('billing-current-plan').innerHTML = `
+      <div class="billing-plan-card current">
+        <div class="billing-plan-badge">${this.escapeHtml(status.planName)}</div>
+        <div class="billing-plan-price">${status.planPrice > 0 ? `$${status.planPrice}/mo` : 'Free'}</div>
+        ${status.stripeSubscriptionId ? `<button class="btn btn-sm btn-danger" onclick="DirtLink.cancelSubscription()">Cancel Subscription</button>` : ''}
+      </div>
+    `;
+
+    // Reveal usage
+    const rev = status.reveals;
+    let revealHtml;
+    if (rev.limit === -1) {
+      revealHtml = '<div class="billing-reveal-bar"><span class="reveals-unlimited">Unlimited reveals</span></div>';
+    } else {
+      const pct = rev.limit > 0 ? Math.min(100, (rev.used / (rev.limit + rev.overagePurchasedThisCycle)) * 100) : 0;
+      revealHtml = `
+        <div class="billing-reveal-info">
+          <span><strong>${rev.remaining}</strong> reveals remaining</span>
+          <span class="billing-reveal-detail">${rev.used} used of ${rev.limit} included${rev.overagePurchasedThisCycle > 0 ? ` + ${rev.overagePurchasedThisCycle} purchased` : ''}</span>
+        </div>
+        <div class="billing-progress-track">
+          <div class="billing-progress-fill" style="width:${pct}%"></div>
+        </div>
+        ${rev.overageSpentThisCycle > 0 ? `<p class="billing-overage-spent">$${rev.overageSpentThisCycle.toFixed(2)} spent on additional reveals this cycle</p>` : ''}
+      `;
+    }
+    document.getElementById('billing-reveals').innerHTML = revealHtml;
+
+    // Smart nudge
+    const nudgeEl = document.getElementById('billing-nudge');
+    if (status.nudge) {
+      nudgeEl.style.display = 'block';
+      nudgeEl.innerHTML = `
+        <div class="nudge-card">
+          <p>${this.escapeHtml(status.nudge.message)}</p>
+          <button class="btn btn-sm btn-primary" onclick="DirtLink.startCheckout('${status.nudge.targetPlan}')">Upgrade to ${this.escapeHtml(status.nudge.targetPlan.charAt(0).toUpperCase() + status.nudge.targetPlan.slice(1))}</button>
+        </div>
+      `;
+    } else {
+      nudgeEl.style.display = 'none';
+    }
+
+    // Plan comparison cards
+    await this._renderPlanCards(status.plan);
+
+    // Billing history
+    const historyEl = document.getElementById('billing-history-list');
+    if (history.length === 0) {
+      historyEl.innerHTML = '<p class="empty-state" style="padding:12px">No billing history yet.</p>';
+    } else {
+      historyEl.innerHTML = history.map(h => `
+        <div class="billing-history-item">
+          <div class="billing-history-desc">
+            <span>${this.escapeHtml(h.description)}</span>
+            <span class="billing-history-date">${new Date(h.created_at).toLocaleDateString()}</span>
+          </div>
+          <div class="billing-history-amount">${h.amount > 0 ? '$' + (h.amount / 100).toFixed(2) : 'Free'}</div>
+        </div>
+      `).join('');
+    }
+  },
+
+  async _renderPlanCards(currentPlan) {
+    const res = await fetch('/api/billing/plans');
+    if (!res.ok) return;
+    const plans = await res.json();
+
+    document.getElementById('billing-plans').innerHTML = `
+      <h4>Available Plans</h4>
+      <div class="plan-cards-grid">
+        ${plans.map(p => `
+          <div class="plan-card ${p.key === currentPlan ? 'plan-current' : ''} ${p.key === 'pro' ? 'plan-recommended' : ''}">
+            ${p.key === 'pro' ? '<div class="plan-recommended-badge">Most Popular</div>' : ''}
+            <h4>${this.escapeHtml(p.name)}</h4>
+            <div class="plan-price">${p.price > 0 ? `$${p.price}<span>/mo</span>` : 'Free'}</div>
+            <ul class="plan-features">
+              ${p.features.map(f => `<li>${this.escapeHtml(f)}</li>`).join('')}
+            </ul>
+            ${p.key === currentPlan
+              ? '<button class="btn btn-outline btn-full" disabled>Current Plan</button>'
+              : p.key === 'free'
+                ? ''
+                : `<button class="btn btn-primary btn-full" onclick="DirtLink.startCheckout('${p.key}')">
+                    ${this._planIndex(p.key) > this._planIndex(currentPlan) ? 'Upgrade' : 'Switch'} to ${this.escapeHtml(p.name)}
+                  </button>`
+            }
+          </div>
+        `).join('')}
+      </div>
+    `;
+  },
+
+  _planIndex(key) {
+    return ['free', 'pro', 'powerhouse', 'enterprise'].indexOf(key);
+  },
+
+  _buildRevealGateOptions(container, reveals) {
+    const rate = reveals.overageRate || 4.99;
+    const plan = reveals.plan || 'free';
+    const plans = { free: { next: 'pro', nextName: 'Pro', nextPrice: 29 }, pro: { next: 'powerhouse', nextName: 'Powerhouse', nextPrice: 59 }, powerhouse: { next: 'enterprise', nextName: 'Enterprise', nextPrice: 149 } };
+    const upgrade = plans[plan];
+
+    let html = `
+      <button class="btn btn-primary btn-full reveal-gate-buy" onclick="DirtLink.buyReveal()">
+        Buy 1 Reveal — $${rate.toFixed(2)}
+      </button>
+    `;
+
+    if (upgrade) {
+      html += `
+        <div class="reveal-gate-upgrade">
+          <p>Or upgrade to <strong>${upgrade.nextName}</strong> for $${upgrade.nextPrice}/mo and get more included reveals.</p>
+          <button class="btn btn-outline btn-full" onclick="DirtLink.startCheckout('${upgrade.next}')">
+            Upgrade to ${upgrade.nextName}
+          </button>
+        </div>
+      `;
+    }
+
+    container.innerHTML = html;
+  },
+
+  showBillingFromInquiry() {
+    this.closePermitModal();
+    this.showProfileModal();
+    // Switch to billing tab
+    setTimeout(() => {
+      document.querySelectorAll('.profile-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.ptab === 'billing');
+      });
+      document.getElementById('form-profile').style.display = 'none';
+      document.getElementById('billing-tab').style.display = 'flex';
+      document.getElementById('form-password').style.display = 'none';
+      this.loadBillingTab();
+    }, 100);
+  },
+
+  async startCheckout(plan) {
+    const res = await fetch('/api/billing/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan })
+    });
+    if (res.ok) {
+      const { url } = await res.json();
+      if (url) {
+        window.location.href = url;
+      } else {
+        alert('Stripe is not configured. In production, this would redirect to checkout.');
+      }
+    } else {
+      const err = await res.json();
+      alert(err.error || 'Failed to start checkout');
+    }
+  },
+
+  async buyReveal() {
+    const btn = document.querySelector('.reveal-gate-buy');
+    if (btn) { btn.disabled = true; btn.textContent = 'Processing...'; }
+
+    const res = await fetch('/api/billing/buy-reveal', { method: 'POST' });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else if (data.devMode) {
+        // Dev mode — reveal granted immediately
+        alert('Reveal purchased (dev mode). You can now use it.');
+        // Close the gate and re-attempt the inquiry
+        document.getElementById('inquiry-no-reveals').style.display = 'none';
+        document.getElementById('inquiry-confirm').style.display = 'block';
+        document.getElementById('reveal-counter').innerHTML = `<strong>${data.reveals.remaining}</strong> reveals remaining.`;
+        // Also close standalone gate modal if open
+        document.getElementById('modal-reveal-gate').style.display = 'none';
+      }
+    } else {
+      const err = await res.json();
+      alert(err.error || 'Failed to purchase reveal');
+    }
+    if (btn) { btn.disabled = false; btn.textContent = `Buy 1 Reveal`; }
+  },
+
+  async cancelSubscription() {
+    if (!confirm('Cancel your subscription? You will keep your current plan until the end of the billing period, then be downgraded to Free.')) return;
+    const res = await fetch('/api/billing/cancel', { method: 'POST' });
+    if (res.ok) {
+      alert('Subscription cancelled. Your plan remains active until the end of the current billing period.');
+      this.loadBillingTab();
+      // Refresh user data
+      await this.checkAuth();
+    } else {
+      const err = await res.json();
+      alert(err.error || 'Failed to cancel subscription');
+    }
+  },
+
+  // Show reveal gate modal (used when clicking a claimed pin to see contact info)
+  showRevealGate(reveals, onRevealGranted) {
+    this._onRevealGranted = onRevealGranted;
+    const content = document.getElementById('reveal-gate-content');
+    const rate = reveals.overageRate || (this.user ? (this.user.overageRate || 4.99) : 4.99);
+    const plan = reveals.plan || (this.user ? this.user.user_type : 'free');
+
+    content.innerHTML = `
+      <h2>No Reveals Remaining</h2>
+      <p style="color:var(--text-muted); margin-bottom:20px;">You've used all ${reveals.limit} of your included reveals this month.</p>
+      <div class="reveal-gate-options" id="modal-reveal-gate-options"></div>
+    `;
+
+    this._buildRevealGateOptions(document.getElementById('modal-reveal-gate-options'), { ...reveals, overageRate: rate, plan });
+    document.getElementById('modal-reveal-gate').style.display = 'flex';
   },
 
   escapeHtml(str) {

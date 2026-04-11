@@ -172,6 +172,19 @@ async function getDb() {
   if (!userCols.includes('reveals_reset_at')) {
     db.run(`ALTER TABLE users ADD COLUMN reveals_reset_at TEXT`);
   }
+  // Stripe & subscription fields
+  if (!userCols.includes('stripe_customer_id')) {
+    db.run(`ALTER TABLE users ADD COLUMN stripe_customer_id TEXT`);
+  }
+  if (!userCols.includes('stripe_subscription_id')) {
+    db.run(`ALTER TABLE users ADD COLUMN stripe_subscription_id TEXT`);
+  }
+  if (!userCols.includes('plan_started_at')) {
+    db.run(`ALTER TABLE users ADD COLUMN plan_started_at TEXT`);
+  }
+  if (!userCols.includes('priority_notifications')) {
+    db.run(`ALTER TABLE users ADD COLUMN priority_notifications INTEGER NOT NULL DEFAULT 0`);
+  }
 
   // Add timeline_date and source_permit_id to pins
   const pinCols = all(`PRAGMA table_info(pins)`).map(c => c.name);
@@ -190,6 +203,34 @@ async function getDb() {
   if (!permitCols.includes('claimed_at')) {
     db.run(`ALTER TABLE permit_pins ADD COLUMN claimed_at TEXT`);
   }
+
+  // Reveal purchases (one-time overage buys)
+  db.run(`
+    CREATE TABLE IF NOT EXISTS reveal_purchases (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      amount INTEGER NOT NULL,
+      stripe_payment_intent_id TEXT,
+      status TEXT NOT NULL DEFAULT 'completed',
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )
+  `);
+
+  // Billing history (subscriptions + one-time purchases)
+  db.run(`
+    CREATE TABLE IF NOT EXISTS billing_history (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      type TEXT NOT NULL,
+      description TEXT NOT NULL,
+      amount INTEGER NOT NULL,
+      stripe_id TEXT,
+      status TEXT NOT NULL DEFAULT 'completed',
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )
+  `);
 
   // Audit log for API calls
   db.run(`
@@ -227,7 +268,11 @@ async function getDb() {
     'CREATE INDEX IF NOT EXISTS idx_audit_log_created ON audit_log(created_at)',
     'CREATE INDEX IF NOT EXISTS idx_inquiries_permit ON inquiries(permit_pin_id)',
     'CREATE INDEX IF NOT EXISTS idx_inquiries_user ON inquiries(user_id)',
-    'CREATE INDEX IF NOT EXISTS idx_permit_pins_claimed ON permit_pins(claimed_by)'
+    'CREATE INDEX IF NOT EXISTS idx_permit_pins_claimed ON permit_pins(claimed_by)',
+    'CREATE INDEX IF NOT EXISTS idx_reveal_purchases_user ON reveal_purchases(user_id)',
+    'CREATE INDEX IF NOT EXISTS idx_reveal_purchases_created ON reveal_purchases(created_at)',
+    'CREATE INDEX IF NOT EXISTS idx_billing_history_user ON billing_history(user_id)',
+    'CREATE INDEX IF NOT EXISTS idx_users_stripe_customer ON users(stripe_customer_id)'
   ];
   indexes.forEach(sql => { try { db.run(sql); } catch(e) {} });
 
