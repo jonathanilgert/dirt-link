@@ -91,6 +91,42 @@ app.get('/unsubscribe/:token', (req, res) => {
   `);
 });
 
+// ── Admin: API key provisioning (secured by ADMIN_SECRET env var) ──
+// Usage: curl -X POST https://dirtlink.ca/api/admin/create-key \
+//   -H "Content-Type: application/json" \
+//   -d '{"secret":"YOUR_ADMIN_SECRET","name":"Hubert Agent"}'
+app.post('/api/admin/create-key', (req, res) => {
+  const adminSecret = process.env.ADMIN_SECRET;
+  if (!adminSecret) {
+    return res.status(503).json({ error: 'ADMIN_SECRET not configured on server' });
+  }
+  const { secret, name } = req.body;
+  if (!secret || secret !== adminSecret) {
+    return res.status(403).json({ error: 'Invalid admin secret' });
+  }
+  if (!name || !name.trim()) {
+    return res.status(400).json({ error: 'Key name is required' });
+  }
+
+  const { v4: uuidv4 } = require('uuid');
+  const { generateApiKey } = require('./middleware/apiKey');
+  const { run } = require('./database/init');
+
+  const id = uuidv4();
+  const { key, hash } = generateApiKey();
+  run(
+    `INSERT INTO api_keys (id, name, key_hash, created_by) VALUES (?, ?, ?, 'admin')`,
+    [id, name.trim(), hash]
+  );
+
+  res.status(201).json({
+    id,
+    name: name.trim(),
+    key,
+    message: 'Store this key securely — it will not be shown again.'
+  });
+});
+
 // SPA fallback
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
