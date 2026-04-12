@@ -336,6 +336,7 @@
 
       <div class="profile-tabs">
         <button class="profile-tab active" data-ptab="details">Company Details</button>
+        <button class="profile-tab" data-ptab="notifications">Notifications</button>
         <button class="profile-tab" data-ptab="billing">Plan &amp; Billing</button>
         <button class="profile-tab" data-ptab="password">Change Password</button>
       </div>
@@ -362,6 +363,31 @@
         <p class="profile-success" id="profile-success"></p>
         <button type="submit" class="btn btn-primary">Save Changes</button>
       </form>
+
+      <!-- Notifications tab -->
+      <div id="notifications-tab" class="profile-form" style="display:none; flex-direction:column; gap:16px;">
+        <div class="notification-settings">
+          <h3 style="margin:0 0 8px;">Email Notifications</h3>
+          <p class="hint" style="margin:0 0 12px;">Receive an email when someone sends you a message on DirtLink. You can reply directly from your email.</p>
+          <label class="toggle-label">
+            <input type="checkbox" id="pref-email-notifications">
+            <span class="toggle-switch"></span>
+            <span>Email notifications</span>
+          </label>
+        </div>
+        <div class="notification-settings">
+          <h3 style="margin:0 0 8px;">SMS Notifications</h3>
+          <p class="hint" style="margin:0 0 12px;">Get a brief text message when you receive a new DirtLink message. Your phone number from your profile is used.</p>
+          <label class="toggle-label">
+            <input type="checkbox" id="pref-sms-notifications">
+            <span class="toggle-switch"></span>
+            <span>SMS notifications</span>
+          </label>
+          <p class="hint" style="margin-top:8px;" id="sms-phone-hint"></p>
+        </div>
+        <p class="profile-success" id="notification-success"></p>
+        <button class="btn btn-primary" id="btn-save-notifications">Save Notification Preferences</button>
+      </div>
 
       <!-- Billing tab -->
       <div id="billing-tab" class="profile-form" style="display:none; flex-direction:column; gap:16px;">

@@ -71,6 +71,24 @@ app.use('/api/messages', require('./routes/messages'));
 app.use('/api/billing', require('./routes/billing'));
 app.use('/api/keys', require('./routes/apiKeys'));
 app.use('/api/external', require('./routes/externalApi'));
+app.use('/api/inbound', require('./routes/inbound'));
+
+// Unsubscribe from email notifications (token-based, no auth required)
+app.get('/unsubscribe/:token', (req, res) => {
+  const { get: dbGet, run: dbRun } = require('./database/init');
+  const user = dbGet('SELECT id, email FROM users WHERE unsubscribe_token = ?', [req.params.token]);
+  if (!user) {
+    return res.send(`
+      <html><head><title>DirtLink</title><style>body{font-family:-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#f9fafb;}</style></head>
+      <body><div style="text-align:center;"><h2>Invalid or expired link</h2><p>This unsubscribe link is no longer valid.</p></div></body></html>
+    `);
+  }
+  dbRun('UPDATE users SET email_notifications = 0 WHERE id = ?', [user.id]);
+  res.send(`
+    <html><head><title>DirtLink — Unsubscribed</title><style>body{font-family:-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#f9fafb;}</style></head>
+    <body><div style="text-align:center;"><h2>Unsubscribed</h2><p>You will no longer receive email notifications from DirtLink.</p><p style="color:#6b7280;">You can re-enable them anytime in your DirtLink profile settings.</p></div></body></html>
+  `);
+});
 
 // SPA fallback
 app.get('*', (req, res) => {

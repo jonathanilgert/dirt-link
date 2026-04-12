@@ -63,7 +63,7 @@ router.post('/logout', (req, res) => {
 
 // Get current user (includes reveal credits and plan info)
 router.get('/me', requireAuth, (req, res) => {
-  const user = get('SELECT id, email, company_name, contact_name, phone, user_type, reveals_used, reveals_reset_at, priority_notifications, created_at FROM users WHERE id = ?', [req.session.userId]);
+  const user = get('SELECT id, email, company_name, contact_name, phone, user_type, reveals_used, reveals_reset_at, priority_notifications, email_notifications, sms_notifications, created_at FROM users WHERE id = ?', [req.session.userId]);
   if (!user) return res.status(404).json({ error: 'User not found' });
 
   const reveals = getRevealStatus(user, { all, run });
@@ -106,6 +106,35 @@ router.put('/password', requireAuth, (req, res) => {
   const password_hash = bcrypt.hashSync(new_password, 10);
   run(`UPDATE users SET password_hash = ?, updated_at = datetime('now') WHERE id = ?`, [password_hash, req.session.userId]);
   res.json({ message: 'Password updated' });
+});
+
+// Update notification preferences
+router.put('/notifications', requireAuth, (req, res) => {
+  const { email_notifications, sms_notifications } = req.body;
+
+  const updates = [];
+  const params = [];
+
+  if (email_notifications !== undefined) {
+    updates.push('email_notifications = ?');
+    params.push(email_notifications ? 1 : 0);
+  }
+  if (sms_notifications !== undefined) {
+    updates.push('sms_notifications = ?');
+    params.push(sms_notifications ? 1 : 0);
+  }
+
+  if (updates.length === 0) {
+    return res.status(400).json({ error: 'No preferences to update' });
+  }
+
+  updates.push("updated_at = datetime('now')");
+  params.push(req.session.userId);
+
+  run(`UPDATE users SET ${updates.join(', ')} WHERE id = ?`, params);
+
+  const user = get('SELECT email_notifications, sms_notifications FROM users WHERE id = ?', [req.session.userId]);
+  res.json(user);
 });
 
 module.exports = router;

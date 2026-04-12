@@ -186,6 +186,34 @@ async function getDb() {
     db.run(`ALTER TABLE users ADD COLUMN priority_notifications INTEGER NOT NULL DEFAULT 0`);
   }
 
+  // Notification preferences on users
+  if (!userCols.includes('email_notifications')) {
+    db.run(`ALTER TABLE users ADD COLUMN email_notifications INTEGER NOT NULL DEFAULT 1`);
+  }
+  if (!userCols.includes('sms_notifications')) {
+    db.run(`ALTER TABLE users ADD COLUMN sms_notifications INTEGER NOT NULL DEFAULT 0`);
+  }
+  if (!userCols.includes('unsubscribe_token')) {
+    db.run(`ALTER TABLE users ADD COLUMN unsubscribe_token TEXT`);
+  }
+
+  // Notification queue for batching
+  db.run(`
+    CREATE TABLE IF NOT EXISTS notification_queue (
+      id TEXT PRIMARY KEY,
+      recipient_id TEXT NOT NULL,
+      conversation_id TEXT NOT NULL,
+      message_id TEXT NOT NULL,
+      sender_name TEXT NOT NULL,
+      pin_address TEXT,
+      message_body TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      sent_at TEXT,
+      FOREIGN KEY (recipient_id) REFERENCES users(id),
+      FOREIGN KEY (conversation_id) REFERENCES conversations(id)
+    )
+  `);
+
   // Add timeline_date and source_permit_id to pins
   const pinCols = all(`PRAGMA table_info(pins)`).map(c => c.name);
   if (!pinCols.includes('timeline_date')) {
@@ -272,7 +300,9 @@ async function getDb() {
     'CREATE INDEX IF NOT EXISTS idx_reveal_purchases_user ON reveal_purchases(user_id)',
     'CREATE INDEX IF NOT EXISTS idx_reveal_purchases_created ON reveal_purchases(created_at)',
     'CREATE INDEX IF NOT EXISTS idx_billing_history_user ON billing_history(user_id)',
-    'CREATE INDEX IF NOT EXISTS idx_users_stripe_customer ON users(stripe_customer_id)'
+    'CREATE INDEX IF NOT EXISTS idx_users_stripe_customer ON users(stripe_customer_id)',
+    'CREATE INDEX IF NOT EXISTS idx_notification_queue_recipient ON notification_queue(recipient_id, sent_at)',
+    'CREATE INDEX IF NOT EXISTS idx_users_unsubscribe ON users(unsubscribe_token)'
   ];
   indexes.forEach(sql => { try { db.run(sql); } catch(e) {} });
 

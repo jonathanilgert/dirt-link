@@ -2,6 +2,7 @@ const express = require('express');
 const { v4: uuidv4 } = require('uuid');
 const { all, get, run } = require('../database/init');
 const { requireAuth } = require('../middleware/auth');
+const { queueNotification, scheduleFlush } = require('../services/notifications');
 
 const router = express.Router();
 
@@ -89,6 +90,24 @@ router.post('/conversations/:conversationId/messages', requireAuth, (req, res) =
     `SELECT m.*, u.company_name, u.contact_name FROM messages m JOIN users u ON m.sender_id = u.id WHERE m.id = ?`,
     [id]
   );
+
+  // Notify the other participant (email + SMS)
+  const recipientId = conversation.initiator_id === req.session.userId
+    ? conversation.owner_id
+    : conversation.initiator_id;
+
+  const pin = get('SELECT address, title FROM pins WHERE id = ?', [conversation.pin_id]);
+  const sender = get('SELECT company_name, contact_name FROM users WHERE id = ?', [req.session.userId]);
+
+  queueNotification({
+    recipientId,
+    conversationId,
+    messageId: id,
+    senderName: sender?.company_name || sender?.contact_name || 'Someone',
+    pinAddress: pin?.address || pin?.title,
+    messageBody: body.trim()
+  });
+  scheduleFlush(recipientId);
 
   res.status(201).json(message);
 });

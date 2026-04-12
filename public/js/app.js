@@ -128,13 +128,16 @@ window.DirtLink = {
         document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
         document.getElementById('form-profile').style.display = tab.dataset.ptab === 'details' ? 'flex' : 'none';
+        document.getElementById('notifications-tab').style.display = tab.dataset.ptab === 'notifications' ? 'flex' : 'none';
         document.getElementById('billing-tab').style.display = tab.dataset.ptab === 'billing' ? 'flex' : 'none';
         document.getElementById('form-password').style.display = tab.dataset.ptab === 'password' ? 'flex' : 'none';
         document.getElementById('profile-error').textContent = '';
         document.getElementById('profile-success').textContent = '';
         document.getElementById('password-error').textContent = '';
         document.getElementById('password-success').textContent = '';
+        document.getElementById('notification-success').textContent = '';
         if (tab.dataset.ptab === 'billing') this.loadBillingTab();
+        if (tab.dataset.ptab === 'notifications') this.loadNotificationPrefs();
       });
     });
 
@@ -184,6 +187,9 @@ window.DirtLink = {
         document.getElementById('password-error').textContent = err.error;
       }
     });
+
+    // Notification preferences save
+    document.getElementById('btn-save-notifications').addEventListener('click', () => this.saveNotificationPrefs());
 
     // Auth tabs
     document.querySelectorAll('#auth-tabs .tab').forEach(tab => {
@@ -360,10 +366,12 @@ window.DirtLink = {
     // Reset tabs to details
     document.querySelectorAll('.profile-tab').forEach(t => t.classList.toggle('active', t.dataset.ptab === 'details'));
     document.getElementById('form-profile').style.display = 'flex';
+    document.getElementById('notifications-tab').style.display = 'none';
     document.getElementById('billing-tab').style.display = 'none';
     document.getElementById('form-password').style.display = 'none';
     document.getElementById('profile-error').textContent = '';
     document.getElementById('profile-success').textContent = '';
+    document.getElementById('notification-success').textContent = '';
     document.getElementById('modal-profile').style.display = 'flex';
   },
 
@@ -846,6 +854,36 @@ window.DirtLink = {
     }
   },
 
+  // ── Notification Preferences ──
+  loadNotificationPrefs() {
+    if (!this.user) return;
+    document.getElementById('pref-email-notifications').checked = !!this.user.email_notifications;
+    document.getElementById('pref-sms-notifications').checked = !!this.user.sms_notifications;
+    const phoneHint = document.getElementById('sms-phone-hint');
+    if (this.user.phone) {
+      phoneHint.textContent = `SMS will be sent to: ${this.user.phone}`;
+    } else {
+      phoneHint.innerHTML = 'No phone number on file. <a href="#" onclick="document.querySelector(\'[data-ptab=details]\').click(); return false;">Add one in Company Details</a>.';
+    }
+  },
+
+  async saveNotificationPrefs() {
+    const emailOn = document.getElementById('pref-email-notifications').checked;
+    const smsOn = document.getElementById('pref-sms-notifications').checked;
+
+    const res = await fetch('/api/auth/notifications', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email_notifications: emailOn, sms_notifications: smsOn })
+    });
+
+    if (res.ok) {
+      this.user.email_notifications = emailOn ? 1 : 0;
+      this.user.sms_notifications = smsOn ? 1 : 0;
+      document.getElementById('notification-success').textContent = 'Preferences saved.';
+    }
+  },
+
   // Poll for unread messages
   async pollUnread() {
     if (!this.user) return;
@@ -1209,6 +1247,7 @@ window.DirtLink = {
         t.classList.toggle('active', t.dataset.ptab === 'billing');
       });
       document.getElementById('form-profile').style.display = 'none';
+      document.getElementById('notifications-tab').style.display = 'none';
       document.getElementById('billing-tab').style.display = 'flex';
       document.getElementById('form-password').style.display = 'none';
       this.loadBillingTab();
