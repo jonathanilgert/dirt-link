@@ -40,6 +40,7 @@ const pinUpload = upload.fields([
 ]);
 
 const { PLANS, getRevealStatus, calculateSavings } = require('../config/pricing');
+const { notifyForNewPin } = require('../services/proximity');
 
 // Get all active permit pins (public — for map display)
 router.get('/permits', (req, res) => {
@@ -142,6 +143,10 @@ router.post('/', requireAuth, pinUpload, (req, res) => {
     [id]
   );
   pin.photos = all('SELECT id, file_path FROM pin_photos WHERE pin_id = ?', [id]);
+
+  // Trigger proximity alerts for nearby subscribers
+  try { notifyForNewPin(pin, 'material_listing', 'pins'); } catch (e) { console.error('[proximity] Error:', e.message); }
+
   res.status(201).json(pin);
 });
 
@@ -289,6 +294,10 @@ router.post('/claim/:permitId', requireAuth, pinUpload, (req, res) => {
     [id]
   );
   pin.photos = all('SELECT id, file_path FROM pin_photos WHERE pin_id = ?', [id]);
+
+  // Trigger proximity alerts for the newly claimed pin
+  try { notifyForNewPin(pin, 'material_listing', 'pins'); } catch (e) { console.error('[proximity] Error:', e.message); }
+
   res.status(201).json(pin);
 });
 

@@ -72,6 +72,7 @@ app.use('/api/billing', require('./routes/billing'));
 app.use('/api/keys', require('./routes/apiKeys'));
 app.use('/api/external', require('./routes/externalApi'));
 app.use('/api/inbound', require('./routes/inbound'));
+app.use('/api/proximity', require('./routes/proximity'));
 
 // Unsubscribe from email notifications (token-based, no auth required)
 app.get('/unsubscribe/:token', (req, res) => {

@@ -2375,3 +2375,236 @@ main {
 .toggle-label input:checked + .toggle-switch::after {
   transform: translateX(20px);
 }
+
+/* ============================================================
+   PROXIMITY ALERTS
+   ============================================================ */
+
+/* Bell button */
+.proximity-bell-wrapper {
+  position: relative;
+  margin-right: 8px;
+}
+
+.btn-proximity-bell {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  position: relative;
+  transition: background 0.15s;
+}
+
+.btn-proximity-bell:hover {
+  background: var(--bg-hover, #f3f4f6);
+}
+
+.proximity-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #ef4444;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+/* Dropdown panel */
+.proximity-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 360px;
+  max-height: 440px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.proximity-dropdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.proximity-dropdown-header h4 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.btn-mark-all-read {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-mark-all-read:hover {
+  text-decoration: underline;
+}
+
+.proximity-dropdown-list {
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.proximity-notif-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.proximity-notif-item:hover {
+  background: #f9fafb;
+}
+
+.proximity-notif-item.unread {
+  background: #fffbeb;
+  border-left: 3px solid var(--primary);
+}
+
+.proximity-notif-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.proximity-notif-body {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.proximity-notif-time {
+  font-size: 11px;
+  color: #9ca3af;
+  margin-top: 4px;
+}
+
+/* Proximity settings in profile */
+.proximity-section {
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+  margin-top: 8px;
+}
+
+.perk-badge {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
+.monitored-pins-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.monitored-pin-card {
+  background: #f9fafb;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.monitored-pin-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.monitored-pin-info strong {
+  font-size: 13px;
+}
+
+.monitored-pin-type {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+.monitored-pin-type.have {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.monitored-pin-type.need {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.monitored-pin-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.monitored-pin-controls select {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.toggle-sm {
+  font-size: 12px;
+}
+
+.toggle-sm .toggle-switch {
+  width: 32px;
+  height: 16px;
+}
+
+.toggle-sm .toggle-switch::after {
+  width: 12px;
+  height: 12px;
+}
+
+.toggle-sm input:checked + .toggle-switch::after {
+  transform: translateX(16px);
+}
+
+/* Monitor button in My Pins cards */
+.btn-monitor-active {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #86efac;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-monitor-active:hover {
+  background: #dcfce7;
+}

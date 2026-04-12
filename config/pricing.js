@@ -36,7 +36,9 @@ const PLANS = {
       'Everything in Pro',
       '40 reveals per month',
       'Additional reveals at $1.49 each',
-      'Priority notifications for new pins nearby'
+      'Proximity alerts — get notified when new sites appear near yours',
+      'Configurable monitoring radius (5-50 km)',
+      'Email, SMS & in-app proximity notifications'
     ],
     stripePriceId: process.env.STRIPE_POWERHOUSE_PRICE_ID || null
   },
@@ -49,7 +51,8 @@ const PLANS = {
       'Everything in Powerhouse',
       'Unlimited reveals',
       'Private map view (your sites only)',
-      'Unlimited outreach'
+      'Unlimited outreach',
+      'Proximity alerts with priority delivery'
     ],
     stripePriceId: process.env.STRIPE_ENTERPRISE_PRICE_ID || null
   }

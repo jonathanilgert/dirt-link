@@ -164,6 +164,44 @@ async function getDb() {
     )
   `);
 
+  // Proximity alert settings — per-pin monitoring config for Powerhouse/Enterprise users
+  db.run(`
+    CREATE TABLE IF NOT EXISTS proximity_alert_settings (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      pin_id TEXT NOT NULL,
+      radius_km REAL NOT NULL DEFAULT 10,
+      notify_email INTEGER NOT NULL DEFAULT 1,
+      notify_sms INTEGER NOT NULL DEFAULT 0,
+      notify_in_app INTEGER NOT NULL DEFAULT 1,
+      is_paused INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (user_id) REFERENCES users(id),
+      FOREIGN KEY (pin_id) REFERENCES pins(id)
+    )
+  `);
+
+  // In-app proximity notifications
+  db.run(`
+    CREATE TABLE IF NOT EXISTS proximity_notifications (
+      id TEXT PRIMARY KEY,
+      recipient_id TEXT NOT NULL,
+      alert_setting_id TEXT NOT NULL,
+      trigger_pin_id TEXT,
+      trigger_permit_pin_id TEXT,
+      trigger_type TEXT NOT NULL,
+      distance_km REAL NOT NULL,
+      title TEXT NOT NULL,
+      body TEXT NOT NULL,
+      link TEXT,
+      is_read INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (recipient_id) REFERENCES users(id),
+      FOREIGN KEY (alert_setting_id) REFERENCES proximity_alert_settings(id)
+    )
+  `);
+
   // Add reveals tracking columns to users (safe — IF NOT EXISTS handled by ALTER failing silently)
   const userCols = all(`PRAGMA table_info(users)`).map(c => c.name);
   if (!userCols.includes('reveals_used')) {
@@ -195,6 +233,13 @@ async function getDb() {
   }
   if (!userCols.includes('unsubscribe_token')) {
     db.run(`ALTER TABLE users ADD COLUMN unsubscribe_token TEXT`);
+  }
+  // Proximity alert defaults
+  if (!userCols.includes('proximity_radius_km')) {
+    db.run(`ALTER TABLE users ADD COLUMN proximity_radius_km REAL NOT NULL DEFAULT 10`);
+  }
+  if (!userCols.includes('proximity_paused')) {
+    db.run(`ALTER TABLE users ADD COLUMN proximity_paused INTEGER NOT NULL DEFAULT 0`);
   }
 
   // Notification queue for batching
@@ -302,7 +347,17 @@ async function getDb() {
     'CREATE INDEX IF NOT EXISTS idx_billing_history_user ON billing_history(user_id)',
     'CREATE INDEX IF NOT EXISTS idx_users_stripe_customer ON users(stripe_customer_id)',
     'CREATE INDEX IF NOT EXISTS idx_notification_queue_recipient ON notification_queue(recipient_id, sent_at)',
-    'CREATE INDEX IF NOT EXISTS idx_users_unsubscribe ON users(unsubscribe_token)'
+    'CREATE INDEX IF NOT EXISTS idx_users_unsubscribe ON users(unsubscribe_token)',
+    // Proximity alert indexes
+    'CREATE INDEX IF NOT EXISTS idx_proximity_settings_user ON proximity_alert_settings(user_id)',
+    'CREATE INDEX IF NOT EXISTS idx_proximity_settings_pin ON proximity_alert_settings(pin_id)',
+    'CREATE INDEX IF NOT EXISTS idx_proximity_settings_active ON proximity_alert_settings(user_id, is_paused)',
+    'CREATE INDEX IF NOT EXISTS idx_proximity_notifications_recipient ON proximity_notifications(recipient_id, is_read)',
+    // Geospatial bounding-box pre-filter indexes
+    'CREATE INDEX IF NOT EXISTS idx_pins_lat ON pins(latitude)',
+    'CREATE INDEX IF NOT EXISTS idx_pins_lng ON pins(longitude)',
+    'CREATE INDEX IF NOT EXISTS idx_permit_pins_lat ON permit_pins(latitude)',
+    'CREATE INDEX IF NOT EXISTS idx_permit_pins_lng ON permit_pins(longitude)'
   ];
   indexes.forEach(sql => { try { db.run(sql); } catch(e) {} });
 

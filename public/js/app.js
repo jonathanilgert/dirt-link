@@ -17,6 +17,8 @@ window.DirtLink = {
     await this.loadPins();
     await this.loadExternalPins();
     this.pollUnread();
+    this.initProximityBell();
+    this.pollProximityAlerts();
   },
 
   populateClaimMaterialSelect() {
@@ -190,6 +192,21 @@ window.DirtLink = {
 
     // Notification preferences save
     document.getElementById('btn-save-notifications').addEventListener('click', () => this.saveNotificationPrefs());
+
+    // Proximity bell
+    document.getElementById('btn-proximity-bell').addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggleProximityDropdown();
+    });
+    document.getElementById('btn-mark-all-read').addEventListener('click', () => this.markAllProximityRead());
+    document.getElementById('btn-save-proximity').addEventListener('click', () => this.saveProximitySettings());
+    // Close dropdown when clicking elsewhere
+    document.addEventListener('click', (e) => {
+      const dropdown = document.getElementById('proximity-dropdown');
+      if (dropdown.style.display !== 'none' && !e.target.closest('.proximity-bell-wrapper')) {
+        dropdown.style.display = 'none';
+      }
+    });
 
     // Auth tabs
     document.querySelectorAll('#auth-tabs .tab').forEach(tab => {
@@ -606,9 +623,28 @@ window.DirtLink = {
       container.innerHTML = '<p class="empty-state">You haven\'t dropped any pins yet.</p>';
       return;
     }
+
+    // Fetch monitored pin IDs if eligible
+    let monitoredPinIds = new Set();
+    if (this._isProximityEligible()) {
+      try {
+        const settingsRes = await fetch('/api/proximity/settings');
+        if (settingsRes.ok) {
+          const data = await settingsRes.json();
+          monitoredPinIds = new Set(data.monitoredPins.map(mp => mp.pin_id));
+        }
+      } catch (e) { /* ignore */ }
+    }
+
     container.innerHTML = pins.map(p => {
       const timelineHtml = this._getTimelineBadgeHtml(p);
       const staleHtml = this._getStaleBadgeHtml(p);
+      const isMonitored = monitoredPinIds.has(p.id);
+      const monitorBtn = this._isProximityEligible() && p.is_active
+        ? `<button class="btn btn-sm ${isMonitored ? 'btn-monitor-active' : 'btn-outline'}" onclick="DirtLink.togglePinMonitoring('${p.id}', ${!isMonitored}).then(() => DirtLink.loadMyPins())" title="${isMonitored ? 'Stop monitoring' : 'Monitor for nearby sites'}">
+            ${isMonitored ? 'Monitoring' : 'Monitor'}
+          </button>`
+        : '';
       return `
       <div class="pin-card ${p.pin_type}">
         <div class="pin-card-header">
@@ -634,6 +670,7 @@ window.DirtLink = {
             <button class="btn btn-sm btn-primary" onclick="DirtLink.editPin('${p.id}')">Edit</button>
             <button class="btn btn-sm btn-outline" onclick="DirtLink.repositionPin('${p.id}')">Reposition</button>
             <button class="btn btn-sm btn-outline" onclick="DirtLink.deactivatePin('${p.id}')">Mark Complete</button>
+            ${monitorBtn}
           ` : `
             <button class="btn btn-sm btn-outline" onclick="DirtLink.reactivatePin('${p.id}')">Reactivate</button>
           `}
@@ -865,6 +902,8 @@ window.DirtLink = {
     } else {
       phoneHint.innerHTML = 'No phone number on file. <a href="#" onclick="document.querySelector(\'[data-ptab=details]\').click(); return false;">Add one in Company Details</a>.';
     }
+    // Load proximity settings if eligible
+    this.loadProximitySettings();
   },
 
   async saveNotificationPrefs() {
@@ -1366,6 +1405,215 @@ window.DirtLink = {
       return `<p class="timeline-detail ${isPast ? 'stale' : ''}"><strong>${label}:</strong> ${d.toLocaleDateString()}${isPast ? ' <span class="stale-tag">Past due</span>' : ''}</p>`;
     }
     return '';
+  },
+
+  // ============================================================
+  // PROXIMITY ALERTS
+  // ============================================================
+
+  _isProximityEligible() {
+    return this.user && (this.user.user_type === 'powerhouse' || this.user.user_type === 'enterprise');
+  },
+
+  initProximityBell() {
+    const wrapper = document.getElementById('proximity-bell-wrapper');
+    if (this._isProximityEligible()) {
+      wrapper.style.display = 'block';
+    } else {
+      wrapper.style.display = 'none';
+    }
+  },
+
+  async pollProximityAlerts() {
+    if (!this._isProximityEligible()) return;
+    try {
+      const res = await fetch('/api/proximity/notifications/count');
+      if (res.ok) {
+        const { count } = await res.json();
+        const badge = document.getElementById('proximity-badge');
+        if (count > 0) {
+          badge.textContent = count;
+          badge.style.display = 'inline';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+    } catch (e) { /* ignore */ }
+    setTimeout(() => this.pollProximityAlerts(), 30000);
+  },
+
+  async toggleProximityDropdown() {
+    const dropdown = document.getElementById('proximity-dropdown');
+    if (dropdown.style.display !== 'none') {
+      dropdown.style.display = 'none';
+      return;
+    }
+    dropdown.style.display = 'block';
+    await this.loadProximityNotifications();
+  },
+
+  async loadProximityNotifications() {
+    const list = document.getElementById('proximity-dropdown-list');
+    list.innerHTML = '<p class="empty-state">Loading...</p>';
+
+    try {
+      const res = await fetch('/api/proximity/notifications?limit=20');
+      if (!res.ok) throw new Error();
+      const { notifications } = await res.json();
+
+      if (notifications.length === 0) {
+        list.innerHTML = '<p class="empty-state">No proximity alerts yet.</p>';
+        return;
+      }
+
+      list.innerHTML = notifications.map(n => `
+        <div class="proximity-notif-item ${n.is_read ? '' : 'unread'}" data-id="${n.id}">
+          <div class="proximity-notif-title">${this.escapeHtml(n.title)}</div>
+          <div class="proximity-notif-body">${this.escapeHtml(n.body)}</div>
+          <div class="proximity-notif-time">${this._timeAgo(n.created_at)}</div>
+        </div>
+      `).join('');
+
+      // Click to mark as read and navigate
+      list.querySelectorAll('.proximity-notif-item.unread').forEach(item => {
+        item.addEventListener('click', async () => {
+          await fetch('/api/proximity/notifications/read', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ notification_ids: [item.dataset.id] })
+          });
+          item.classList.remove('unread');
+          this.pollProximityAlerts();
+        });
+      });
+    } catch (e) {
+      list.innerHTML = '<p class="empty-state">Failed to load alerts.</p>';
+    }
+  },
+
+  async markAllProximityRead() {
+    await fetch('/api/proximity/notifications/read', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ all: true })
+    });
+    document.getElementById('proximity-badge').style.display = 'none';
+    document.querySelectorAll('.proximity-notif-item.unread').forEach(el => el.classList.remove('unread'));
+  },
+
+  async loadProximitySettings() {
+    const section = document.getElementById('proximity-settings-section');
+    if (!this._isProximityEligible()) {
+      section.style.display = 'none';
+      return;
+    }
+    section.style.display = 'block';
+
+    try {
+      const res = await fetch('/api/proximity/settings');
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+
+      document.getElementById('proximity-default-radius').value = data.defaultRadius || 10;
+      document.getElementById('proximity-global-pause').checked = !!data.globalPaused;
+
+      const container = document.getElementById('proximity-monitored-pins');
+      if (data.monitoredPins.length === 0) {
+        container.innerHTML = '<p class="empty-state">No pins are being monitored yet. Go to My Pins and enable monitoring on any active listing.</p>';
+      } else {
+        container.innerHTML = data.monitoredPins.map(mp => `
+          <div class="monitored-pin-card" data-setting-id="${mp.setting_id}">
+            <div class="monitored-pin-info">
+              <strong>${this.escapeHtml(mp.title || mp.address || 'Untitled')}</strong>
+              <span class="monitored-pin-type ${mp.pin_type}">${mp.pin_type === 'have' ? 'HAVE' : 'NEED'}</span>
+            </div>
+            <div class="monitored-pin-controls">
+              <select class="monitored-radius" data-setting-id="${mp.setting_id}">
+                ${[5, 10, 25, 50].map(r => `<option value="${r}" ${r === mp.radius_km ? 'selected' : ''}>${r} km</option>`).join('')}
+              </select>
+              <label class="toggle-label toggle-sm">
+                <input type="checkbox" class="monitored-pause" data-setting-id="${mp.setting_id}" ${mp.is_paused ? 'checked' : ''}>
+                <span class="toggle-switch"></span>
+                <span>Pause</span>
+              </label>
+              <button class="btn btn-sm btn-danger" onclick="DirtLink.removeMonitoring('${mp.setting_id}')">Remove</button>
+            </div>
+          </div>
+        `).join('');
+      }
+    } catch (e) {
+      // Not eligible or error
+    }
+  },
+
+  async saveProximitySettings() {
+    const radius = parseInt(document.getElementById('proximity-default-radius').value);
+    const paused = document.getElementById('proximity-global-pause').checked;
+
+    const res = await fetch('/api/proximity/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ default_radius_km: radius, paused })
+    });
+
+    // Save individual pin settings
+    const cards = document.querySelectorAll('.monitored-pin-card');
+    for (const card of cards) {
+      const settingId = card.dataset.settingId;
+      const radiusEl = card.querySelector('.monitored-radius');
+      const pauseEl = card.querySelector('.monitored-pause');
+      await fetch(`/api/proximity/monitor/${settingId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          radius_km: parseInt(radiusEl.value),
+          is_paused: pauseEl.checked
+        })
+      });
+    }
+
+    const msg = document.getElementById('proximity-success');
+    msg.textContent = res.ok ? 'Proximity settings saved.' : 'Failed to save settings.';
+  },
+
+  async removeMonitoring(settingId) {
+    await fetch(`/api/proximity/monitor/${settingId}`, { method: 'DELETE' });
+    this.loadProximitySettings();
+  },
+
+  async togglePinMonitoring(pinId, enable) {
+    if (enable) {
+      const res = await fetch(`/api/proximity/monitor/${pinId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      });
+      return res.ok;
+    } else {
+      // Find setting for this pin and delete it
+      const settingsRes = await fetch('/api/proximity/settings');
+      if (settingsRes.ok) {
+        const data = await settingsRes.json();
+        const setting = data.monitoredPins.find(mp => mp.pin_id === pinId);
+        if (setting) {
+          await fetch(`/api/proximity/monitor/${setting.setting_id}`, { method: 'DELETE' });
+        }
+      }
+      return true;
+    }
+  },
+
+  _timeAgo(dateStr) {
+    const now = new Date();
+    const d = new Date(dateStr + (dateStr.includes('Z') ? '' : 'Z'));
+    const diffMs = now - d;
+    const mins = Math.floor(diffMs / 60000);
+    if (mins < 1) return 'Just now';
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    const days = Math.floor(hrs / 24);
+    return `${days}d ago`;
   },
 
   escapeHtml(str) {

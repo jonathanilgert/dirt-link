@@ -28,6 +28,25 @@
       </button>
     </nav>
     <div class="header-right">
+      <!-- Proximity notification bell (Powerhouse/Enterprise only) -->
+      <div id="proximity-bell-wrapper" class="proximity-bell-wrapper" style="display:none">
+        <button class="btn-proximity-bell" id="btn-proximity-bell" title="Proximity alerts">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span class="proximity-badge" id="proximity-badge" style="display:none">0</span>
+        </button>
+        <div class="proximity-dropdown" id="proximity-dropdown" style="display:none">
+          <div class="proximity-dropdown-header">
+            <h4>Proximity Alerts</h4>
+            <button class="btn-mark-all-read" id="btn-mark-all-read">Mark all read</button>
+          </div>
+          <div class="proximity-dropdown-list" id="proximity-dropdown-list">
+            <p class="empty-state">No alerts yet.</p>
+          </div>
+        </div>
+      </div>
       <div id="auth-area">
         <button class="btn btn-outline" id="btn-login">Log In</button>
         <button class="btn btn-primary" id="btn-register">Sign Up</button>
@@ -387,6 +406,34 @@
         </div>
         <p class="profile-success" id="notification-success"></p>
         <button class="btn btn-primary" id="btn-save-notifications">Save Notification Preferences</button>
+
+        <!-- Proximity Alert Settings (Powerhouse/Enterprise only) -->
+        <div id="proximity-settings-section" class="notification-settings proximity-section" style="display:none">
+          <h3 style="margin:0 0 4px;">Proximity Alerts <span class="perk-badge">Powerhouse+</span></h3>
+          <p class="hint" style="margin:0 0 12px;">Get notified when new sites or development permits appear near your active listings.</p>
+          <div class="form-group">
+            <label for="proximity-default-radius">Default monitoring radius</label>
+            <select id="proximity-default-radius">
+              <option value="5">5 km</option>
+              <option value="10" selected>10 km</option>
+              <option value="25">25 km</option>
+              <option value="50">50 km</option>
+            </select>
+          </div>
+          <label class="toggle-label">
+            <input type="checkbox" id="proximity-global-pause">
+            <span class="toggle-switch"></span>
+            <span>Pause all proximity alerts</span>
+          </label>
+          <div style="margin-top:16px;">
+            <h4 style="margin:0 0 8px;">Monitored Pins</h4>
+            <div id="proximity-monitored-pins" class="monitored-pins-list">
+              <p class="empty-state">No pins are being monitored yet. Go to My Pins and enable monitoring on any active listing.</p>
+            </div>
+          </div>
+          <button class="btn btn-primary" id="btn-save-proximity" style="margin-top:12px;">Save Proximity Settings</button>
+          <p class="profile-success" id="proximity-success"></p>
+        </div>
       </div>
 
       <!-- Billing tab -->

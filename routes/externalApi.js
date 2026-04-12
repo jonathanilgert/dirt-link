@@ -5,6 +5,8 @@ const { requireApiKey } = require('../middleware/apiKey');
 const { rateLimit } = require('../middleware/rateLimit');
 const { auditLog } = require('../middleware/auditLog');
 
+const { notifyForNewPin, notifyForNewPinsBatch } = require('../services/proximity');
+
 const router = express.Router();
 
 // All external API routes require API key + rate limiting + audit logging
@@ -81,6 +83,10 @@ router.post('/permit-pins', (req, res) => {
   );
 
   const pin = get(`SELECT * FROM permit_pins WHERE id = ?`, [id]);
+
+  // Trigger proximity alerts
+  try { notifyForNewPin(pin, 'development_permit', 'permit_pins'); } catch (e) { console.error('[proximity] Error:', e.message); }
+
   res.status(201).json(pin);
 });
 
@@ -165,6 +171,16 @@ router.post('/bulk', (req, res) => {
       );
       results.permanent_pins.push({ id, site_name: pin.site_name.trim() });
     });
+  }
+
+  // Trigger batched proximity alerts for all newly created permit pins
+  if (results.permit_pins.length > 0) {
+    try {
+      const newPermits = results.permit_pins.map(p => get(`SELECT * FROM permit_pins WHERE id = ?`, [p.id])).filter(Boolean);
+      if (newPermits.length > 0) {
+        notifyForNewPinsBatch(newPermits, 'development_permit', 'permit_pins');
+      }
+    } catch (e) { console.error('[proximity] Batch error:', e.message); }
   }
 
   const status = results.errors.length > 0 ? 207 : 201;
