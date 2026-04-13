@@ -277,6 +277,24 @@ async function getDb() {
     db.run(`ALTER TABLE permit_pins ADD COLUMN claimed_at TEXT`);
   }
 
+  // Add claimable fields to permanent_pins (business directory feature)
+  const permPinCols = all(`PRAGMA table_info(permanent_pins)`).map(c => c.name);
+  if (!permPinCols.includes('claimed_by')) {
+    db.run(`ALTER TABLE permanent_pins ADD COLUMN claimed_by TEXT`);
+  }
+  if (!permPinCols.includes('claimed_at')) {
+    db.run(`ALTER TABLE permanent_pins ADD COLUMN claimed_at TEXT`);
+  }
+  if (!permPinCols.includes('category')) {
+    db.run(`ALTER TABLE permanent_pins ADD COLUMN category TEXT`);
+  }
+  if (!permPinCols.includes('description')) {
+    db.run(`ALTER TABLE permanent_pins ADD COLUMN description TEXT`);
+  }
+  if (!permPinCols.includes('services')) {
+    db.run(`ALTER TABLE permanent_pins ADD COLUMN services TEXT`);
+  }
+
   // Reveal purchases (one-time overage buys)
   db.run(`
     CREATE TABLE IF NOT EXISTS reveal_purchases (
@@ -337,6 +355,7 @@ async function getDb() {
     'CREATE INDEX IF NOT EXISTS idx_permit_pins_permit ON permit_pins(permit_number)',
     'CREATE INDEX IF NOT EXISTS idx_permanent_pins_active ON permanent_pins(is_active)',
     'CREATE INDEX IF NOT EXISTS idx_permanent_pins_type ON permanent_pins(site_type)',
+    'CREATE INDEX IF NOT EXISTS idx_permanent_pins_claimed ON permanent_pins(claimed_by)',
     'CREATE INDEX IF NOT EXISTS idx_audit_log_key ON audit_log(api_key_id)',
     'CREATE INDEX IF NOT EXISTS idx_audit_log_created ON audit_log(created_at)',
     'CREATE INDEX IF NOT EXISTS idx_inquiries_permit ON inquiries(permit_pin_id)',

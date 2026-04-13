@@ -178,25 +178,40 @@ function createPermitPinIcon() {
   </svg>`;
   return L.divIcon({
     className: 'custom-pin permit-pin',
-    html: svg,
+    html: `<div title="Development Permit">${svg}</div>`,
     iconSize: [size, size],
     iconAnchor: [size / 2, size],
     popupAnchor: [0, -size]
   });
 }
 
-// Create icon for permanent site pins — square with distinct color
+// Site type config — colors, labels, and tooltip text
+const SITE_TYPE_CONFIG = {
+  landfill:           { color: '#7C3AED', label: 'LF', tooltip: 'Landfill' },
+  transfer_station:   { color: '#0891B2', label: 'TS', tooltip: 'Transfer Station' },
+  processing_site:    { color: '#B45309', label: 'PS', tooltip: 'Processing Site' },
+  supplier:           { color: '#059669', label: 'SP', tooltip: 'Earth Material Supplier' },
+  recycler:           { color: '#0284C7', label: 'RC', tooltip: 'Metal Recycler' },
+  composting:         { color: '#65A30D', label: 'CM', tooltip: 'Composting Facility' },
+  concrete_plant:     { color: '#64748B', label: 'CP', tooltip: 'Concrete Plant' },
+  demolition:         { color: '#DC2626', label: 'DM', tooltip: 'Demolition Services' },
+};
+
+function getSiteConfig(siteType) {
+  return SITE_TYPE_CONFIG[siteType] || { color: '#6B7280', label: (siteType || '??').substring(0, 2).toUpperCase(), tooltip: (siteType || 'Site').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) };
+}
+
+// Create icon for permanent site pins — square with distinct color + tooltip
 function createPermanentPinIcon(siteType) {
   const size = 34;
-  const color = siteType === 'landfill' ? '#6B4C9A' : siteType === 'transfer_station' ? '#2C7A7B' : '#8B5E3C';
-  const label = siteType === 'landfill' ? 'LF' : siteType === 'transfer_station' ? 'TS' : 'PS';
+  const cfg = getSiteConfig(siteType);
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));display:block;">
-    <rect x="2" y="2" width="30" height="30" rx="5" fill="${color}" stroke="white" stroke-width="2.5"/>
-    <text x="17" y="19" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="white" font-weight="700" font-family="Inter,sans-serif">${label}</text>
+    <rect x="2" y="2" width="30" height="30" rx="5" fill="${cfg.color}" stroke="white" stroke-width="2.5"/>
+    <text x="17" y="19" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="white" font-weight="700" font-family="Inter,sans-serif">${cfg.label}</text>
   </svg>`;
   return L.divIcon({
     className: 'custom-pin permanent-pin',
-    html: svg,
+    html: `<div title="${cfg.tooltip}">${svg}</div>`,
     iconSize: [size, size],
     iconAnchor: [size / 2, size],
     popupAnchor: [0, -size]
@@ -223,26 +238,24 @@ window.addPermitPinToMap = function(pin) {
   pinMarkers.addLayer(marker);
 };
 
-// Add permanent site pin to map
+// Add permanent site pin to map — click opens detail modal
 window.addPermanentPinToMap = function(pin) {
   const icon = createPermanentPinIcon(pin.site_type);
   const marker = L.marker([pin.latitude, pin.longitude], { icon });
-  const typeLabel = (pin.site_type || '').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  const cfg = getSiteConfig(pin.site_type);
+
+  // Compact popup with "View Details" link
   marker.bindPopup(`
     <div class="pin-popup">
-      <div class="pp-header" style="background:${pin.site_type === 'landfill' ? '#6B4C9A' : pin.site_type === 'transfer_station' ? '#2C7A7B' : '#8B5E3C'}">
-        <span class="pp-type">&#9632; ${typeLabel}</span>
+      <div class="pp-header" style="background:${cfg.color}">
+        <span class="pp-type">&#9632; ${cfg.tooltip}</span>
       </div>
       <div class="pp-body">
         <div class="pp-title">${DirtLink.escapeHtml(pin.site_name)}</div>
         <div class="pp-company">${DirtLink.escapeHtml(pin.address)}</div>
-        ${pin.hours_of_operation ? `<div class="pp-qty">Hours: ${DirtLink.escapeHtml(pin.hours_of_operation)}</div>` : ''}
-        ${pin.accepted_materials ? `<div class="pp-qty">Accepts: ${DirtLink.escapeHtml(pin.accepted_materials)}</div>` : ''}
-        ${pin.rates_fees ? `<div class="pp-qty">Rates: ${DirtLink.escapeHtml(pin.rates_fees)}</div>` : ''}
-        ${pin.contact_phone ? `<div class="pp-qty">Phone: ${DirtLink.escapeHtml(pin.contact_phone)}</div>` : ''}
-        ${pin.website_url ? `<div class="pp-qty"><a href="${DirtLink.escapeHtml(pin.website_url)}" target="_blank" rel="noopener">Website</a></div>` : ''}
-        ${pin.notes ? `<div class="pp-qty">${DirtLink.escapeHtml(pin.notes)}</div>` : ''}
-        <div style="margin-top:6px;font-size:11px;color:#888;">Permanent site</div>
+        ${pin.accepted_materials ? `<div class="pp-qty" style="margin-top:4px">${DirtLink.escapeHtml(pin.accepted_materials)}</div>` : ''}
+        ${pin.claimed_company ? `<div style="margin-top:4px;font-size:11px;color:var(--success);font-weight:600;">Claimed by ${DirtLink.escapeHtml(pin.claimed_company)}</div>` : ''}
+        <a class="pp-action" href="#" onclick="event.preventDefault(); DirtLink.showPermanentPinDetail('${pin.id}')" style="color:${cfg.color}">View Details &#8594;</a>
       </div>
     </div>
   `, { maxWidth: 280, className: 'dl-popup' });
@@ -292,6 +305,10 @@ window.addPinToMap = function(pin) {
 
   pinMarkers.addLayer(marker);
 };
+
+// Expose site config for use in app.js
+window.getSiteConfig = getSiteConfig;
+window.SITE_TYPE_CONFIG = SITE_TYPE_CONFIG;
 
 // Init when DOM is ready
 document.addEventListener('DOMContentLoaded', initMap);

@@ -98,13 +98,13 @@ router.post('/permanent-pins', (req, res) => {
     return res.status(400).json({ error: 'Validation failed', details: errors });
   }
 
-  const { latitude, longitude, site_name, site_type, address, contact_phone, contact_email, hours_of_operation, accepted_materials, rates_fees, website_url, notes } = req.body;
+  const { latitude, longitude, site_name, site_type, address, contact_phone, contact_email, hours_of_operation, accepted_materials, rates_fees, website_url, notes, category, description, services } = req.body;
 
   const id = uuidv4();
   run(
-    `INSERT INTO permanent_pins (id, latitude, longitude, site_name, site_type, address, contact_phone, contact_email, hours_of_operation, accepted_materials, rates_fees, website_url, notes, created_by_key)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [id, latitude, longitude, site_name.trim(), site_type.trim(), address.trim(), contact_phone?.trim() || null, contact_email?.trim() || null, hours_of_operation?.trim() || null, accepted_materials?.trim() || null, rates_fees?.trim() || null, website_url?.trim() || null, notes?.trim() || null, req.apiKey.id]
+    `INSERT INTO permanent_pins (id, latitude, longitude, site_name, site_type, address, contact_phone, contact_email, hours_of_operation, accepted_materials, rates_fees, website_url, notes, category, description, services, created_by_key)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [id, latitude, longitude, site_name.trim(), site_type.trim(), address.trim(), contact_phone?.trim() || null, contact_email?.trim() || null, hours_of_operation?.trim() || null, accepted_materials?.trim() || null, rates_fees?.trim() || null, website_url?.trim() || null, notes?.trim() || null, category?.trim() || null, description?.trim() || null, services?.trim() || null, req.apiKey.id]
   );
 
   const pin = get(`SELECT * FROM permanent_pins WHERE id = ?`, [id]);
@@ -165,9 +165,9 @@ router.post('/bulk', (req, res) => {
 
       const id = uuidv4();
       run(
-        `INSERT INTO permanent_pins (id, latitude, longitude, site_name, site_type, address, contact_phone, contact_email, hours_of_operation, accepted_materials, rates_fees, website_url, notes, created_by_key)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [id, pin.latitude, pin.longitude, pin.site_name.trim(), pin.site_type.trim(), pin.address.trim(), pin.contact_phone?.trim() || null, pin.contact_email?.trim() || null, pin.hours_of_operation?.trim() || null, pin.accepted_materials?.trim() || null, pin.rates_fees?.trim() || null, pin.website_url?.trim() || null, pin.notes?.trim() || null, req.apiKey.id]
+        `INSERT INTO permanent_pins (id, latitude, longitude, site_name, site_type, address, contact_phone, contact_email, hours_of_operation, accepted_materials, rates_fees, website_url, notes, category, description, services, created_by_key)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [id, pin.latitude, pin.longitude, pin.site_name.trim(), pin.site_type.trim(), pin.address.trim(), pin.contact_phone?.trim() || null, pin.contact_email?.trim() || null, pin.hours_of_operation?.trim() || null, pin.accepted_materials?.trim() || null, pin.rates_fees?.trim() || null, pin.website_url?.trim() || null, pin.notes?.trim() || null, pin.category?.trim() || null, pin.description?.trim() || null, pin.services?.trim() || null, req.apiKey.id]
       );
       results.permanent_pins.push({ id, site_name: pin.site_name.trim() });
     });

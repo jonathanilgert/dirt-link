@@ -50,8 +50,77 @@ router.get('/permits', (req, res) => {
 
 // Get all active permanent pins (public — for map display)
 router.get('/permanent', (req, res) => {
-  const pins = all(`SELECT * FROM permanent_pins WHERE is_active = 1 ORDER BY created_at DESC`);
+  const pins = all(`SELECT pp.*, u.company_name AS claimed_company FROM permanent_pins pp LEFT JOIN users u ON pp.claimed_by = u.id WHERE pp.is_active = 1 ORDER BY pp.created_at DESC`);
   res.json(pins);
+});
+
+// Get single permanent pin detail
+router.get('/permanent/:id', (req, res) => {
+  const pin = get(
+    `SELECT pp.*, u.company_name AS claimed_company, u.contact_name AS claimed_contact FROM permanent_pins pp LEFT JOIN users u ON pp.claimed_by = u.id WHERE pp.id = ?`,
+    [req.params.id]
+  );
+  if (!pin) return res.status(404).json({ error: 'Permanent pin not found' });
+  res.json(pin);
+});
+
+// Claim a permanent pin (business directory listing)
+router.post('/permanent/claim/:pinId', requireAuth, (req, res) => {
+  const pin = get('SELECT * FROM permanent_pins WHERE id = ? AND is_active = 1', [req.params.pinId]);
+  if (!pin) return res.status(404).json({ error: 'Permanent pin not found' });
+  if (pin.claimed_by) return res.status(409).json({ error: 'This listing has already been claimed' });
+
+  run(
+    `UPDATE permanent_pins SET claimed_by = ?, claimed_at = datetime('now'), updated_at = datetime('now') WHERE id = ?`,
+    [req.session.userId, pin.id]
+  );
+
+  const updated = get(
+    `SELECT pp.*, u.company_name AS claimed_company FROM permanent_pins pp LEFT JOIN users u ON pp.claimed_by = u.id WHERE pp.id = ?`,
+    [pin.id]
+  );
+  res.json(updated);
+});
+
+// Update a claimed permanent pin (only owner can update)
+router.put('/permanent/:id', requireAuth, (req, res) => {
+  const pin = get('SELECT * FROM permanent_pins WHERE id = ? AND claimed_by = ?', [req.params.id, req.session.userId]);
+  if (!pin) return res.status(404).json({ error: 'Listing not found or not yours' });
+
+  const { site_name, site_type, address, contact_phone, contact_email, hours_of_operation, accepted_materials, rates_fees, website_url, notes, category, description, services } = req.body;
+
+  run(
+    `UPDATE permanent_pins SET
+      site_name = COALESCE(?, site_name),
+      site_type = COALESCE(?, site_type),
+      address = COALESCE(?, address),
+      contact_phone = COALESCE(?, contact_phone),
+      contact_email = COALESCE(?, contact_email),
+      hours_of_operation = COALESCE(?, hours_of_operation),
+      accepted_materials = COALESCE(?, accepted_materials),
+      rates_fees = COALESCE(?, rates_fees),
+      website_url = COALESCE(?, website_url),
+      notes = COALESCE(?, notes),
+      category = COALESCE(?, category),
+      description = COALESCE(?, description),
+      services = COALESCE(?, services),
+      updated_at = datetime('now')
+    WHERE id = ?`,
+    [
+      site_name || null, site_type || null, address || null,
+      contact_phone || null, contact_email || null,
+      hours_of_operation || null, accepted_materials || null,
+      rates_fees || null, website_url || null, notes || null,
+      category || null, description || null, services || null,
+      req.params.id
+    ]
+  );
+
+  const updated = get(
+    `SELECT pp.*, u.company_name AS claimed_company FROM permanent_pins pp LEFT JOIN users u ON pp.claimed_by = u.id WHERE pp.id = ?`,
+    [req.params.id]
+  );
+  res.json(updated);
 });
 
 // Get my pins (must be before /:id to avoid route conflict)

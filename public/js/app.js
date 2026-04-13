@@ -871,6 +871,94 @@ window.DirtLink = {
     document.getElementById('modal-pin-detail').style.display = 'flex';
   },
 
+  // Permanent pin detail modal — clean grouped layout
+  async showPermanentPinDetail(pinId) {
+    const res = await fetch(`/api/pins/permanent/${pinId}`);
+    if (!res.ok) return;
+    const pin = await res.json();
+    const cfg = getSiteConfig(pin.site_type);
+
+    const row = (label, value, isLink) => {
+      if (!value) return '';
+      const escaped = this.escapeHtml(value);
+      const content = isLink
+        ? `<a href="${escaped}" target="_blank" rel="noopener" style="color:${cfg.color};word-break:break-all;">${escaped}</a>`
+        : escaped;
+      return `<div class="perm-detail-row"><span class="perm-detail-label">${label}</span><span class="perm-detail-value">${content}</span></div>`;
+    };
+
+    const phoneLink = pin.contact_phone
+      ? `<a href="tel:${this.escapeHtml(pin.contact_phone)}" style="color:${cfg.color}">${this.escapeHtml(pin.contact_phone)}</a>`
+      : null;
+    const emailLink = pin.contact_email
+      ? `<a href="mailto:${this.escapeHtml(pin.contact_email)}" style="color:${cfg.color}">${this.escapeHtml(pin.contact_email)}</a>`
+      : null;
+
+    const isMine = this.user && pin.claimed_by === this.user.id;
+    const canClaim = this.user && !pin.claimed_by;
+
+    document.getElementById('pin-detail-content').innerHTML = `
+      <div class="perm-detail">
+        <div class="perm-detail-header" style="background:${cfg.color}">
+          <span class="perm-detail-type">${cfg.tooltip}</span>
+          ${pin.claimed_company ? `<span class="perm-detail-claimed">Claimed</span>` : ''}
+        </div>
+        <h2 class="perm-detail-name">${this.escapeHtml(pin.site_name)}</h2>
+        ${pin.description ? `<p class="perm-detail-desc">${this.escapeHtml(pin.description)}</p>` : ''}
+
+        <div class="perm-detail-section">
+          <div class="perm-detail-section-title">Location & Contact</div>
+          ${row('Address', pin.address)}
+          ${pin.contact_phone ? `<div class="perm-detail-row"><span class="perm-detail-label">Phone</span><span class="perm-detail-value">${phoneLink}</span></div>` : ''}
+          ${pin.contact_email ? `<div class="perm-detail-row"><span class="perm-detail-label">Email</span><span class="perm-detail-value">${emailLink}</span></div>` : ''}
+          ${row('Website', pin.website_url, true)}
+        </div>
+
+        <div class="perm-detail-section">
+          <div class="perm-detail-section-title">Details</div>
+          ${row('Hours', pin.hours_of_operation)}
+          ${row('Accepted Materials', pin.accepted_materials)}
+          ${row('Services', pin.services)}
+          ${row('Rates & Fees', pin.rates_fees)}
+          ${row('Category', pin.category)}
+        </div>
+
+        ${pin.notes ? `
+        <div class="perm-detail-section">
+          <div class="perm-detail-section-title">Notes</div>
+          <p class="perm-detail-notes">${this.escapeHtml(pin.notes)}</p>
+        </div>` : ''}
+
+        ${pin.claimed_company ? `<div class="perm-detail-claimed-by">Managed by <strong>${this.escapeHtml(pin.claimed_company)}</strong></div>` : ''}
+
+        <div class="perm-detail-actions">
+          ${canClaim ? `<button class="btn btn-primary" onclick="DirtLink.claimPermanentPin('${pin.id}')">Claim This Listing</button>` : ''}
+          ${isMine ? `<button class="btn btn-outline" onclick="DirtLink.editPermanentPin('${pin.id}')">Edit Listing</button>` : ''}
+          ${!pin.claimed_by && !this.user ? `<p class="hint">Log in to claim this listing</p>` : ''}
+        </div>
+      </div>
+    `;
+    document.getElementById('modal-pin-detail').style.display = 'flex';
+  },
+
+  async claimPermanentPin(pinId) {
+    if (!this.user) { this.showAuthModal('register'); return; }
+    const res = await fetch(`/api/pins/permanent/claim/${pinId}`, { method: 'POST' });
+    if (res.ok) {
+      await this.loadExternalPins();
+      await this.loadPins();
+      this.showPermanentPinDetail(pinId);
+    } else {
+      const err = await res.json();
+      alert(err.error || 'Could not claim this listing.');
+    }
+  },
+
+  async editPermanentPin(pinId) {
+    // For now, re-show detail. Full edit form is a future enhancement.
+    alert('To update your listing details, please contact support or use the API. Full self-service editing is coming soon.');
+  },
+
   async startConversation(pinId) {
     document.getElementById('modal-pin-detail').style.display = 'none';
     // Switch to messages view
