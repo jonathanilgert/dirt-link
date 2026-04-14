@@ -555,11 +555,11 @@ main {
 .legend-item::before {
   content: '';
   position: absolute;
-  left: -20px;
+  left: -22px;
   top: 50%;
   transform: translateY(-50%);
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: #D6CEC6;
   border: 1.5px solid #fff;
@@ -577,7 +577,7 @@ main {
 }
 .legend-item.active::before {
   background: var(--dot-color, #C8BFB6);
-  transform: translateY(-50%) scale(1.25);
+  transform: translateY(-50%) scale(1.2);
 }
 
 /* Legacy compat */
