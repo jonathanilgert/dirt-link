@@ -273,13 +273,12 @@ window.DirtLink = {
       }
     });
 
-    // Sites Now Active filter
+    // Active now toggle
     document.getElementById('filter-active-now').addEventListener('click', () => {
       const btn = document.getElementById('filter-active-now');
       btn.classList.toggle('active');
       const isOn = btn.classList.contains('active');
-      btn.querySelector('.filter-now-label').textContent = isOn ? 'Sites Now Active' : 'Show All Active Sites';
-      btn.querySelector('.filter-now-status').textContent = isOn ? 'on' : 'off';
+      btn.querySelector('.sidebar-toggle-pill').textContent = isOn ? 'On' : 'Off';
       this.applyFilters();
     });
 
