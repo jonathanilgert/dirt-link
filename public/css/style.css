@@ -372,6 +372,16 @@ main {
   font-weight: 700;
   box-shadow: 0 1px 4px rgba(26,18,13,0.1);
 }
+.pin-type-btn[data-filter-type="have"].active {
+  background: #FEE2E2;
+  color: var(--have);
+  box-shadow: none;
+}
+.pin-type-btn[data-filter-type="need"].active {
+  background: #DBEAFE;
+  color: var(--need);
+  box-shadow: none;
+}
 
 /* Material select */
 .sidebar-select-wrap {
