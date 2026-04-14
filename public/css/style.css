@@ -523,15 +523,26 @@ main {
 }
 .legend-group.collapsed .legend-chevron { transform: rotate(180deg); }
 
-/* Children container with left line */
+/* Children container — line drawn via ::before so dots aren't clipped */
 .legend-children {
   margin: 0 8px 4px 28px;
-  padding-left: 16px;
-  border-left: 2px solid var(--border);
+  padding-left: 24px;
+  position: relative;
   overflow: hidden;
   transition: max-height 0.25s ease, opacity 0.2s;
   max-height: 400px;
   opacity: 1;
+}
+/* Vertical line */
+.legend-children::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--border);
+  z-index: 0;
 }
 .legend-group.collapsed .legend-children {
   max-height: 0;
@@ -551,24 +562,27 @@ main {
   transition: background 0.12s, color 0.12s;
   position: relative;
 }
-/* Dot sits centered on the border line */
+/* Dot centered on the line. Item starts at padding-left(24px); line center at 11px.
+   Dot left edge = 11 - 5 = 6px from container → relative to item: 6 - 24 = -18px */
 .legend-item::before {
   content: '';
   position: absolute;
-  left: -22px;
+  left: -18px;
   top: 50%;
   transform: translateY(-50%);
   width: 10px;
   height: 10px;
   border-radius: 50%;
   background: #D6CEC6;
-  border: 1.5px solid #fff;
-  transition: background 0.15s, transform 0.15s;
-  flex-shrink: 0;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px #D6CEC6;
+  transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+  z-index: 1;
 }
 .legend-item:hover { background: var(--bg); color: var(--text); }
 .legend-item:hover::before {
   background: var(--dot-color, #C8BFB6);
+  box-shadow: 0 0 0 1px var(--dot-color, #C8BFB6);
 }
 .legend-item.active {
   background: var(--bg);
@@ -577,7 +591,8 @@ main {
 }
 .legend-item.active::before {
   background: var(--dot-color, #C8BFB6);
-  transform: translateY(-50%) scale(1.2);
+  box-shadow: 0 0 0 1px var(--dot-color, #C8BFB6);
+  transform: translateY(-50%) scale(1.15);
 }
 
 /* Legacy compat */
