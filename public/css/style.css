@@ -575,14 +575,12 @@ main {
   border-radius: 50%;
   background: #D6CEC6;
   border: 2px solid #fff;
-  box-shadow: 0 0 0 1px #D6CEC6;
-  transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+  transition: background 0.15s, transform 0.15s;
   z-index: 1;
 }
 .legend-item:hover { background: var(--bg); color: var(--text); }
 .legend-item:hover::before {
   background: var(--dot-color, #C8BFB6);
-  box-shadow: 0 0 0 1px var(--dot-color, #C8BFB6);
 }
 .legend-item.active {
   background: var(--bg);
@@ -591,7 +589,6 @@ main {
 }
 .legend-item.active::before {
   background: var(--dot-color, #C8BFB6);
-  box-shadow: 0 0 0 1px var(--dot-color, #C8BFB6);
   transform: translateY(-50%) scale(1.15);
 }
 
