@@ -70,6 +70,7 @@ window.DirtLink = {
       const haveItem = document.createElement('div');
       haveItem.className = 'legend-item';
       haveItem.dataset.cat = key;
+      haveItem.dataset.pinType = 'have';
       haveItem.style.setProperty('--dot-color', cat.haveColor);
       haveItem.innerHTML = cat.label;
       haveContainer.appendChild(haveItem);
@@ -77,6 +78,7 @@ window.DirtLink = {
       const needItem = document.createElement('div');
       needItem.className = 'legend-item';
       needItem.dataset.cat = key;
+      needItem.dataset.pinType = 'need';
       needItem.style.setProperty('--dot-color', cat.needColor);
       needItem.innerHTML = cat.label;
       needContainer.appendChild(needItem);
@@ -85,19 +87,17 @@ window.DirtLink = {
     document.querySelectorAll('.legend-item').forEach(item => {
       item.addEventListener('click', () => {
         const cat = item.dataset.cat;
-        const select = document.getElementById('filter-material');
+        const pinType = item.dataset.pinType;
         const isActive = item.classList.contains('active');
 
         // Clear all active states
         document.querySelectorAll('.legend-item').forEach(i => i.classList.remove('active'));
 
         if (isActive) {
-          // Toggle off — reset filter
-          select.value = '';
+          this._legendFilter = null;
         } else {
-          // Activate this category — highlight both have + need rows
-          document.querySelectorAll(`.legend-item[data-cat="${cat}"]`).forEach(i => i.classList.add('active'));
-          select.value = 'cat:' + cat;
+          item.classList.add('active');
+          this._legendFilter = { cat, pinType };
         }
 
         this.applyFilters();
@@ -331,6 +331,8 @@ window.DirtLink = {
       });
     });
     document.getElementById('filter-material').addEventListener('change', () => {
+      this._legendFilter = null;
+      document.querySelectorAll('.legend-item').forEach(i => i.classList.remove('active'));
       document.querySelectorAll('.legend-item').forEach(i => i.classList.remove('active'));
       this.applyFilters();
     });
@@ -589,10 +591,16 @@ window.DirtLink = {
     const testedOnly = document.getElementById('filter-tested').checked;
     const myCompanyOnly = document.getElementById('filter-my-company').checked;
     const activeNowOnly = document.getElementById('filter-active-now').classList.contains('active');
+    const legendFilter = this._legendFilter || null;
 
     const filtered = this.pins.filter(p => {
       if (pinType !== 'all' && p.pin_type !== pinType) return false;
-      if (materialFilter) {
+      // Legend filter overrides material select — filters by type AND category independently
+      if (legendFilter) {
+        if (p.pin_type !== legendFilter.pinType) return false;
+        const mat = MATERIALS[p.material_type];
+        if (!mat || mat.category !== legendFilter.cat) return false;
+      } else if (materialFilter) {
         if (materialFilter.startsWith('cat:')) {
           const catKey = materialFilter.replace('cat:', '');
           const mat = MATERIALS[p.material_type];
