@@ -71,14 +71,14 @@ window.DirtLink = {
       haveItem.className = 'legend-item';
       haveItem.dataset.cat = key;
       haveItem.style.setProperty('--dot-color', cat.haveColor);
-      haveItem.innerHTML = `<span class="legend-dot"></span>${cat.label}`;
+      haveItem.innerHTML = cat.label;
       haveContainer.appendChild(haveItem);
 
       const needItem = document.createElement('div');
       needItem.className = 'legend-item';
       needItem.dataset.cat = key;
       needItem.style.setProperty('--dot-color', cat.needColor);
-      needItem.innerHTML = `<span class="legend-dot"></span>${cat.label}`;
+      needItem.innerHTML = cat.label;
       needContainer.appendChild(needItem);
     });
 
