@@ -1704,6 +1704,11 @@ window.DirtLink = {
     return `${days}d ago`;
   },
 
+  toggleLegendGroup(headerEl) {
+    const group = headerEl.closest('.legend-group');
+    group.classList.toggle('collapsed');
+  },
+
   escapeHtml(str) {
     const div = document.createElement('div');
     div.textContent = str;

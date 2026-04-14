@@ -375,7 +375,7 @@ main {
 
 /* Material select */
 .sidebar-select-wrap {
-  padding: 4px 14px;
+  padding: 12px 14px 4px;
 }
 .sidebar-select-wrap select {
   width: 100%;
@@ -469,39 +469,66 @@ main {
 }
 
 /* Legend */
+.legend-group { margin-bottom: 4px; }
+
 .legend-header {
   display: flex;
   align-items: center;
-  gap: 7px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  padding: 10px 14px 4px;
+  gap: 9px;
+  padding: 8px 14px;
   margin: 0 8px;
-  color: var(--text-subtle);
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.12s;
 }
+.legend-header:hover { background: var(--bg); }
+
 .legend-type-dot {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
 }
-.have-header { color: var(--text-muted); }
-.need-header { color: var(--text-muted); }
+.legend-chevron {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-muted);
+  transition: transform 0.2s;
+  line-height: 1;
+}
+.legend-group.collapsed .legend-chevron { transform: rotate(180deg); }
+
+/* Children container with left line */
+.legend-children {
+  margin: 2px 8px 6px 22px;
+  padding-left: 14px;
+  border-left: 2px solid var(--border);
+  overflow: hidden;
+  transition: max-height 0.25s ease, opacity 0.2s;
+  max-height: 300px;
+  opacity: 1;
+}
+.legend-group.collapsed .legend-children {
+  max-height: 0;
+  opacity: 0;
+}
 
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
   font-size: 13px;
-  padding: 7px 14px;
-  margin: 1px 8px;
-  color: var(--text-muted);
+  padding: 6px 10px;
+  margin: 2px 0;
   border-radius: var(--radius);
-  transition: background 0.1s, color 0.1s;
+  color: var(--text-muted);
   cursor: pointer;
   user-select: none;
+  transition: background 0.1s, color 0.1s;
 }
 .legend-item:hover { background: var(--bg); color: var(--text); }
 .legend-item.active {
@@ -509,14 +536,15 @@ main {
   color: var(--text);
   font-weight: 600;
 }
-.legend-item.active .legend-dot {
-  box-shadow: 0 0 0 2px white, 0 0 0 3.5px currentColor;
-}
 .legend-dot {
-  width: 9px;
-  height: 9px;
+  width: 8px;
+  height: 8px;
   border-radius: 3px;
   flex-shrink: 0;
+  transition: box-shadow 0.15s;
+}
+.legend-item.active .legend-dot {
+  box-shadow: 0 0 0 2px white, 0 0 0 3.5px var(--border-strong);
 }
 
 /* Legacy compat */

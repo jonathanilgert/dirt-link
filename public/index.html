@@ -118,17 +118,22 @@
         <!-- LEGEND -->
         <div class="sidebar-label" style="margin-top:8px;">Legend</div>
 
-        <div id="legend-have">
-          <div class="legend-header have-header">
-            <span class="legend-type-dot" style="background:var(--have)"></span>Have Material
+        <div class="legend-group" id="legend-have">
+          <div class="legend-header" onclick="DirtLink.toggleLegendGroup(this)">
+            <span class="legend-type-dot" style="background:var(--have)"></span>
+            Have Material
+            <span class="legend-chevron">&#8743;</span>
           </div>
-          <div id="legend-have-items"></div>
+          <div class="legend-children" id="legend-have-items"></div>
         </div>
-        <div id="legend-need">
-          <div class="legend-header need-header">
-            <span class="legend-type-dot" style="background:var(--need)"></span>Need Material
+
+        <div class="legend-group" id="legend-need">
+          <div class="legend-header" onclick="DirtLink.toggleLegendGroup(this)">
+            <span class="legend-type-dot" style="background:var(--need)"></span>
+            Need Material
+            <span class="legend-chevron">&#8743;</span>
           </div>
-          <div id="legend-need-items"></div>
+          <div class="legend-children" id="legend-need-items"></div>
         </div>
 
       </aside>
