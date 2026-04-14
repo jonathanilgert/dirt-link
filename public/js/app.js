@@ -278,7 +278,7 @@ window.DirtLink = {
       const btn = document.getElementById('filter-active-now');
       btn.classList.toggle('active');
       const isOn = btn.classList.contains('active');
-      btn.querySelector('.sidebar-toggle-pill').textContent = isOn ? 'On' : 'Off';
+      btn.querySelector('.toggle-label').textContent = isOn ? 'On' : 'Off';
       this.applyFilters();
     });
 
