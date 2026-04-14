@@ -573,14 +573,10 @@ main {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #D6CEC6;
-  border: 2px solid #fff;
-  transition: background 0.15s, transform 0.15s;
-  z-index: 1;
-}
-.legend-item:hover { background: var(--bg); color: var(--text); }
-.legend-item:hover::before {
   background: var(--dot-color, #C8BFB6);
+  border: 2px solid #fff;
+  transition: transform 0.15s;
+  z-index: 1;
 }
 .legend-item.active {
   background: var(--bg);
