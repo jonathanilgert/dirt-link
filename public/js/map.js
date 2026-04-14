@@ -10,9 +10,10 @@ function initMap() {
     zoomControl: false
   });
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    maxZoom: 19
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 20
   }).addTo(map);
 
   // Zoom control — bottom-right keeps the top clear for the instruction bar
@@ -54,18 +55,18 @@ function initMap() {
         const ww = el.tags?.waterway;
         if (ww) {
           L.polyline(latlngs, {
-            color: '#89C4E1',
-            weight: (ww === 'river' || ww === 'canal') ? 3 : 1.5,
-            opacity: 0.75,
+            color: '#A8C8E8',
+            weight: (ww === 'river' || ww === 'canal') ? 2.5 : 1.5,
+            opacity: 0.6,
             lineCap: 'round',
             lineJoin: 'round'
           }).addTo(riverLayer);
         } else {
           L.polygon(latlngs, {
-            color: '#7BD295',
-            fillColor: '#7BD295',
+            color: '#B8D8B8',
+            fillColor: '#C4DFC4',
             weight: 0,
-            fillOpacity: 0.45
+            fillOpacity: 0.5
           }).addTo(greenLayer);
         }
       });
