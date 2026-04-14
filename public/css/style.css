@@ -312,141 +312,160 @@ main {
    SIDEBAR
    ============================================================ */
 #map-sidebar {
-  width: 264px;
-  min-width: 264px;
+  width: 256px;
+  min-width: 256px;
   background: var(--surface);
   border-right: 1px solid var(--border);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  padding: 16px 0 32px;
 }
 
-/* Section wrappers */
-.sidebar-section {
-  padding: 22px 20px;
-  border-bottom: 1px solid var(--border);
+/* Drop pin CTA — top of sidebar */
+#btn-drop-pin {
+  margin: 4px 14px 20px;
+  width: calc(100% - 28px);
+  border-radius: var(--radius-lg);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 11px 16px;
 }
 
-#map-sidebar h3 {
-  font-size: 10px;
+/* Section label */
+.sidebar-label {
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.09em;
   color: var(--text-subtle);
-  margin-bottom: 14px;
+  padding: 18px 20px 6px;
 }
 
-#map-sidebar h3.sidebar-title {
-  font-size: 18px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0;
-  color: #2C1A0E;
+/* Pin type segmented control */
+.pin-type-control {
+  display: flex;
+  margin: 6px 14px 4px;
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: 3px;
+  gap: 2px;
 }
-
-/* Hide original HRs — sections handle separation */
-#map-sidebar hr {
+.pin-type-btn {
+  flex: 1;
+  padding: 6px 4px;
   border: none;
-  border-top: 1px solid var(--border);
-  margin: 0;
-}
-
-.filter-group {
-  margin-bottom: 18px;
-}
-
-.filter-group:last-child { margin-bottom: 0; }
-
-.filter-group > label:first-child {
-  display: block;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-subtle);
-  margin-bottom: 9px;
-}
-
-/* Checkbox label within filter-group */
-.filter-group label:has(input[type="checkbox"]) {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 400;
-  text-transform: none;
-  letter-spacing: 0;
-  color: var(--text);
-  cursor: pointer;
-}
-
-.filter-group input[type="checkbox"] {
-  accent-color: var(--primary);
-  width: 14px;
-  height: 14px;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.filter-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-.filter-btn {
-  padding: 5px 11px;
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  background: var(--surface);
+  background: transparent;
+  border-radius: 6px;
   font-size: 12px;
   font-weight: 500;
   font-family: inherit;
   color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.12s;
+  transition: all 0.15s;
+  text-align: center;
 }
-
-.filter-btn:hover {
-  border-color: var(--border-strong);
+.pin-type-btn:hover { color: var(--text); }
+.pin-type-btn.active {
+  background: var(--surface);
   color: var(--text);
-  background: var(--bg);
+  font-weight: 700;
+  box-shadow: 0 1px 4px rgba(26,18,13,0.1);
 }
 
-.filter-btn.active {
-  background: var(--text);
-  color: white;
-  border-color: var(--text);
+/* Material select */
+.sidebar-select-wrap {
+  padding: 4px 14px;
 }
-
-.filter-btn.have.active {
-  background: var(--have);
-  border-color: var(--have);
-  color: white;
-}
-
-.filter-btn.need.active {
-  background: var(--need);
-  border-color: var(--need);
-  color: white;
-}
-
-.filter-group select {
+.sidebar-select-wrap select {
   width: 100%;
-  padding: 7px 10px;
-  border: 1px solid var(--border);
+  padding: 8px 11px;
+  border: 1.5px solid var(--border);
   border-radius: var(--radius);
   font-size: 13px;
   font-family: inherit;
-  background: white;
+  background: var(--surface);
   color: var(--text);
-  transition: border-color 0.12s, box-shadow 0.12s;
+  transition: border-color 0.12s;
+  cursor: pointer;
 }
-
-.filter-group select:focus {
+.sidebar-select-wrap select:focus {
   outline: none;
   border-color: var(--primary);
   box-shadow: 0 0 0 3px var(--primary-ring);
+}
+
+/* Sidebar row — icon + label */
+.sidebar-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 14px;
+  margin: 1px 8px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.12s;
+  user-select: none;
+}
+.sidebar-row:hover { background: var(--bg); }
+.sidebar-row.active {
+  background: var(--bg);
+  font-weight: 600;
+}
+.sidebar-row-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+.sidebar-row.active .sidebar-row-icon { color: var(--text); }
+.sidebar-row input[type="checkbox"] {
+  accent-color: var(--primary);
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin: 0;
+}
+
+/* Active now toggle row */
+.sidebar-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 14px;
+  margin: 1px 8px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.sidebar-toggle-row:hover { background: var(--bg); }
+.sidebar-toggle-pill {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: all 0.15s;
+}
+.sidebar-toggle-row.active .sidebar-toggle-pill {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--primary-dark);
 }
 
 /* Legend */
@@ -454,64 +473,57 @@ main {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
-  margin: 10px 0 6px;
+  letter-spacing: 0.07em;
+  padding: 10px 14px 4px;
+  margin: 0 8px;
   color: var(--text-subtle);
 }
-
 .legend-type-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   flex-shrink: 0;
 }
-
-.have-header { color: var(--have); }
-.need-header { color: var(--need); }
+.have-header { color: var(--text-muted); }
+.need-header { color: var(--text-muted); }
 
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  padding: 5px 8px;
+  gap: 10px;
+  font-size: 13px;
+  padding: 7px 14px;
+  margin: 1px 8px;
   color: var(--text-muted);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius);
   transition: background 0.1s, color 0.1s;
   cursor: pointer;
   user-select: none;
 }
-
-.legend-item:hover {
-  background: var(--bg);
-  color: var(--text);
-}
-
+.legend-item:hover { background: var(--bg); color: var(--text); }
 .legend-item.active {
   background: var(--bg);
   color: var(--text);
   font-weight: 600;
 }
-
 .legend-item.active .legend-dot {
-  box-shadow: 0 0 0 2.5px white, 0 0 0 4px currentColor;
+  box-shadow: 0 0 0 2px white, 0 0 0 3.5px currentColor;
 }
-
 .legend-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
   flex-shrink: 0;
 }
 
-/* Drop pin button — sticks to bottom of sidebar content */
-#btn-drop-pin {
-  margin: 20px;
-  width: calc(100% - 40px);
-}
+/* Legacy compat */
+.sidebar-section { padding: 0; border-bottom: none; }
+.filter-group { display: none; }
+.filter-buttons { display: none; }
+.filter-btn { display: none; }
 
 /* ============================================================
    MAP

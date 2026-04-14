@@ -322,9 +322,9 @@ window.DirtLink = {
     });
 
     // Filters
-    document.querySelectorAll('.filter-btn').forEach(btn => {
+    document.querySelectorAll('.pin-type-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.pin-type-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         this.applyFilters();
       });
@@ -582,7 +582,7 @@ window.DirtLink = {
   },
 
   applyFilters() {
-    const typeBtn = document.querySelector('.filter-btn.active');
+    const typeBtn = document.querySelector('.pin-type-btn.active');
     const pinType = typeBtn ? typeBtn.dataset.filterType : 'all';
     const materialFilter = document.getElementById('filter-material').value;
     const testedOnly = document.getElementById('filter-tested').checked;

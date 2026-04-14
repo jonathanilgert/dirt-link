@@ -65,52 +65,72 @@
   <main>
     <!-- Map View -->
     <div id="view-map" class="view active">
-      <!-- Sidebar filters -->
+      <!-- Sidebar -->
       <aside id="map-sidebar">
-        <div class="sidebar-section">
-          <h3 class="sidebar-title">Filter</h3>
-          <div class="filter-group">
-            <label>Pin Type</label>
-            <div class="filter-buttons">
-              <button class="filter-btn active" data-filter-type="all">All</button>
-              <button class="filter-btn have" data-filter-type="have">Have</button>
-              <button class="filter-btn need" data-filter-type="need">Need</button>
-            </div>
-          </div>
-          <div class="filter-group">
-            <label>Material Category</label>
-            <select id="filter-material">
-              <option value="">All Categories</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label><input type="checkbox" id="filter-tested"> Tested materials only</label>
-          </div>
-          <div class="filter-group">
-            <button class="filter-now-btn" id="filter-active-now">
-              <span class="filter-now-label">Show All Active Sites</span>
-              <span class="filter-now-status">off</span>
-            </button>
-          </div>
-          <div class="filter-group" id="filter-company-group" style="display:none">
-            <label><input type="checkbox" id="filter-my-company"> My company only</label>
-            <span class="filter-tier-hint">(Enterprise tier only)</span>
-          </div>
+
+        <!-- CTA -->
+        <button class="btn btn-primary btn-full" id="btn-drop-pin">+ Drop a Pin</button>
+
+        <!-- FILTERS -->
+        <div class="sidebar-label">Filters</div>
+
+        <!-- Pin type segmented control -->
+        <div class="pin-type-control">
+          <button class="pin-type-btn active" data-filter-type="all">All</button>
+          <button class="pin-type-btn" data-filter-type="have">▲ Have</button>
+          <button class="pin-type-btn" data-filter-type="need">▽ Need</button>
         </div>
-        <div class="sidebar-section">
-          <h3>Legend</h3>
-          <div id="legend-have">
-            <div class="legend-header have-header"><span class="legend-type-dot" style="background:var(--have)"></span>Have Material</div>
-            <div id="legend-have-items"></div>
-          </div>
-          <div id="legend-need">
-            <div class="legend-header need-header"><span class="legend-type-dot" style="background:var(--need)"></span>Need Material</div>
-            <div id="legend-need-items"></div>
-          </div>
+
+        <!-- Material category -->
+        <div class="sidebar-select-wrap">
+          <select id="filter-material">
+            <option value="">All Materials</option>
+          </select>
         </div>
-        <button class="btn btn-primary btn-full" id="btn-drop-pin">
-          + Drop a Pin
-        </button>
+
+        <!-- Tested only -->
+        <label class="sidebar-row" for="filter-tested">
+          <span class="sidebar-row-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          </span>
+          Tested only
+          <input type="checkbox" id="filter-tested" style="margin-left:auto;">
+        </label>
+
+        <!-- Active now toggle -->
+        <div class="sidebar-toggle-row" id="filter-active-now">
+          <span class="sidebar-row-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </span>
+          Active now
+          <span class="sidebar-toggle-pill filter-now-status">Off</span>
+        </div>
+
+        <!-- My company (enterprise) -->
+        <label class="sidebar-row" id="filter-company-group" for="filter-my-company" style="display:none">
+          <span class="sidebar-row-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </span>
+          My company only
+          <input type="checkbox" id="filter-my-company" style="margin-left:auto;">
+        </label>
+
+        <!-- LEGEND -->
+        <div class="sidebar-label" style="margin-top:8px;">Legend</div>
+
+        <div id="legend-have">
+          <div class="legend-header have-header">
+            <span class="legend-type-dot" style="background:var(--have)"></span>Have Material
+          </div>
+          <div id="legend-have-items"></div>
+        </div>
+        <div id="legend-need">
+          <div class="legend-header need-header">
+            <span class="legend-type-dot" style="background:var(--need)"></span>Need Material
+          </div>
+          <div id="legend-need-items"></div>
+        </div>
+
       </aside>
 
       <!-- Map container -->
