@@ -109,7 +109,7 @@ body {
 }
 
 .logo-text strong {
-  color: var(--primary);
+  color: var(--text);
   font-weight: 800;
 }
 
