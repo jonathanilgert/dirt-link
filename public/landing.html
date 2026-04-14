@@ -3,663 +3,1194 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DirtLink — Connect Earth Material Sites Across Canada</title>
+  <title>DirtLink — Connect Earth Material Sites in Calgary</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
 
     :root {
       --bg:           #F3F0EB;
       --surface:      #FFFFFF;
       --text:         #1A1410;
-      --text-muted:   #8A7E74;
+      --muted:        #8A7E74;
+      --subtle:       #B0A49A;
       --border:       #E2D9CF;
+      --border-mid:   #D0C4BA;
       --primary:      #F59E0B;
       --primary-dark: #D97706;
+      --primary-bg:   #FFFBEB;
       --have:         #DC2626;
+      --have-bg:      #FEF2F2;
       --need:         #2563EB;
-      --radius:       8px;
-      --radius-lg:    12px;
-      --radius-xl:    16px;
-      --shadow:       0 1px 4px rgba(26,18,13,0.08), 0 2px 10px rgba(26,18,13,0.06);
-      --shadow-lg:    0 8px 24px rgba(26,18,13,0.14);
+      --need-bg:      #EFF6FF;
+      --r-sm:  6px;
+      --r:     10px;
+      --r-lg:  14px;
+      --r-xl:  20px;
+      --r-2xl: 28px;
     }
 
     body {
-      font-family: 'Figtree', -apple-system, sans-serif;
+      font-family: 'Figtree', -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--bg);
       color: var(--text);
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
     a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
 
-    /* ── NAV ── */
+    /* ─── NAV ─────────────────────────────────────────────── */
     nav {
       position: sticky;
       top: 0;
-      z-index: 100;
-      background: var(--surface);
+      z-index: 200;
+      background: rgba(243,240,235,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
-      height: 60px;
+      height: 62px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 0 40px;
+      padding: 0 32px;
     }
-
-    .logo {
+    .nav-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      width: 100%;
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 18px;
-      font-weight: 700;
+      gap: 0;
     }
-    .logo-icon {
-      width: 32px; height: 32px;
-      background: var(--primary);
-      border-radius: 6px;
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text);
+      flex-shrink: 0;
+      word-spacing: 0;
+      letter-spacing: 0;
+    }
+    .nav-logo span, .nav-logo strong { word-spacing: 0; }
+    .nav-logo-icon {
       display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: 800; color: white;
     }
-
     .nav-links {
       display: flex;
-      gap: 32px;
+      align-items: center;
+      gap: 6px;
       list-style: none;
+      margin: 0 auto;
+    }
+    .nav-links a {
+      padding: 6px 13px;
       font-size: 14px;
       font-weight: 500;
-      color: var(--text-muted);
+      color: var(--muted);
+      border-radius: var(--r);
+      transition: color 0.15s, background 0.15s;
     }
-    .nav-links a:hover { color: var(--text); }
-
-    .nav-actions { display: flex; gap: 10px; }
+    .nav-links a:hover { color: var(--text); background: rgba(26,20,16,0.05); }
+    .nav-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
     .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      display: inline-flex; align-items: center; justify-content: center;
       padding: 9px 20px;
-      border-radius: var(--radius);
-      font-family: inherit;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      transition: all 0.15s;
-      text-decoration: none;
+      border-radius: var(--r);
+      font-family: inherit; font-size: 14px; font-weight: 600;
+      cursor: pointer; border: none; transition: all 0.15s;
+      text-decoration: none; white-space: nowrap;
     }
-    .btn-outline {
+    .btn-ghost {
       background: transparent;
       border: 1.5px solid var(--border);
       color: var(--text);
     }
-    .btn-outline:hover { border-color: var(--text-muted); }
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-    }
+    .btn-ghost:hover { border-color: var(--border-mid); background: var(--surface); }
+    .btn-primary { background: var(--primary); color: white; }
     .btn-primary:hover { background: var(--primary-dark); }
-    .btn-lg {
-      padding: 13px 28px;
-      font-size: 15px;
-      border-radius: var(--radius-lg);
-    }
-
-    /* ── SECTIONS ── */
-    section { padding: 80px 40px; }
-    .container { max-width: 1100px; margin: 0 auto; }
-
-    .section-label {
-      font-size: 12px;
+    .btn-primary-lg {
+      background: var(--primary); color: white;
+      padding: 13px 30px; font-size: 16px; border-radius: var(--r-lg);
       font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--primary);
-      margin-bottom: 12px;
     }
-    .section-title {
-      font-size: 36px;
-      font-weight: 800;
-      line-height: 1.15;
-      margin-bottom: 16px;
+    .btn-primary-lg:hover { background: var(--primary-dark); }
+    .btn-ghost-lg {
+      background: transparent; color: var(--text);
+      border: 1.5px solid var(--border);
+      padding: 13px 30px; font-size: 16px; border-radius: var(--r-lg);
+      font-weight: 600;
     }
-    .section-sub {
-      font-size: 17px;
-      color: var(--text-muted);
-      line-height: 1.6;
-      max-width: 560px;
+    .btn-ghost-lg:hover { border-color: var(--border-mid); background: var(--surface); }
+
+    /* ─── PILL BADGE ──────────────────────────────────────── */
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 14px;
+      background: var(--primary-bg);
+      border: 1.5px solid #FDE68A;
+      border-radius: 999px;
+      font-size: 13px; font-weight: 600;
+      color: var(--primary-dark);
+      margin-bottom: 20px;
     }
 
-    /* ── HERO ── */
+    /* ─── SECTION BASE ────────────────────────────────────── */
+    .section { padding: 96px 32px; }
+    .section-sm { padding: 72px 32px; }
+    .wrap { max-width: 1120px; margin: 0 auto; }
+    .section-head { text-align: center; margin-bottom: 56px; }
+    .section-head h2 {
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+    }
+    .section-head p {
+      font-size: 17px;
+      color: var(--muted);
+      line-height: 1.65;
+      max-width: 540px;
+      margin: 0 auto;
+    }
+
+    /* ─── HERO ────────────────────────────────────────────── */
     #hero {
       background: var(--surface);
-      padding: 80px 40px 0;
-      text-align: center;
+      padding: 88px 32px 0;
       border-bottom: 1px solid var(--border);
+      text-align: center;
     }
-    #hero .section-sub { margin: 0 auto 32px; }
-
+    .hero-inner { max-width: 1000px; margin: 0 auto; }
+    .hero-inner h1 {
+      font-size: clamp(44px, 6.5vw, 82px);
+      font-weight: 900;
+      line-height: 1.04;
+      letter-spacing: -0.035em;
+      margin-bottom: 20px;
+      color: var(--text);
+    }
+    .hero-inner p {
+      font-size: 18px;
+      color: var(--muted);
+      line-height: 1.65;
+      max-width: 520px;
+      margin: 0 auto 32px;
+    }
     .hero-actions {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      margin-bottom: 56px;
+      display: flex; align-items: center; justify-content: center;
+      gap: 12px; margin-bottom: 14px;
+      flex-wrap: wrap;
     }
+    .hero-trust {
+      font-size: 13px; color: var(--subtle);
+      margin-bottom: 64px;
+    }
+    .hero-trust span { margin: 0 6px; }
 
-    .hero-screenshot {
-      max-width: 960px;
+    /* Browser chrome + screenshot */
+    .browser-section {
+      perspective: 1400px;
+      perspective-origin: 50% -20%;
+    }
+    .browser-wrap {
+      max-width: 1120px;
       margin: 0 auto;
-      background: #D6CFC6;
-      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-      border: 1px solid var(--border);
-      border-bottom: none;
-      height: 480px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 12px;
-      color: var(--text-muted);
-      font-size: 14px;
-      font-weight: 600;
+      border-radius: var(--r-2xl) var(--r-2xl) 0 0;
       overflow: hidden;
+      border: 1px solid var(--border-mid);
+      border-bottom: none;
+      box-shadow: 0 -16px 64px rgba(26,18,13,0.14), 0 -4px 20px rgba(26,18,13,0.08);
+      animation: heroSlideIn 1s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+      will-change: transform;
     }
-    .hero-screenshot img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: top;
-      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-      display: none; /* shown once src is set */
+    @keyframes heroSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(56px) rotateX(6deg) scale(0.97);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0px) rotateX(0deg) scale(1);
+      }
     }
-    .screenshot-placeholder {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
+    .browser-bar {
+      background: #2A2420;
+      height: 36px;
+      display: flex; align-items: center;
+      padding: 0 16px; gap: 7px;
     }
-    .screenshot-placeholder svg { opacity: 0.35; }
+    .b-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+    .browser-url {
+      flex: 1; margin: 0 14px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 5px; height: 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; color: rgba(255,255,255,0.35);
+      letter-spacing: 0.02em; font-weight: 500;
+    }
+    .browser-wrap img {
+      width: 100%; display: block;
+    }
 
-    /* ── HOW IT WORKS ── */
+    /* ─── HOW IT WORKS ────────────────────────────────────── */
     #how-it-works { background: var(--bg); }
     .steps-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
-      margin-top: 48px;
+      gap: 20px;
     }
     .step-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: var(--radius-xl);
-      padding: 32px 28px;
+      border-radius: var(--r-xl);
+      padding: 36px 30px;
     }
-    .step-number {
-      width: 36px; height: 36px;
+    .step-num {
+      width: 38px; height: 38px;
       background: var(--primary);
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 15px; font-weight: 800; color: white;
-      margin-bottom: 20px;
+      font-size: 16px; font-weight: 800; color: white;
+      margin-bottom: 22px;
     }
     .step-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
-    .step-card p  { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+    .step-card p  { font-size: 14px; color: var(--muted); line-height: 1.65; }
 
-    /* ── WHO IT'S FOR ── */
-    #who-its-for { background: var(--surface); }
-    .audience-grid {
+    /* ─── WHO IT'S FOR ────────────────────────────────────── */
+    #who-its-for { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .who-layout {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      margin-top: 48px;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 72px;
+      align-items: start;
     }
-    .audience-card {
-      border-radius: var(--radius-xl);
-      border: 2px solid var(--border);
-      padding: 36px 32px;
+    .who-left { position: sticky; top: 80px; }
+    .who-left h2 {
+      font-size: clamp(32px, 3.5vw, 44px);
+      font-weight: 800; letter-spacing: -0.02em;
+      line-height: 1.12; margin-bottom: 16px;
     }
-    .audience-card.have { border-color: var(--have); background: #FEF2F2; }
-    .audience-card.need { border-color: var(--need); background: #EFF6FF; }
-    .audience-tag {
-      display: inline-block;
-      padding: 4px 12px;
+    .who-left p {
+      font-size: 16px; color: var(--muted);
+      line-height: 1.65; margin-bottom: 32px;
+      max-width: 320px;
+    }
+    .who-cards { display: flex; flex-direction: column; gap: 14px; }
+    .who-card {
+      border-radius: 20px;
+      padding: 28px 28px 24px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 16px;
+      transition: background 0.2s, border-color 0.2s, transform 0.2s;
+      cursor: default;
+    }
+    .who-card:hover {
+      background: var(--primary);
+      border-color: var(--primary-dark);
+      transform: translateX(4px);
+    }
+    .who-card-top {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 16px;
+    }
+    .who-card-icon {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: #1A1410;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .who-card.highlight .who-card-icon { background: rgba(0,0,0,0.25); }
+    .who-card h3 {
+      font-size: 20px; font-weight: 800;
+      letter-spacing: -0.02em; line-height: 1.2;
+      margin-bottom: 6px;
+    }
+    .who-card h3 { transition: color 0.2s; }
+    .who-card:hover h3 { color: white; }
+    .who-card p {
+      font-size: 14px; color: var(--muted); line-height: 1.6;
+      transition: color 0.2s;
+    }
+    .who-card:hover p { color: rgba(255,255,255,0.75); }
+    .who-card-bottom {
+      display: flex; align-items: center;
+      justify-content: space-between;
+    }
+    .who-card-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .who-card-tag {
+      padding: 4px 11px;
+      background: rgba(26,20,16,0.07);
       border-radius: 999px;
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 16px;
+      font-size: 11px; font-weight: 600; color: var(--muted);
+      transition: background 0.2s, color 0.2s;
     }
-    .audience-card.have .audience-tag { background: var(--have); color: white; }
-    .audience-card.need .audience-tag { background: var(--need); color: white; }
-    .audience-card h3 { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
-    .audience-card p  { font-size: 15px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; }
-    .audience-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+    .who-card:hover .who-card-tag {
+      background: rgba(0,0,0,0.15);
+      color: rgba(255,255,255,0.85);
     }
-    .audience-list li {
-      font-size: 14px;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .who-card-arrow {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: #1A1410;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; color: white; font-size: 16px;
+      transition: transform 0.2s, background 0.2s;
     }
-    .audience-list li::before {
-      content: '✓';
-      font-weight: 700;
-      font-size: 13px;
+    .who-card:hover .who-card-arrow {
+      transform: rotate(45deg);
+      background: rgba(0,0,0,0.3);
     }
-    .audience-card.have .audience-list li::before { color: var(--have); }
-    .audience-card.need .audience-list li::before { color: var(--need); }
 
-    /* ── FEATURES ── */
+    /* ─── FEATURES ────────────────────────────────────────── */
     #features { background: var(--bg); }
     .features-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      margin-top: 48px;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
     }
-    .feature-card {
+    .feat-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: var(--radius-xl);
-      padding: 28px 24px;
+      border-radius: var(--r-xl);
+      padding: 30px 26px;
+      transition: box-shadow 0.2s, transform 0.2s;
     }
-    .feature-icon {
-      width: 44px; height: 44px;
-      background: #FFFBEB;
+    .feat-card:hover {
+      box-shadow: 0 8px 32px rgba(26,18,13,0.09);
+      transform: translateY(-2px);
+    }
+    .feat-icon {
+      width: 46px; height: 46px;
+      background: var(--primary-bg);
       border: 1.5px solid #FDE68A;
-      border-radius: var(--radius-lg);
+      border-radius: var(--r-lg);
       display: flex; align-items: center; justify-content: center;
-      font-size: 20px;
-      margin-bottom: 16px;
+      font-size: 22px; margin-bottom: 18px;
     }
-    .feature-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
-    .feature-card p  { font-size: 14px; color: var(--text-muted); line-height: 1.55; }
+    .feat-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .feat-card p  { font-size: 14px; color: var(--muted); line-height: 1.6; }
 
-    /* ── FAQ ── */
-    #faq { background: var(--surface); }
-    .faq-list {
-      max-width: 720px;
-      margin: 48px auto 0;
-    }
-    .faq-item {
-      border-bottom: 1px solid var(--border);
-    }
-    .faq-question {
-      width: 100%;
-      background: none;
-      border: none;
-      padding: 22px 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-family: inherit;
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--text);
-      cursor: pointer;
-      text-align: left;
-      gap: 16px;
-    }
-    .faq-arrow {
-      width: 20px; height: 20px;
-      flex-shrink: 0;
-      transition: transform 0.2s;
-      color: var(--text-muted);
-    }
-    .faq-item.open .faq-arrow { transform: rotate(180deg); }
-    .faq-answer {
-      display: none;
-      padding: 0 0 22px;
-      font-size: 15px;
-      color: var(--text-muted);
-      line-height: 1.65;
-    }
-    .faq-item.open .faq-answer { display: block; }
-
-    /* ── CONTACT ── */
-    #contact { background: var(--bg); }
-    .contact-wrap {
+    /* ─── SPLIT FEATURE ───────────────────────────────────── */
+    #split-feature { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .split-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--r-2xl);
+      padding: 56px 60px;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 60px;
+      align-items: center;
+    }
+    .split-text .pill { margin-bottom: 18px; }
+    .split-text h2 {
+      font-size: clamp(28px, 3.5vw, 40px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.12;
+      margin-bottom: 16px;
+    }
+    .split-text p {
+      font-size: 16px; color: var(--muted); line-height: 1.7;
+      margin-bottom: 28px;
+    }
+    .split-points { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .split-points li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 14px; color: var(--muted); line-height: 1.5;
+    }
+    .split-points li::before {
+      content: '✓';
+      width: 20px; height: 20px;
+      background: var(--primary-bg);
+      border: 1.5px solid #FDE68A;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 800; color: var(--primary-dark);
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .split-visual {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .split-visual-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px;
+      background: var(--bg);
+      border-radius: var(--r-lg);
+      border: 1px solid var(--border);
+    }
+    .split-visual-dot {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+    }
+    .split-visual-info { flex: 1; }
+    .split-visual-info strong { font-size: 13px; font-weight: 700; display: block; }
+    .split-visual-info span  { font-size: 12px; color: var(--muted); }
+    .split-visual-badge {
+      padding: 3px 10px; border-radius: 999px;
+      font-size: 11px; font-weight: 700;
+    }
+    .badge-have { background: var(--have-bg); color: var(--have); }
+    .badge-need { background: var(--need-bg); color: var(--need); }
+
+    /* ─── PRICING ─────────────────────────────────────────── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
       align-items: start;
       margin-top: 48px;
     }
-    .contact-form {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xl);
-      padding: 36px 32px;
+    .pricing-card {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: 28px 24px 32px;
+      position: relative;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 0;
     }
-    .form-group label {
-      display: block;
+    .pricing-card-featured {
+      background: var(--surface);
+      border-color: var(--primary);
+      border-width: 2px;
+      box-shadow: 0 8px 32px rgba(245,158,11,0.12);
+    }
+    .pricing-badge {
+      position: absolute;
+      top: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--primary);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .pricing-tier {
       font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 6px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .pricing-price {
+      font-size: 42px;
+      font-weight: 900;
       color: var(--text);
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+    .pricing-price span {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+    .pricing-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 20px;
+      min-height: 38px;
+    }
+    .pricing-btn {
+      display: block;
+      text-align: center;
+      padding: 10px 16px;
+      border-radius: var(--r-lg);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-bottom: 24px;
+    }
+    .pricing-btn-outline {
+      border: 1.5px solid var(--border-mid);
+      color: var(--text);
+      background: transparent;
+    }
+    .pricing-btn-outline:hover { border-color: var(--text); }
+    .pricing-btn-primary {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+    }
+    .pricing-btn-primary:hover { background: var(--primary-dark); }
+    .pricing-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--text);
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+    }
+    .pricing-features li { display: flex; align-items: flex-start; gap: 8px; line-height: 1.4; }
+    .pf-check { color: var(--primary-dark); font-weight: 700; flex-shrink: 0; }
+    .pf-dash { color: var(--subtle); flex-shrink: 0; }
+    .pf-no { color: var(--subtle); }
+    @media (max-width: 900px) {
+      .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 560px) {
+      .pricing-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ─── FAQ ─────────────────────────────────────────────── */
+    #faq { background: var(--bg); }
+    .faq-list { max-width: 700px; margin: 0 auto; }
+    .faq-item { border-bottom: 1px solid var(--border); }
+    .faq-item:first-child { border-top: 1px solid var(--border); }
+    .faq-q {
+      width: 100%; background: none; border: none; padding: 22px 0;
+      display: flex; align-items: center; justify-content: space-between;
+      font-family: inherit; font-size: 16px; font-weight: 600;
+      color: var(--text); cursor: pointer; text-align: left; gap: 20px;
+    }
+    .faq-q:hover { color: var(--primary-dark); }
+    .faq-icon {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--surface); border: 1.5px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: all 0.2s;
+      font-size: 18px; line-height: 1; color: var(--muted); font-weight: 400;
+    }
+    .faq-item.open .faq-icon {
+      background: var(--primary); border-color: var(--primary); color: white; transform: rotate(45deg);
+    }
+    .faq-a {
+      display: none; padding: 0 0 22px;
+      font-size: 15px; color: var(--muted); line-height: 1.7;
+    }
+    .faq-item.open .faq-a { display: block; }
+
+    /* ─── CONTACT ─────────────────────────────────────────── */
+    #contact { background: var(--surface); border-top: 1px solid var(--border); }
+    .contact-grid {
+      display: grid; grid-template-columns: 1fr 1.4fr; gap: 72px; align-items: start;
+    }
+    .contact-left h2 {
+      font-size: clamp(28px, 3vw, 38px); font-weight: 800;
+      letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 14px;
+    }
+    .contact-left > p {
+      font-size: 16px; color: var(--muted); line-height: 1.65; margin-bottom: 36px;
+    }
+    .contact-detail {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 16px; font-size: 15px;
+    }
+    .contact-detail-icon {
+      width: 38px; height: 38px;
+      background: var(--primary-bg); border: 1.5px solid #FDE68A;
+      border-radius: var(--r); display: flex; align-items: center;
+      justify-content: center; font-size: 17px; flex-shrink: 0;
+    }
+    .contact-detail strong { display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 1px; }
+    .contact-detail span { font-size: 15px; font-weight: 500; }
+    .contact-form-wrap {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--r-2xl);
+      padding: 40px 36px;
+    }
+    .form-group { margin-bottom: 18px; }
+    .form-group label {
+      display: block; font-size: 13px; font-weight: 600;
+      margin-bottom: 7px; color: var(--text);
     }
     .form-group input,
     .form-group textarea {
-      width: 100%;
-      padding: 10px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      font-family: inherit;
-      font-size: 14px;
-      color: var(--text);
-      background: var(--surface);
-      transition: border-color 0.15s;
+      width: 100%; padding: 11px 14px;
+      border: 1.5px solid var(--border); border-radius: var(--r);
+      font-family: inherit; font-size: 14px; color: var(--text);
+      background: var(--surface); transition: border-color 0.15s;
       resize: vertical;
     }
     .form-group input:focus,
-    .form-group textarea:focus {
-      outline: none;
-      border-color: var(--primary);
-    }
-    .contact-info { padding-top: 8px; }
-    .contact-info h3 { font-size: 22px; font-weight: 700; margin-bottom: 12px; }
-    .contact-info p  { font-size: 15px; color: var(--text-muted); line-height: 1.65; margin-bottom: 24px; }
-    .contact-detail {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 14px;
-      color: var(--text-muted);
-      margin-bottom: 12px;
+    .form-group textarea:focus { outline: none; border-color: var(--primary); }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    #contact-success {
+      display: none; margin-top: 12px;
+      font-size: 14px; font-weight: 600; color: #16A34A;
     }
 
-    /* ── CTA BANNER ── */
-    #cta-banner {
+    /* ─── CTA BANNER ──────────────────────────────────────── */
+    #cta { background: var(--bg); }
+    .cta-card {
       background: var(--primary);
+      border-radius: var(--r-2xl);
       padding: 72px 40px;
       text-align: center;
+      position: relative;
+      overflow: hidden;
     }
-    #cta-banner h2 {
-      font-size: 36px;
-      font-weight: 800;
-      color: white;
-      margin-bottom: 12px;
+    .cta-card::before, .cta-card::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      pointer-events: none;
     }
-    #cta-banner p {
-      font-size: 17px;
-      color: rgba(255,255,255,0.8);
-      margin-bottom: 32px;
+    .cta-card::before { width: 320px; height: 320px; top: -120px; left: -80px; }
+    .cta-card::after  { width: 240px; height: 240px; bottom: -80px; right: -40px; }
+    .cta-card h2 {
+      font-size: clamp(28px, 4vw, 44px); font-weight: 900;
+      color: white; letter-spacing: -0.025em; margin-bottom: 12px;
     }
-    #cta-banner .btn-outline {
-      border-color: rgba(255,255,255,0.5);
-      color: white;
+    .cta-card p { font-size: 17px; color: rgba(255,255,255,0.8); margin-bottom: 32px; }
+    .btn-white {
+      background: white; color: var(--primary-dark);
+      padding: 14px 32px; font-size: 16px; font-weight: 700;
+      border-radius: var(--r-lg); border: none; cursor: pointer;
+      font-family: inherit; transition: all 0.15s; text-decoration: none;
+      display: inline-flex; align-items: center;
     }
-    #cta-banner .btn-outline:hover { border-color: white; }
-    .cta-actions { display: flex; gap: 12px; justify-content: center; }
+    .btn-white:hover { background: var(--primary-bg); }
 
-    /* ── FOOTER ── */
+    /* ─── FOOTER ──────────────────────────────────────────── */
     footer {
       background: var(--text);
-      color: rgba(255,255,255,0.5);
-      padding: 32px 40px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      padding: 56px 32px 32px;
+      color: rgba(255,255,255,0.55);
+    }
+    .footer-inner {
+      max-width: 1120px; margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.8fr 1fr 1fr 1fr;
+      gap: 48px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 28px;
+    }
+    .footer-brand .nav-logo { color: white; margin-bottom: 14px; }
+    .footer-brand .nav-logo-icon { background: var(--primary); }
+    .footer-brand p { font-size: 14px; line-height: 1.65; max-width: 240px; }
+    .footer-col h4 {
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: rgba(255,255,255,0.9); margin-bottom: 16px;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-col ul a { font-size: 14px; color: rgba(255,255,255,0.5); transition: color 0.15s; }
+    .footer-col ul a:hover { color: white; }
+    .footer-bottom {
+      max-width: 1120px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
       font-size: 13px;
     }
-    footer .logo { color: white; }
-    footer .logo-icon { background: var(--primary); }
-    .footer-links { display: flex; gap: 24px; }
-    .footer-links a:hover { color: white; }
 
-    /* ── RESPONSIVE ── */
+    /* ─── RESPONSIVE ──────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .steps-grid { grid-template-columns: 1fr; }
+      .features-grid { grid-template-columns: 1fr 1fr; }
+      .split-card { grid-template-columns: 1fr; gap: 36px; padding: 36px 28px; }
+      .footer-inner { grid-template-columns: 1fr 1fr; gap: 36px; }
+    }
+
     @media (max-width: 768px) {
       nav { padding: 0 20px; }
       .nav-links { display: none; }
-      section { padding: 56px 20px; }
-      #hero { padding: 56px 20px 0; }
-      .section-title { font-size: 28px; }
-      .steps-grid,
+      .section { padding: 64px 20px; }
+      .section-sm { padding: 52px 20px; }
+      #hero { padding: 64px 20px 0; }
+      .hero-inner h1 { font-size: 36px; }
+      .hero-inner p { font-size: 16px; }
+      .who-layout { grid-template-columns: 1fr; gap: 36px; }
+      .who-left { position: static; }
       .features-grid { grid-template-columns: 1fr; }
-      .audience-grid { grid-template-columns: 1fr; }
-      .contact-wrap { grid-template-columns: 1fr; gap: 32px; }
-      .hero-screenshot { height: 260px; }
-      footer { flex-direction: column; gap: 16px; text-align: center; }
-      #cta-banner h2 { font-size: 26px; }
-      .cta-actions { flex-direction: column; align-items: center; }
+      .contact-grid { grid-template-columns: 1fr; gap: 36px; }
+      .form-row-2 { grid-template-columns: 1fr; }
+      footer { padding: 40px 20px 24px; }
+      .footer-inner { grid-template-columns: 1fr 1fr; gap: 28px; }
+      .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+      .cta-card { padding: 48px 24px; }
+    }
+
+    @media (max-width: 480px) {
+      .hero-actions { flex-direction: column; align-items: stretch; }
+      .hero-actions .btn-primary-lg,
+      .hero-actions .btn-ghost-lg { text-align: center; }
+      .footer-inner { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ── NAV ── -->
-  <nav>
-    <div class="logo">
-      <div class="logo-icon">DL</div>
-      <span>Dirt<strong>Link</strong></span>
+<!-- ─── NAV ──────────────────────────────────────────────── -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">
+      <div class="nav-logo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 44 44"><polygon points="22,5 41,39 3,39" fill="#F59E0B" stroke="white" stroke-width="2" stroke-linejoin="round"/></svg></div><span>Dirt<strong>Link</strong></span>
     </div>
     <ul class="nav-links">
       <li><a href="#how-it-works">How It Works</a></li>
       <li><a href="#who-its-for">Who It's For</a></li>
       <li><a href="#features">Features</a></li>
-      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#pricing">Pricing</a></li><li><a href="#faq">FAQ</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
     <div class="nav-actions">
-      <a href="/app" class="btn btn-outline">Log In</a>
+      <a href="/app" class="btn btn-ghost">Log In</a>
       <a href="/app" class="btn btn-primary">Sign Up Free</a>
     </div>
-  </nav>
+  </div>
+</nav>
 
-  <!-- ── HERO ── -->
-  <section id="hero">
-    <div class="container">
-      <p class="section-label">Canada's Earth Material Marketplace</p>
-      <h1 class="section-title">Connect Sites.<br>Move Earth.<br>Cut the Waste.</h1>
-      <p class="section-sub">
-        DirtLink connects construction sites that have excess fill with sites that need it —
-        no brokers, no phone tag, no wasted material.
-      </p>
-      <div class="hero-actions">
-        <a href="/app" class="btn btn-primary btn-lg">Start for Free</a>
-        <a href="#how-it-works" class="btn btn-outline btn-lg">See How It Works</a>
+<!-- ─── HERO ─────────────────────────────────────────────── -->
+<section id="hero">
+  <div class="hero-inner">
+    <div class="pill">📍 Calgary Earth Material Marketplace</div>
+    <h1>Connect Sites. Move Earth.<br>Cut the Waste.</h1>
+    <p>DirtLink connects construction sites that have excess fill with sites that need it — no brokers, no phone tag, no wasted material.</p>
+    <div class="hero-actions">
+      <a href="/app" class="btn-primary-lg">Start for Free</a>
+      <a href="#how-it-works" class="btn-ghost-lg">See How It Works</a>
+    </div>
+    <p class="hero-trust">
+      Free to use <span>·</span> No credit card <span>·</span> Calgary
+    </p>
+  </div>
+  <div style="max-width:1200px; margin:0 auto; padding:0 32px;" class="browser-section">
+    <div class="browser-wrap" id="browser-wrap">
+      <div class="browser-bar">
+        <div class="b-dot" style="background:#FF5F57"></div>
+        <div class="b-dot" style="background:#FEBC2E"></div>
+        <div class="b-dot" style="background:#28C840"></div>
+        <div class="browser-url">dirtlink.ca</div>
+      </div>
+      <img src="/images/dashboard.png" alt="DirtLink — Live map dashboard showing material pins across Calgary">
+    </div>
+  </div>
+</section>
+
+<!-- ─── HOW IT WORKS ──────────────────────────────────────── -->
+<section id="how-it-works" class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="pill">How It Works</div>
+      <h2>Get Connected in<br>3 Simple Steps</h2>
+      <p>From listing your site to coordinating a material transfer — it takes minutes, not days.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <h3>Drop a Pin</h3>
+        <p>Mark your site on the map. Tell us what you have or need — material type, quantity, access conditions, and photos.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <h3>Browse Nearby Sites</h3>
+        <p>See all active material sites in your area on the live map. Filter by material type, Have vs. Need, and tested status.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <h3>Connect Directly</h3>
+        <p>Message the site contact directly through DirtLink. No brokers, no middlemen — just two contractors solving a problem.</p>
       </div>
     </div>
-    <!-- Dashboard screenshot -->
-    <div class="container">
-      <div class="hero-screenshot" id="hero-screenshot">
-        <img id="screenshot-img" src="" alt="DirtLink dashboard">
-        <div class="screenshot-placeholder" id="screenshot-placeholder">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
-            <path d="m21 15-5-5L5 21"/>
-          </svg>
-          <span>[ Dashboard screenshot — dirtlink.ca ]</span>
-        </div>
+  </div>
+</section>
+
+<!-- ─── WHO IT'S FOR ──────────────────────────────────────── -->
+<section id="who-its-for" class="section">
+  <div class="wrap">
+    <div class="who-layout">
+
+      <!-- Left: sticky heading -->
+      <div class="who-left">
+        <div class="pill">Built For</div>
+        <h2>Built for Everyone on the Job Site</h2>
+        <p>Whether you're offloading excess fill or sourcing material for a project — DirtLink works for you.</p>
+        <a href="/app" class="btn btn-primary" style="font-size:15px; padding:11px 24px;">Get Started Free</a>
       </div>
-    </div>
-  </section>
 
-  <!-- ── HOW IT WORKS ── -->
-  <section id="how-it-works">
-    <div class="container">
-      <p class="section-label">Simple Process</p>
-      <h2 class="section-title">How DirtLink Works</h2>
-      <p class="section-sub">Three steps to connect your site with the right material match nearby.</p>
-      <div class="steps-grid">
-        <div class="step-card">
-          <div class="step-number">1</div>
-          <h3>Drop a Pin</h3>
-          <p>Mark your site on the map. Tell us what you have or what you need — material type, quantity, and access conditions.</p>
-        </div>
-        <div class="step-card">
-          <div class="step-number">2</div>
-          <h3>Browse Nearby Sites</h3>
-          <p>See all active material sites in your area on the live map. Filter by material type, tested status, and pin type.</p>
-        </div>
-        <div class="step-card">
-          <div class="step-number">3</div>
-          <h3>Connect Directly</h3>
-          <p>Message the site contact directly through DirtLink. No brokers, no middlemen — just two companies solving a problem together.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+      <!-- Right: stacked cards -->
+      <div class="who-cards">
 
-  <!-- ── WHO IT'S FOR ── -->
-  <section id="who-its-for">
-    <div class="container">
-      <p class="section-label">Built For</p>
-      <h2 class="section-title">Who Uses DirtLink?</h2>
-      <p class="section-sub">Built for contractors, excavators, developers, and site managers across Canada.</p>
-      <div class="audience-grid">
-        <div class="audience-card have">
-          <span class="audience-tag">Have Material</span>
-          <h3>You Have Excess Fill</h3>
-          <p>Your excavation generated more material than you expected. Instead of paying to haul it to a landfill, find a nearby site that needs exactly what you have.</p>
-          <ul class="audience-list">
-            <li>Excavation contractors</li>
-            <li>General contractors</li>
-            <li>Developers clearing land</li>
-            <li>Municipal projects</li>
-          </ul>
-        </div>
-        <div class="audience-card need">
-          <span class="audience-tag">Need Material</span>
-          <h3>You Need Fill or Aggregate</h3>
-          <p>Your project needs fill, aggregate, or organic material. Find a local source and coordinate delivery directly — no supplier markups.</p>
-          <ul class="audience-list">
-            <li>Landscaping companies</li>
-            <li>Road & infrastructure crews</li>
-            <li>Foundation & grading contractors</li>
-            <li>Property developers</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── FEATURES ── -->
-  <section id="features">
-    <div class="container">
-      <p class="section-label">Platform Features</p>
-      <h2 class="section-title">Everything You Need</h2>
-      <p class="section-sub">Simple tools built for the construction industry — no fluff.</p>
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon">🗺️</div>
-          <h3>Live Map View</h3>
-          <p>See all active pins on an interactive map. Filter by material type, Have vs. Need, and tested materials.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">💬</div>
-          <h3>Direct Messaging</h3>
-          <p>Message site contacts directly within the platform. Keep all conversations organized by pin.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">📄</div>
-          <h3>Test Reports & Photos</h3>
-          <p>Upload test reports and site photos with your pin so other contractors can verify material quality before reaching out.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🎯</div>
-          <h3>Material Categories</h3>
-          <p>Fill & Topsoil, Aggregate, Rock & Rubble, Organic — each with a distinct colour on the map so you spot what you need instantly.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">📍</div>
-          <h3>Precise Pin Placement</h3>
-          <p>Place your pin exactly where your site is. Edit, reposition, or deactivate it any time as conditions change.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🆓</div>
-          <h3>Free to Use</h3>
-          <p>DirtLink is free for contractors across Canada. Create an account, drop a pin, and start connecting today.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── FAQ ── -->
-  <section id="faq">
-    <div class="container">
-      <p class="section-label">FAQ</p>
-      <h2 class="section-title">Common Questions</h2>
-      <div class="faq-list">
-
-        <div class="faq-item">
-          <button class="faq-question">
-            Is DirtLink free to use?
-            <svg class="faq-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-          </button>
-          <p class="faq-answer">Yes — DirtLink is completely free for all contractors in Canada. Create an account, drop pins, browse the map, and message other sites at no cost.</p>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question">
-            What materials can I list?
-            <svg class="faq-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-          </button>
-          <p class="faq-answer">You can list Fill & Topsoil, Aggregate (gravel, sand, crushed rock), Rock & Rubble (boulders, broken concrete), and Organic material (wood chips, brush). More categories will be added based on user feedback.</p>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question">
-            Is DirtLink only available in Canada?
-            <svg class="faq-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-          </button>
-          <p class="faq-answer">For now, yes — DirtLink is focused on the Canadian market. We are starting in major cities and expanding across all provinces. US coverage is on the roadmap.</p>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question">
-            Do I need to register a company?
-            <svg class="faq-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-          </button>
-          <p class="faq-answer">No formal registration required. Just sign up with a company name, contact name, email, and phone number. We keep it simple so you can get started in under a minute.</p>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question">
-            How do I contact a site I found on the map?
-            <svg class="faq-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-          </button>
-          <p class="faq-answer">Click any pin on the map to view its details, then hit "Send Message" to open a direct conversation with the site contact. You need a free account to message other users.</p>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question">
-            Can I list a site without knowing the exact quantity?
-            <svg class="faq-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-          </button>
-          <p class="faq-answer">Yes — the quantity field is an estimate and is optional. You can always update your pin as the project progresses or conditions change.</p>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ── CONTACT ── -->
-  <section id="contact">
-    <div class="container">
-      <p class="section-label">Get In Touch</p>
-      <h2 class="section-title">Contact Us</h2>
-      <div class="contact-wrap">
-        <form class="contact-form" onsubmit="handleContact(event)">
-          <div class="form-group">
-            <label>Your Name</label>
-            <input type="text" placeholder="Jane Smith" required>
+        <div class="who-card">
+          <div class="who-card-top">
+            <div class="who-card-icon">🏗️</div>
           </div>
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" placeholder="jane@company.com" required>
+          <div>
+            <h3>Excavation Contractors</h3>
+            <p>Your dig generated thousands of cubic yards you didn't plan for. Find a receiving site nearby — no broker, no landfill fees.</p>
+          </div>
+          <div class="who-card-bottom">
+            <div class="who-card-tags">
+              <span class="who-card-tag">Excess fill</span>
+              <span class="who-card-tag">Cut & fill</span>
+              <span class="who-card-tag">Tested material</span>
+            </div>
+            <div class="who-card-arrow">↗</div>
+          </div>
+        </div>
+
+        <div class="who-card">
+          <div class="who-card-top">
+            <div class="who-card-icon">🏘️</div>
+          </div>
+          <div>
+            <h3>Property Developers</h3>
+            <p>Clearing a site or grading a subdivision? Offload what you don't need and source what you do — from projects already near you.</p>
+          </div>
+          <div class="who-card-bottom">
+            <div class="who-card-tags">
+              <span class="who-card-tag">Land clearing</span>
+              <span class="who-card-tag">Grading</span>
+              <span class="who-card-tag">Topsoil</span>
+            </div>
+            <div class="who-card-arrow">↗</div>
+          </div>
+        </div>
+
+        <div class="who-card">
+          <div class="who-card-top">
+            <div class="who-card-icon">🌱</div>
+          </div>
+          <div>
+            <h3>Landscaping Companies</h3>
+            <p>Need topsoil, organic fill, or aggregate? Browse available material from sites near your job at source price — no markups.</p>
+          </div>
+          <div class="who-card-bottom">
+            <div class="who-card-tags">
+              <span class="who-card-tag">Topsoil</span>
+              <span class="who-card-tag">Organic</span>
+              <span class="who-card-tag">Aggregate</span>
+            </div>
+            <div class="who-card-arrow">↗</div>
+          </div>
+        </div>
+
+        <div class="who-card">
+          <div class="who-card-top">
+            <div class="who-card-icon">🛣️</div>
+          </div>
+          <div>
+            <h3>Road & Infrastructure Crews</h3>
+            <p>Large volumes, specific specs, tight timelines. Source tested aggregate from nearby projects and coordinate directly with the site manager.</p>
+          </div>
+          <div class="who-card-bottom">
+            <div class="who-card-tags">
+              <span class="who-card-tag">Large volumes</span>
+              <span class="who-card-tag">Rock & rubble</span>
+              <span class="who-card-tag">Tested</span>
+            </div>
+            <div class="who-card-arrow">↗</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SPLIT FEATURE ─────────────────────────────────────── -->
+<section id="split-feature" class="section">
+  <div class="wrap">
+    <div class="split-card">
+      <div class="split-text">
+        <div class="pill">Live Map</div>
+        <h2>See Every Available Site in Your Area</h2>
+        <p>The DirtLink map shows all active Have and Need pins near you in real time. Filter by material type, check test reports, and reach out instantly.</p>
+        <ul class="split-points">
+          <li>Colour-coded pins by material type and direction</li>
+          <li>Filter by Fill, Aggregate, Rock & Rubble, or Organic</li>
+          <li>Show only tested materials with verified reports</li>
+          <li>Works on desktop and mobile</li>
+        </ul>
+      </div>
+      <div class="split-visual">
+        <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); margin-bottom:4px;">Active Sites Near You</div>
+        <div class="split-visual-row">
+          <div class="split-visual-dot" style="background:#DC2626"></div>
+          <div class="split-visual-info">
+            <strong>Downtown Condo Excavation</strong>
+            <span>Fill & Topsoil · 800 cubic yards · Tested</span>
+          </div>
+          <span class="split-visual-badge badge-have">Have</span>
+        </div>
+        <div class="split-visual-row">
+          <div class="split-visual-dot" style="background:#F59E0B"></div>
+          <div class="split-visual-info">
+            <strong>NE Industrial Site</strong>
+            <span>Aggregate · 1,200 tonnes · Tested</span>
+          </div>
+          <span class="split-visual-badge badge-have">Have</span>
+        </div>
+        <div class="split-visual-row">
+          <div class="split-visual-dot" style="background:#2563EB"></div>
+          <div class="split-visual-info">
+            <strong>Residential Dev — SW</strong>
+            <span>Fill & Topsoil · 400 cubic yards needed</span>
+          </div>
+          <span class="split-visual-badge badge-need">Need</span>
+        </div>
+        <div class="split-visual-row">
+          <div class="split-visual-dot" style="background:#16A34A"></div>
+          <div class="split-visual-info">
+            <strong>Springbank Road Project</strong>
+            <span>Organic · 200 truck loads · Untested</span>
+          </div>
+          <span class="split-visual-badge badge-have">Have</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FEATURES ──────────────────────────────────────────── -->
+<section id="features" class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="pill">Platform Features</div>
+      <h2>Everything You Need,<br>Nothing You Don't</h2>
+      <p>Simple tools built specifically for the construction industry — no fluff, no learning curve.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon">🗺️</div>
+        <h3>Live Map View</h3>
+        <p>Interactive map showing all active pins. Filter by material type, Have vs. Need, and tested status in real time.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">💬</div>
+        <h3>Direct Messaging</h3>
+        <p>Message site contacts directly through DirtLink. All conversations are organized by pin — no email chains.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📄</div>
+        <h3>Test Reports & Photos</h3>
+        <p>Upload test reports and site photos so other contractors can verify material quality before reaching out.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🎯</div>
+        <h3>Material Categories</h3>
+        <p>Fill & Topsoil, Aggregate, Rock & Rubble, Organic — each colour-coded on the map for instant identification.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📍</div>
+        <h3>Precise Pin Placement</h3>
+        <p>Place your pin exactly where your site is. Edit, reposition, or deactivate it any time as conditions change.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🆓</div>
+        <h3>Free to Use</h3>
+        <p>DirtLink is completely free for all contractors in Calgary. Sign up in under a minute, no credit card needed.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PRICING ────────────────────────────────────────────── -->
+<section id="pricing" class="section" style="background:var(--surface); border-top:1px solid var(--border);">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="pill">Pricing</div>
+      <h2 class="section-title">Simple, transparent plans</h2>
+      <p class="section-sub">Start free and upgrade as your operation grows. No contracts, cancel anytime.</p>
+    </div>
+
+    <div class="pricing-grid">
+
+      <!-- Free -->
+      <div class="pricing-card">
+        <div class="pricing-tier">Free</div>
+        <div class="pricing-price">$0<span>/mo</span></div>
+        <div class="pricing-desc">Get started, post pins and browse the map.</div>
+        <a href="/app" class="pricing-btn pricing-btn-outline">Get Started</a>
+        <ul class="pricing-features">
+          <li><span class="pf-check">✓</span> Post unlimited pins</li>
+          <li><span class="pf-check">✓</span> Browse the full map</li>
+          <li><span class="pf-check">✓</span> 3 reveals / month</li>
+          <li><span class="pf-check">✓</span> Extra reveal: $4.99 each</li>
+          <li class="pf-no"><span class="pf-dash">–</span> Proximity alerts</li>
+          <li class="pf-no"><span class="pf-dash">–</span> Monitoring radius</li>
+          <li class="pf-no"><span class="pf-dash">–</span> Private map view</li>
+          <li class="pf-no"><span class="pf-dash">–</span> Unlimited outreach</li>
+        </ul>
+      </div>
+
+      <!-- Pro -->
+      <div class="pricing-card">
+        <div class="pricing-tier">Pro</div>
+        <div class="pricing-price">$29<span>/mo</span></div>
+        <div class="pricing-desc">More reveals and lower per-reveal cost.</div>
+        <a href="/app" class="pricing-btn pricing-btn-outline">Get Started</a>
+        <ul class="pricing-features">
+          <li><span class="pf-check">✓</span> Post unlimited pins</li>
+          <li><span class="pf-check">✓</span> Browse the full map</li>
+          <li><span class="pf-check">✓</span> 10 reveals / month</li>
+          <li><span class="pf-check">✓</span> Extra reveal: $2.99 each</li>
+          <li class="pf-no"><span class="pf-dash">–</span> Proximity alerts</li>
+          <li class="pf-no"><span class="pf-dash">–</span> Monitoring radius</li>
+          <li class="pf-no"><span class="pf-dash">–</span> Private map view</li>
+          <li class="pf-no"><span class="pf-dash">–</span> Unlimited outreach</li>
+        </ul>
+      </div>
+
+      <!-- Powerhouse — featured -->
+      <div class="pricing-card pricing-card-featured">
+        <div class="pricing-badge">Most Popular</div>
+        <div class="pricing-tier">Powerhouse</div>
+        <div class="pricing-price">$59<span>/mo</span></div>
+        <div class="pricing-desc">Built for active sites that need real-time awareness.</div>
+        <a href="/app" class="pricing-btn pricing-btn-primary">Get Started</a>
+        <ul class="pricing-features">
+          <li><span class="pf-check">✓</span> Post unlimited pins</li>
+          <li><span class="pf-check">✓</span> Browse the full map</li>
+          <li><span class="pf-check">✓</span> 40 reveals / month</li>
+          <li><span class="pf-check">✓</span> Extra reveal: $1.49 each</li>
+          <li><span class="pf-check">✓</span> Proximity alerts</li>
+          <li><span class="pf-check">✓</span> 5–50 km monitoring radius</li>
+          <li><span class="pf-check">✓</span> Email/SMS notifications</li>
+          <li class="pf-no"><span class="pf-dash">–</span> Private map view</li>
+        </ul>
+      </div>
+
+      <!-- Enterprise -->
+      <div class="pricing-card">
+        <div class="pricing-tier">Enterprise</div>
+        <div class="pricing-price">$149<span>/mo</span></div>
+        <div class="pricing-desc">Full control for large contractors and fleet operations.</div>
+        <a href="/app" class="pricing-btn pricing-btn-outline">Get Started</a>
+        <ul class="pricing-features">
+          <li><span class="pf-check">✓</span> Post unlimited pins</li>
+          <li><span class="pf-check">✓</span> Browse the full map</li>
+          <li><span class="pf-check">✓</span> Unlimited reveals</li>
+          <li><span class="pf-check">✓</span> No extra reveal cost</li>
+          <li><span class="pf-check">✓</span> Proximity alerts</li>
+          <li><span class="pf-check">✓</span> 5–50 km monitoring radius</li>
+          <li><span class="pf-check">✓</span> Priority SMS/in-app alerts</li>
+          <li><span class="pf-check">✓</span> Private map view</li>
+          <li><span class="pf-check">✓</span> Unlimited outreach</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── FAQ ───────────────────────────────────────────────── -->
+<section id="faq" class="section" style="background:var(--surface); border-top:1px solid var(--border);">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="pill">FAQ</div>
+      <h2>Common Questions</h2>
+      <p>Everything you need to know before getting started.</p>
+    </div>
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q">
+          Is DirtLink free to use?
+          <span class="faq-icon">+</span>
+        </button>
+        <p class="faq-a">Yes — DirtLink is completely free for all contractors in Calgary. Create an account, drop pins, browse the map, and message other sites at no cost.</p>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">
+          What materials can I list?
+          <span class="faq-icon">+</span>
+        </button>
+        <p class="faq-a">You can list Fill & Topsoil, Aggregate (gravel, sand, crushed rock), Rock & Rubble (boulders, broken concrete), and Organic material (wood chips, brush). More categories will be added based on user feedback.</p>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">
+          Where is DirtLink available?
+          <span class="faq-icon">+</span>
+        </button>
+        <p class="faq-a">DirtLink is currently serving Calgary and the surrounding area. We're starting local to build a strong, active network — with plans to expand to other Alberta cities and beyond.</p>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">
+          Do I need to register a company?
+          <span class="faq-icon">+</span>
+        </button>
+        <p class="faq-a">No formal registration required. Just sign up with a company name, contact name, email, and phone number. You can get started in under a minute.</p>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">
+          How do I contact a site I found on the map?
+          <span class="faq-icon">+</span>
+        </button>
+        <p class="faq-a">Click any pin on the map to view its details, then hit "Send Message" to open a direct conversation with the site contact. You need a free account to message other users.</p>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">
+          Can I list a site without knowing the exact quantity?
+          <span class="faq-icon">+</span>
+        </button>
+        <p class="faq-a">Yes — the quantity field is an estimate and is optional. You can always update your pin as the project progresses or conditions change on site.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── CONTACT ────────────────────────────────────────────── -->
+<section id="contact" class="section">
+  <div class="wrap">
+    <div class="contact-grid">
+      <div class="contact-left">
+        <div class="pill">Get In Touch</div>
+        <h2>We'd Love to Hear From You</h2>
+        <p>Have a question, a feature idea, or want to partner with us? We respond to every message.</p>
+        <div class="contact-detail">
+          <div class="contact-detail-icon">📧</div>
+          <div>
+            <strong>Email</strong>
+            <span>hello@dirtlink.ca</span>
+          </div>
+        </div>
+        <div class="contact-detail">
+          <div class="contact-detail-icon">🌐</div>
+          <div>
+            <strong>Website</strong>
+            <span>dirtlink.ca</span>
+          </div>
+        </div>
+        <div class="contact-detail">
+          <div class="contact-detail-icon">🍁</div>
+          <div>
+            <strong>Location</strong>
+            <span>Calgary, AB</span>
+          </div>
+        </div>
+      </div>
+      <div class="contact-form-wrap">
+        <form onsubmit="handleContact(event)">
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Your Name</label>
+              <input type="text" placeholder="Jane Smith" required>
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" placeholder="jane@company.com" required>
+            </div>
           </div>
           <div class="form-group">
             <label>Company</label>
@@ -669,82 +1200,104 @@
             <label>Message</label>
             <textarea rows="5" placeholder="Tell us what's on your mind..." required></textarea>
           </div>
-          <button type="submit" class="btn btn-primary">Send Message</button>
-          <p id="contact-success" style="display:none; color:#16A34A; font-size:14px; font-weight:600;">Message sent — we'll get back to you soon.</p>
+          <button type="submit" class="btn btn-primary" style="width:100%;padding:12px;font-size:15px;">Send Message</button>
+          <p id="contact-success">Message sent — we'll get back to you soon.</p>
         </form>
-        <div class="contact-info">
-          <h3>We'd love to hear from you</h3>
-          <p>Have a question, a feature idea, or want to partner with us? Reach out — we respond to every message.</p>
-          <div class="contact-detail">
-            <span>📧</span>
-            <span>hello@dirtlink.ca</span>
-          </div>
-          <div class="contact-detail">
-            <span>🌐</span>
-            <span>dirtlink.ca</span>
-          </div>
-          <div class="contact-detail">
-            <span>🍁</span>
-            <span>Canada — serving all provinces</span>
-          </div>
-        </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ── CTA BANNER ── -->
-  <section id="cta-banner">
-    <div class="container">
-      <h2>Ready to connect your site?</h2>
-      <p>Join contractors across Canada already using DirtLink. Free to sign up, free to use.</p>
-      <div class="cta-actions">
-        <a href="/app" class="btn btn-lg" style="background:white; color:var(--primary); font-weight:700;">Start for Free</a>
-        <a href="/app" class="btn btn-lg btn-outline">Browse the Map</a>
+<!-- ─── CTA ────────────────────────────────────────────────── -->
+<section id="cta" class="section">
+  <div class="wrap">
+    <div class="cta-card">
+      <h2>Ready to Connect Your Site?</h2>
+      <p>Join contractors in Calgary already using DirtLink. Free to sign up, free to use.</p>
+      <a href="/app" class="btn-white">Start for Free →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="nav-logo">
+        <div class="nav-logo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 44 44"><polygon points="22,5 41,39 3,39" fill="#F59E0B" stroke="white" stroke-width="2" stroke-linejoin="round"/></svg></div>
+        <span>Dirt<strong style="color:white;">Link</strong></span>
       </div>
+      <p>Connect construction sites that have excess earth material with sites that need it — across Calgary.</p>
     </div>
-  </section>
+    <div class="footer-col">
+      <h4>Platform</h4>
+      <ul>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#who-its-for">Who It's For</a></li>
+        <li><a href="#pricing">Pricing</a></li><li><a href="#faq">FAQ</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="/app">Sign Up</a></li>
+        <li><a href="/app">Log In</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="mailto:hello@dirtlink.ca">hello@dirtlink.ca</a></li>
+        <li><a href="#">dirtlink.ca</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2026 DirtLink. All rights reserved.</span>
+    <span>📍 Calgary, AB</span>
+  </div>
+</footer>
 
-  <!-- ── FOOTER ── -->
-  <footer>
-    <div class="logo">
-      <div class="logo-icon">DL</div>
-      <span>Dirt<strong>Link</strong></span>
-    </div>
-    <span>&copy; 2026 DirtLink. All rights reserved. Canada.</span>
-    <div class="footer-links">
-      <a href="#how-it-works">How It Works</a>
-      <a href="#faq">FAQ</a>
-      <a href="#contact">Contact</a>
-      <a href="/app">Open App</a>
-    </div>
-  </footer>
-
-  <script>
-    // FAQ accordion
-    document.querySelectorAll('.faq-question').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const item = btn.closest('.faq-item');
-        const isOpen = item.classList.contains('open');
-        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
-        if (!isOpen) item.classList.add('open');
-      });
+<script>
+  // FAQ accordion
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
     });
+  });
 
-    // Contact form stub
-    function handleContact(e) {
-      e.preventDefault();
-      document.getElementById('contact-success').style.display = 'block';
-      e.target.reset();
+  // Contact form
+  function handleContact(e) {
+    e.preventDefault();
+    document.getElementById('contact-success').style.display = 'block';
+    e.target.reset();
+  }
+
+  // Smooth scroll
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+    });
+  });
+
+  // Parallax scroll on hero screenshot
+  const browserWrap = document.getElementById('browser-wrap');
+  const hero = document.getElementById('hero');
+
+  window.addEventListener('scroll', () => {
+    const scrollY = window.scrollY;
+    const heroBottom = hero.offsetHeight;
+    if (scrollY < heroBottom) {
+      browserWrap.style.transform = `translateY(${scrollY * 0.22}px)`;
     }
-
-    // Smooth scroll for nav links
-    document.querySelectorAll('a[href^="#"]').forEach(a => {
-      a.addEventListener('click', e => {
-        const target = document.querySelector(a.getAttribute('href'));
-        if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
-      });
-    });
-  </script>
+  }, { passive: true });
+</script>
 
 </body>
 </html>
