@@ -495,10 +495,9 @@ main {
 }
 .legend-chevron {
   margin-left: auto;
-  font-size: 11px;
   color: var(--text-muted);
   transition: transform 0.2s;
-  line-height: 1;
+  flex-shrink: 0;
 }
 .legend-group.collapsed .legend-chevron { transform: rotate(180deg); }
 
