@@ -453,7 +453,7 @@
       margin-top: 48px;
     }
     .pricing-card {
-      background: var(--bg);
+      background: var(--surface);
       border: 1.5px solid var(--border);
       border-radius: var(--r-xl);
       padding: 28px 24px 32px;
@@ -461,20 +461,40 @@
       display: flex;
       flex-direction: column;
       gap: 0;
+      box-shadow: 0 4px 16px rgba(26,20,16,0.06);
     }
     .pricing-card-featured {
-      background: var(--surface);
+      background: var(--primary);
       border-color: var(--primary);
-      border-width: 2px;
-      box-shadow: 0 8px 32px rgba(245,158,11,0.12);
+      box-shadow: 0 8px 32px rgba(245,158,11,0.3);
+    }
+    .pricing-card-featured .pricing-tier,
+    .pricing-card-featured .pricing-price,
+    .pricing-card-featured .pricing-price span,
+    .pricing-card-featured .pricing-desc,
+    .pricing-card-featured .pricing-features,
+    .pricing-card-featured .pricing-features li,
+    .pricing-card-featured .pf-no,
+    .pricing-card-featured .pf-dash {
+      color: rgba(255,255,255,0.9);
+    }
+    .pricing-card-featured .pricing-price { color: #fff; }
+    .pricing-card-featured .pf-check { color: #fff; }
+    .pricing-card-featured .pricing-features { border-color: rgba(255,255,255,0.25); }
+    .pricing-card-featured .pricing-btn-primary {
+      background: #fff;
+      color: var(--primary-dark);
+    }
+    .pricing-card-featured .pricing-btn-primary:hover {
+      background: rgba(255,255,255,0.9);
     }
     .pricing-badge {
       position: absolute;
       top: -13px;
       left: 50%;
       transform: translateX(-50%);
-      background: var(--primary);
-      color: #fff;
+      background: #fff;
+      color: var(--primary-dark);
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.05em;
