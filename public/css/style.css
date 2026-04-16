@@ -1086,6 +1086,8 @@ main {
   display: grid;
   grid-template-columns: 240px 1fr;
   min-height: 100%;
+  width: 100%;
+  align-items: start;
 }
 
 /* Left sidebar */
@@ -1100,6 +1102,7 @@ main {
   top: 0;
   height: 100vh;
   overflow-y: auto;
+  align-self: start;
 }
 .account-user-card {
   display: flex;
@@ -1162,7 +1165,9 @@ main {
 /* Right content area */
 .account-content {
   padding: 36px 40px 60px;
-  max-width: 760px;
+  width: 100%;
+  min-width: 0;
+  align-self: start;
 }
 .account-form {
   max-width: 460px;
