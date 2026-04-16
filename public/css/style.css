@@ -1081,29 +1081,33 @@ main {
 }
 
 /* ─── Account Page View ─────────────────────────────────── */
-.account-page-view {
+#view-account.active {
+  display: block !important;
+  overflow-y: auto;
   background: var(--bg);
 }
 .account-layout {
-  display: grid;
-  grid-template-columns: 240px 1fr;
+  display: flex;
   width: 100%;
   min-height: 100%;
 }
 
-/* Left sidebar */
+/* Left sidebar — fixed to viewport left edge */
 .account-sidebar {
+  position: fixed;
+  top: 62px; /* below header */
+  left: 0;
+  width: 240px;
+  height: calc(100vh - 62px);
   background: var(--surface);
   border-right: 1px solid var(--border);
   padding: 32px 20px;
   display: flex;
   flex-direction: column;
   gap: 28px;
-  position: sticky;
-  top: 0;
-  height: calc(100vh - 62px);
   overflow-y: auto;
-  align-self: start;
+  z-index: 10;
+  flex-shrink: 0;
 }
 .account-user-card {
   display: flex;
@@ -1165,10 +1169,10 @@ main {
 
 /* Right content area */
 .account-content {
-  padding: 36px 40px 60px;
+  margin-left: 240px;
+  padding: 36px 48px 60px;
   width: 100%;
   min-width: 0;
-  align-self: start;
 }
 .account-form {
   max-width: 460px;
