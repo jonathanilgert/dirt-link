@@ -2285,8 +2285,11 @@ main {
   font-weight: 600;
   color: var(--primary-dark);
   text-align: center;
-  padding: 8px 0 2px;
   margin-top: auto;
+  padding: 7px 12px;
+  border: 1.5px solid var(--primary);
+  border-radius: var(--radius);
+  background: var(--primary-light);
 }
 .plan-card .btn { margin-top: auto; }
 

@@ -1340,7 +1340,7 @@ window.DirtLink = {
           <div class="plan-card ${p.key === currentPlan ? 'plan-current' : ''} ${p.key === 'powerhouse' && p.key !== currentPlan ? 'plan-recommended' : ''}">
             ${p.key === 'powerhouse' && p.key !== currentPlan ? '<div class="plan-recommended-badge">Most Popular</div>' : ''}
             <div class="plan-card-tier">${this.escapeHtml(p.name)}</div>
-            <div class="plan-price">${p.price > 0 ? `$${p.price}<span>/mo</span>` : '<span class="plan-free">Free</span>'}</div>
+            <div class="plan-price">${p.price > 0 ? `$${p.price}<span>/mo</span>` : `$0<span>/mo</span>`}</div>
             <ul class="plan-features">
               ${p.features.map(f => `<li>${this.escapeHtml(f)}</li>`).join('')}
             </ul>
