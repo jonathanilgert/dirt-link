@@ -373,32 +373,43 @@
   <!-- Modal: Profile -->
   <!-- Account Page View -->
   <div id="view-account" class="view account-page-view">
-    <div class="account-page">
+    <div class="account-layout">
 
-      <!-- Page header -->
-      <div class="account-page-header">
-        <div class="account-user-info">
+      <!-- Left sidebar -->
+      <aside class="account-sidebar">
+        <div class="account-user-card">
           <div class="profile-avatar-lg" id="profile-avatar-lg"></div>
-          <div>
-            <h2 id="profile-heading"></h2>
+          <div class="account-user-text">
+            <h3 id="profile-heading"></h3>
             <p class="profile-member-since" id="profile-member-since"></p>
           </div>
         </div>
-      </div>
+        <nav class="account-nav">
+          <button class="profile-tab active" data-ptab="details">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Company Details
+          </button>
+          <button class="profile-tab" data-ptab="notifications">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            Notifications
+          </button>
+          <button class="profile-tab" data-ptab="billing">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            Plan &amp; Billing
+          </button>
+          <button class="profile-tab" data-ptab="password">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Change Password
+          </button>
+        </nav>
+      </aside>
 
-      <!-- Tab nav -->
-      <div class="profile-tabs account-tabs">
-        <button class="profile-tab active" data-ptab="details">Company Details</button>
-        <button class="profile-tab" data-ptab="notifications">Notifications</button>
-        <button class="profile-tab" data-ptab="billing">Plan &amp; Billing</button>
-        <button class="profile-tab" data-ptab="password">Change Password</button>
-      </div>
-
-      <!-- Tab content -->
-      <div class="account-tab-content">
+      <!-- Right content -->
+      <div class="account-content">
 
         <!-- Details tab -->
         <form id="form-profile" class="profile-form account-form" style="display:flex">
+          <h3 style="font-size:18px;font-weight:700;margin-bottom:20px;">Company Details</h3>
           <div class="form-group">
             <label>Company Name</label>
             <input type="text" id="profile-company" placeholder="Company Name" required>
@@ -422,6 +433,7 @@
 
         <!-- Notifications tab -->
         <div id="notifications-tab" class="profile-form account-form" style="display:none; flex-direction:column; gap:16px;">
+          <h3 style="font-size:18px;font-weight:700;margin-bottom:4px;">Notifications</h3>
           <div class="notification-settings">
             <h3 style="margin:0 0 8px;">Email Notifications</h3>
             <p class="hint" style="margin:0 0 12px;">Receive an email when someone sends you a message on DirtLink. You can reply directly from your email.</p>
@@ -473,7 +485,8 @@
         </div>
 
         <!-- Billing tab -->
-        <div id="billing-tab" class="profile-form account-form" style="display:none; flex-direction:column; gap:16px; position:relative;">
+        <div id="billing-tab" class="profile-form account-form" style="display:none; flex-direction:column; gap:16px;">
+          <h3 style="font-size:18px;font-weight:700;margin-bottom:4px;">Plan &amp; Billing</h3>
           <div class="billing-current-plan" id="billing-current-plan"></div>
           <div class="billing-reveals" id="billing-reveals"></div>
           <div class="billing-nudge" id="billing-nudge" style="display:none"></div>
@@ -496,6 +509,7 @@
 
         <!-- Password tab -->
         <form id="form-password" class="profile-form account-form" style="display:none">
+          <h3 style="font-size:18px;font-weight:700;margin-bottom:20px;">Change Password</h3>
           <div class="form-group">
             <label>Current Password</label>
             <input type="password" id="pw-current" placeholder="Current password" required>
@@ -513,8 +527,8 @@
           <button type="submit" class="btn btn-primary">Update Password</button>
         </form>
 
-      </div><!-- /account-tab-content -->
-    </div><!-- /account-page -->
+      </div><!-- /account-content -->
+    </div><!-- /account-layout -->
   </div><!-- /view-account -->
 
   <!-- Modal: Reveal Gate (shown when user has no reveals left) -->

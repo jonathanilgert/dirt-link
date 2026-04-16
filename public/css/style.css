@@ -1082,39 +1082,110 @@ main {
   overflow-y: auto;
   height: 100%;
 }
-.account-page {
-  max-width: 860px;
-  margin: 0 auto;
-  padding: 40px 32px 60px;
+.account-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100%;
 }
-.account-page-header {
-  margin-bottom: 32px;
+
+/* Left sidebar */
+.account-sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 32px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
 }
-.account-user-info {
+.account-user-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+.account-user-card .profile-avatar-lg {
+  width: 64px;
+  height: 64px;
+  font-size: 26px;
+}
+.account-user-text h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+.account-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+/* Override horizontal profile-tab for vertical account nav */
+.account-nav .profile-tab {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  border-bottom: none;
+  margin-bottom: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  transition: background 0.12s, color 0.12s;
 }
-.account-user-info h2 {
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: -0.3px;
+.account-nav .profile-tab:hover {
+  background: var(--bg);
+  color: var(--text);
 }
-.account-tabs {
-  margin-bottom: 28px;
+.account-nav .profile-tab.active {
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  border-bottom: none;
+  font-weight: 600;
 }
-.account-tab-content {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 28px;
+.account-nav .profile-tab svg {
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+.account-nav .profile-tab.active svg {
+  opacity: 1;
+  color: var(--primary-dark);
+}
+
+/* Right content area */
+.account-content {
+  padding: 36px 40px 60px;
+  max-width: 760px;
 }
 .account-form {
-  max-width: 480px;
+  max-width: 460px;
 }
-/* Billing tab is full-width */
-#billing-tab.account-form {
+#billing-tab.account-form,
+#notifications-tab.account-form {
   max-width: 100%;
+}
+
+/* Section headings inside account */
+.account-content h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: var(--text);
+}
+
+@media (max-width: 720px) {
+  .account-layout { grid-template-columns: 1fr; }
+  .account-sidebar { position: static; height: auto; flex-direction: row; flex-wrap: wrap; padding: 16px; }
+  .account-user-card { flex-direction: row; text-align: left; border-bottom: none; border-right: 1px solid var(--border); padding: 0 16px 0 0; }
+  .account-nav { flex-direction: row; flex-wrap: wrap; }
+  .account-content { padding: 20px; }
 }
 
 /* Welcome / location modal */
@@ -2235,23 +2306,25 @@ main {
 /* Plan cards grid */
 /* Change Plan popup */
 .billing-plans-popup {
-  position: absolute;
-  inset: -28px;
+  position: fixed;
+  inset: 0;
   background: rgba(26,20,16,0.45);
-  backdrop-filter: blur(3px);
-  z-index: 10;
+  backdrop-filter: blur(4px);
+  z-index: 500;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-xl);
+  padding: 24px;
   animation: modal-in 0.15s ease-out;
 }
 .billing-plans-popup-inner {
   background: var(--surface);
   border-radius: var(--radius-lg);
-  padding: 20px 20px 24px;
+  padding: 24px 24px 28px;
   width: 100%;
-  max-width: 820px;
+  max-width: 860px;
+  max-height: 90vh;
+  overflow-y: auto;
   box-shadow: var(--shadow-xl);
   border: 1px solid var(--border);
 }
