@@ -2192,6 +2192,53 @@ main {
 }
 
 /* Plan cards grid */
+/* Change Plan popup */
+.billing-plans-popup {
+  position: absolute;
+  inset: -28px;
+  background: rgba(26,20,16,0.45);
+  backdrop-filter: blur(3px);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-xl);
+  animation: modal-in 0.15s ease-out;
+}
+.billing-plans-popup-inner {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 20px 20px 24px;
+  width: 100%;
+  max-width: 820px;
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--border);
+}
+.billing-plans-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+.billing-plans-popup-close {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: var(--text-muted);
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 2px;
+}
+.billing-plans-popup-close:hover { color: var(--text); }
+.billing-plan-card-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 .billing-plans-header h4 {
   font-size: 13px;
   font-weight: 700;

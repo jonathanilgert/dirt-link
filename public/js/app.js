@@ -1258,7 +1258,10 @@ window.DirtLink = {
           <div class="billing-plan-badge">${this.escapeHtml(status.planName)}</div>
           <div class="billing-plan-price">${status.planPrice > 0 ? `$${status.planPrice}<span>/mo</span>` : 'Free forever'}</div>
         </div>
-        ${status.stripeSubscriptionId ? `<button class="btn btn-sm btn-danger" onclick="DirtLink.cancelSubscription()">Cancel Plan</button>` : ''}
+        <div class="billing-plan-card-actions">
+          <button class="btn btn-sm btn-primary" onclick="DirtLink.openPlanPopup()">Change Plan</button>
+          ${status.stripeSubscriptionId ? `<button class="btn btn-sm btn-danger" onclick="DirtLink.cancelSubscription()">Cancel</button>` : ''}
+        </div>
       </div>
     `;
 
@@ -1308,9 +1311,6 @@ window.DirtLink = {
       nudgeEl.style.display = 'none';
     }
 
-    // Plan comparison cards
-    await this._renderPlanCards(status.plan);
-
     // Billing history
     const historyEl = document.getElementById('billing-history-list');
     if (history.length === 0) {
@@ -1326,6 +1326,17 @@ window.DirtLink = {
         </div>
       `).join('');
     }
+  },
+
+  async openPlanPopup() {
+    const popup = document.getElementById('billing-plans-popup');
+    popup.style.display = 'flex';
+    const status = await fetch('/api/billing/status').then(r => r.json()).catch(() => null);
+    if (status) await this._renderPlanCards(status.plan);
+  },
+
+  closePlanPopup() {
+    document.getElementById('billing-plans-popup').style.display = 'none';
   },
 
   async _renderPlanCards(currentPlan) {

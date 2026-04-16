@@ -465,20 +465,28 @@
       </div>
 
       <!-- Billing tab -->
-      <div id="billing-tab" class="profile-form" style="display:none; flex-direction:column; gap:16px;">
+      <div id="billing-tab" class="profile-form" style="display:none; flex-direction:column; gap:16px; position:relative;">
         <!-- Current Plan -->
         <div class="billing-current-plan" id="billing-current-plan"></div>
         <!-- Reveal Usage -->
         <div class="billing-reveals" id="billing-reveals"></div>
         <!-- Smart Nudge -->
         <div class="billing-nudge" id="billing-nudge" style="display:none"></div>
-        <!-- Plan Cards -->
-        <div class="billing-plans" id="billing-plans"></div>
         <!-- Billing History -->
         <div class="billing-history-section">
           <h4>Billing History</h4>
           <div id="billing-history-list" class="billing-history-list">
             <p class="empty-state" style="padding:12px">No billing history yet.</p>
+          </div>
+        </div>
+        <!-- Change Plan Popup (shown on top when triggered) -->
+        <div id="billing-plans-popup" class="billing-plans-popup" style="display:none;">
+          <div class="billing-plans-popup-inner">
+            <div class="billing-plans-popup-header">
+              <span>Choose a Plan</span>
+              <button class="billing-plans-popup-close" onclick="DirtLink.closePlanPopup()">&times;</button>
+            </div>
+            <div class="billing-plans" id="billing-plans"></div>
           </div>
         </div>
       </div>
