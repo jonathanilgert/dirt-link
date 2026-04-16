@@ -1254,9 +1254,11 @@ window.DirtLink = {
     // Current Plan card
     document.getElementById('billing-current-plan').innerHTML = `
       <div class="billing-plan-card current">
-        <div class="billing-plan-badge">${this.escapeHtml(status.planName)}</div>
-        <div class="billing-plan-price">${status.planPrice > 0 ? `$${status.planPrice}/mo` : 'Free'}</div>
-        ${status.stripeSubscriptionId ? `<button class="btn btn-sm btn-danger" onclick="DirtLink.cancelSubscription()">Cancel Subscription</button>` : ''}
+        <div class="billing-plan-card-left">
+          <div class="billing-plan-badge">${this.escapeHtml(status.planName)}</div>
+          <div class="billing-plan-price">${status.planPrice > 0 ? `$${status.planPrice}<span>/mo</span>` : 'Free forever'}</div>
+        </div>
+        ${status.stripeSubscriptionId ? `<button class="btn btn-sm btn-danger" onclick="DirtLink.cancelSubscription()">Cancel Plan</button>` : ''}
       </div>
     `;
 
@@ -1264,19 +1266,31 @@ window.DirtLink = {
     const rev = status.reveals;
     let revealHtml;
     if (rev.limit === -1) {
-      revealHtml = '<div class="billing-reveal-bar"><span class="reveals-unlimited">Unlimited reveals</span></div>';
+      revealHtml = `
+        <div class="billing-reveals-card">
+          <div class="billing-reveals-label">Monthly Reveals</div>
+          <div class="billing-reveals-value">Unlimited</div>
+        </div>`;
     } else {
       const pct = rev.limit > 0 ? Math.min(100, (rev.used / (rev.limit + rev.overagePurchasedThisCycle)) * 100) : 0;
+      const pctColor = pct >= 90 ? 'var(--have)' : pct >= 60 ? 'var(--primary-dark)' : 'var(--primary)';
       revealHtml = `
-        <div class="billing-reveal-info">
-          <span><strong>${rev.remaining}</strong> reveals remaining</span>
-          <span class="billing-reveal-detail">${rev.used} used of ${rev.limit} included${rev.overagePurchasedThisCycle > 0 ? ` + ${rev.overagePurchasedThisCycle} purchased` : ''}</span>
-        </div>
-        <div class="billing-progress-track">
-          <div class="billing-progress-fill" style="width:${pct}%"></div>
-        </div>
-        ${rev.overageSpentThisCycle > 0 ? `<p class="billing-overage-spent">$${rev.overageSpentThisCycle.toFixed(2)} spent on additional reveals this cycle</p>` : ''}
-      `;
+        <div class="billing-reveals-card">
+          <div class="billing-reveals-top">
+            <div>
+              <div class="billing-reveals-label">Monthly Reveals</div>
+              <div class="billing-reveals-value"><strong>${rev.remaining}</strong> remaining</div>
+            </div>
+            <button class="btn btn-sm btn-primary" onclick="DirtLink.buyReveal()">+ Buy Reveal — $${rev.overageRate.toFixed(2)}</button>
+          </div>
+          <div class="billing-progress-track" style="margin-top:10px">
+            <div class="billing-progress-fill" style="width:${pct}%; background:${pctColor}"></div>
+          </div>
+          <div class="billing-reveal-info" style="margin-top:6px">
+            <span class="billing-reveal-detail">${rev.used} of ${rev.limit} included used${rev.overagePurchasedThisCycle > 0 ? ` · ${rev.overagePurchasedThisCycle} extra purchased` : ''}</span>
+            ${rev.overageSpentThisCycle > 0 ? `<span class="billing-overage-spent">$${rev.overageSpentThisCycle.toFixed(2)} spent on extras</span>` : ''}
+          </div>
+        </div>`;
     }
     document.getElementById('billing-reveals').innerHTML = revealHtml;
 
@@ -1320,21 +1334,21 @@ window.DirtLink = {
     const plans = await res.json();
 
     document.getElementById('billing-plans').innerHTML = `
-      <h4>Available Plans</h4>
+      <div class="billing-plans-header"><h4>Choose a Plan</h4></div>
       <div class="plan-cards-grid">
         ${plans.map(p => `
-          <div class="plan-card ${p.key === currentPlan ? 'plan-current' : ''} ${p.key === 'pro' ? 'plan-recommended' : ''}">
-            ${p.key === 'pro' ? '<div class="plan-recommended-badge">Most Popular</div>' : ''}
-            <h4>${this.escapeHtml(p.name)}</h4>
-            <div class="plan-price">${p.price > 0 ? `$${p.price}<span>/mo</span>` : 'Free'}</div>
+          <div class="plan-card ${p.key === currentPlan ? 'plan-current' : ''} ${p.key === 'powerhouse' && p.key !== currentPlan ? 'plan-recommended' : ''}">
+            ${p.key === 'powerhouse' && p.key !== currentPlan ? '<div class="plan-recommended-badge">Most Popular</div>' : ''}
+            <div class="plan-card-tier">${this.escapeHtml(p.name)}</div>
+            <div class="plan-price">${p.price > 0 ? `$${p.price}<span>/mo</span>` : '<span class="plan-free">Free</span>'}</div>
             <ul class="plan-features">
               ${p.features.map(f => `<li>${this.escapeHtml(f)}</li>`).join('')}
             </ul>
             ${p.key === currentPlan
-              ? '<button class="btn btn-outline btn-full" disabled>Current Plan</button>'
+              ? '<div class="plan-current-label">✓ Your current plan</div>'
               : p.key === 'free'
-                ? ''
-                : `<button class="btn btn-primary btn-full" onclick="DirtLink.startCheckout('${p.key}')">
+                ? `<button class="btn btn-outline btn-full btn-sm" onclick="DirtLink.cancelSubscription()">Downgrade to Free</button>`
+                : `<button class="btn ${p.key === 'powerhouse' ? 'btn-primary' : 'btn-outline'} btn-full btn-sm" onclick="DirtLink.startCheckout('${p.key}')">
                     ${this._planIndex(p.key) > this._planIndex(currentPlan) ? 'Upgrade' : 'Switch'} to ${this.escapeHtml(p.name)}
                   </button>`
             }
