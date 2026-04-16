@@ -306,8 +306,8 @@ main {
 .view.active { display: flex; }
 
 /* Account view overrides — needs to scroll, not clip */
-#view-account { overflow-y: auto; align-items: flex-start; }
-#view-account.active { display: block; }
+#view-account { display: none; }
+#view-account.active { display: block !important; overflow-y: auto; }
 
 #view-map { display: none; flex-direction: row; }
 #view-map.active { display: flex; }
@@ -1081,9 +1081,7 @@ main {
 }
 
 /* ─── Account Page View ─────────────────────────────────── */
-#view-account.active {
-  display: block !important;
-  overflow-y: auto;
+.account-page-view {
   background: var(--bg);
 }
 .account-layout {
@@ -1170,7 +1168,7 @@ main {
 /* Right content area */
 .account-content {
   margin-left: 240px;
-  padding: 36px 48px 60px;
+  padding: 32px 48px 60px;
   width: 100%;
   min-width: 0;
 }
