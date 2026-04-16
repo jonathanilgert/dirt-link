@@ -117,6 +117,7 @@ window.DirtLink = {
         if (btn.dataset.view === 'messages') this.loadConversations();
         if (btn.dataset.view === 'my-pins') this.loadMyPins();
         if (btn.dataset.view === 'map' && window.map) window.map.invalidateSize();
+        if (btn.dataset.view === 'account') this.showProfileModal();
       });
     });
 
@@ -368,14 +369,16 @@ window.DirtLink = {
       const initial = (this.user.company_name || '?')[0].toUpperCase();
       document.querySelectorAll('#profile-avatar, #profile-avatar-lg').forEach(el => el.textContent = initial);
       document.getElementById('filter-company-group').style.display = 'block';
+      document.getElementById('nav-account').style.display = '';
     } else {
       document.getElementById('auth-area').style.display = 'flex';
       document.getElementById('user-area').style.display = 'none';
       document.getElementById('filter-company-group').style.display = 'none';
+      document.getElementById('nav-account').style.display = 'none';
     }
   },
 
-  showProfileModal() {
+  showProfileModal(tab) {
     document.getElementById('profile-company').value  = this.user.company_name || '';
     document.getElementById('profile-contact').value  = this.user.contact_name || '';
     document.getElementById('profile-phone').value    = this.user.phone || '';
@@ -383,16 +386,23 @@ window.DirtLink = {
     document.getElementById('profile-heading').textContent = this.user.company_name;
     const joined = this.user.created_at ? new Date(this.user.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : '';
     document.getElementById('profile-member-since').textContent = joined ? `Member since ${joined}` : '';
-    // Reset tabs to details
-    document.querySelectorAll('.profile-tab').forEach(t => t.classList.toggle('active', t.dataset.ptab === 'details'));
-    document.getElementById('form-profile').style.display = 'flex';
-    document.getElementById('notifications-tab').style.display = 'none';
-    document.getElementById('billing-tab').style.display = 'none';
-    document.getElementById('form-password').style.display = 'none';
+    // Reset tabs
+    const activeTab = tab || 'details';
+    document.querySelectorAll('.profile-tab').forEach(t => t.classList.toggle('active', t.dataset.ptab === activeTab));
+    document.getElementById('form-profile').style.display = activeTab === 'details' ? 'flex' : 'none';
+    document.getElementById('notifications-tab').style.display = activeTab === 'notifications' ? 'flex' : 'none';
+    document.getElementById('billing-tab').style.display = activeTab === 'billing' ? 'flex' : 'none';
+    document.getElementById('form-password').style.display = activeTab === 'password' ? 'flex' : 'none';
     document.getElementById('profile-error').textContent = '';
     document.getElementById('profile-success').textContent = '';
     document.getElementById('notification-success').textContent = '';
-    document.getElementById('modal-profile').style.display = 'flex';
+    if (activeTab === 'billing') this.loadBillingTab();
+    // Navigate to account view
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    const accountNav = document.getElementById('nav-account');
+    if (accountNav) accountNav.classList.add('active');
+    document.getElementById('view-account').classList.add('active');
   },
 
   async handleLogin(e) {
@@ -1401,18 +1411,7 @@ window.DirtLink = {
 
   showBillingFromInquiry() {
     this.closePermitModal();
-    this.showProfileModal();
-    // Switch to billing tab
-    setTimeout(() => {
-      document.querySelectorAll('.profile-tab').forEach(t => {
-        t.classList.toggle('active', t.dataset.ptab === 'billing');
-      });
-      document.getElementById('form-profile').style.display = 'none';
-      document.getElementById('notifications-tab').style.display = 'none';
-      document.getElementById('billing-tab').style.display = 'flex';
-      document.getElementById('form-password').style.display = 'none';
-      this.loadBillingTab();
-    }, 100);
+    this.showProfileModal('billing');
   },
 
   async startCheckout(plan) {

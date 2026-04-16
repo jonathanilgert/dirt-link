@@ -26,6 +26,7 @@
         Messages
         <span class="badge" id="unread-badge" style="display:none">0</span>
       </button>
+      <button class="nav-btn" data-view="account" id="nav-account" style="display:none">Account</button>
     </nav>
     <div class="header-right">
       <!-- Proximity notification bell (Powerhouse/Enterprise only) -->
@@ -370,147 +371,151 @@
   </div>
 
   <!-- Modal: Profile -->
-  <div class="modal-overlay" id="modal-profile" style="display:none">
-    <div class="modal modal-xl">
-      <button class="modal-close" onclick="document.getElementById('modal-profile').style.display='none'">&times;</button>
-      <div class="profile-modal-header">
-        <div class="profile-avatar-lg" id="profile-avatar-lg"></div>
-        <div>
-          <h2 id="profile-heading"></h2>
-          <p class="profile-member-since" id="profile-member-since"></p>
+  <!-- Account Page View -->
+  <div id="view-account" class="view account-page-view">
+    <div class="account-page">
+
+      <!-- Page header -->
+      <div class="account-page-header">
+        <div class="account-user-info">
+          <div class="profile-avatar-lg" id="profile-avatar-lg"></div>
+          <div>
+            <h2 id="profile-heading"></h2>
+            <p class="profile-member-since" id="profile-member-since"></p>
+          </div>
         </div>
       </div>
 
-      <div class="profile-tabs">
+      <!-- Tab nav -->
+      <div class="profile-tabs account-tabs">
         <button class="profile-tab active" data-ptab="details">Company Details</button>
         <button class="profile-tab" data-ptab="notifications">Notifications</button>
         <button class="profile-tab" data-ptab="billing">Plan &amp; Billing</button>
         <button class="profile-tab" data-ptab="password">Change Password</button>
       </div>
 
-      <!-- Details tab -->
-      <form id="form-profile" class="profile-form" style="display:flex">
-        <div class="form-group">
-          <label>Company Name</label>
-          <input type="text" id="profile-company" placeholder="Company Name" required>
-        </div>
-        <div class="form-group">
-          <label>Contact Name</label>
-          <input type="text" id="profile-contact" placeholder="Your Name" required>
-        </div>
-        <div class="form-group">
-          <label>Phone</label>
-          <input type="tel" id="profile-phone" placeholder="Phone">
-        </div>
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" id="profile-email" disabled>
-        </div>
-        <p class="auth-error" id="profile-error"></p>
-        <p class="profile-success" id="profile-success"></p>
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-      </form>
+      <!-- Tab content -->
+      <div class="account-tab-content">
 
-      <!-- Notifications tab -->
-      <div id="notifications-tab" class="profile-form" style="display:none; flex-direction:column; gap:16px;">
-        <div class="notification-settings">
-          <h3 style="margin:0 0 8px;">Email Notifications</h3>
-          <p class="hint" style="margin:0 0 12px;">Receive an email when someone sends you a message on DirtLink. You can reply directly from your email.</p>
-          <label class="toggle-label">
-            <input type="checkbox" id="pref-email-notifications">
-            <span class="toggle-switch"></span>
-            <span>Email notifications</span>
-          </label>
-        </div>
-        <div class="notification-settings">
-          <h3 style="margin:0 0 8px;">SMS Notifications</h3>
-          <p class="hint" style="margin:0 0 12px;">Get a brief text message when you receive a new DirtLink message. Your phone number from your profile is used.</p>
-          <label class="toggle-label">
-            <input type="checkbox" id="pref-sms-notifications">
-            <span class="toggle-switch"></span>
-            <span>SMS notifications</span>
-          </label>
-          <p class="hint" style="margin-top:8px;" id="sms-phone-hint"></p>
-        </div>
-        <p class="profile-success" id="notification-success"></p>
-        <button class="btn btn-primary" id="btn-save-notifications">Save Notification Preferences</button>
-
-        <!-- Proximity Alert Settings (Powerhouse/Enterprise only) -->
-        <div id="proximity-settings-section" class="notification-settings proximity-section" style="display:none">
-          <h3 style="margin:0 0 4px;">Proximity Alerts <span class="perk-badge">Powerhouse+</span></h3>
-          <p class="hint" style="margin:0 0 12px;">Get notified when new sites or development permits appear near your active listings.</p>
+        <!-- Details tab -->
+        <form id="form-profile" class="profile-form account-form" style="display:flex">
           <div class="form-group">
-            <label for="proximity-default-radius">Default monitoring radius</label>
-            <select id="proximity-default-radius">
-              <option value="5">5 km</option>
-              <option value="10" selected>10 km</option>
-              <option value="25">25 km</option>
-              <option value="50">50 km</option>
-            </select>
+            <label>Company Name</label>
+            <input type="text" id="profile-company" placeholder="Company Name" required>
           </div>
-          <label class="toggle-label">
-            <input type="checkbox" id="proximity-global-pause">
-            <span class="toggle-switch"></span>
-            <span>Pause all proximity alerts</span>
-          </label>
-          <div style="margin-top:16px;">
-            <h4 style="margin:0 0 8px;">Monitored Pins</h4>
-            <div id="proximity-monitored-pins" class="monitored-pins-list">
-              <p class="empty-state">No pins are being monitored yet. Go to My Pins and enable monitoring on any active listing.</p>
+          <div class="form-group">
+            <label>Contact Name</label>
+            <input type="text" id="profile-contact" placeholder="Your Name" required>
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="tel" id="profile-phone" placeholder="Phone">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="profile-email" disabled>
+          </div>
+          <p class="auth-error" id="profile-error"></p>
+          <p class="profile-success" id="profile-success"></p>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+
+        <!-- Notifications tab -->
+        <div id="notifications-tab" class="profile-form account-form" style="display:none; flex-direction:column; gap:16px;">
+          <div class="notification-settings">
+            <h3 style="margin:0 0 8px;">Email Notifications</h3>
+            <p class="hint" style="margin:0 0 12px;">Receive an email when someone sends you a message on DirtLink. You can reply directly from your email.</p>
+            <label class="toggle-label">
+              <input type="checkbox" id="pref-email-notifications">
+              <span class="toggle-switch"></span>
+              <span>Email notifications</span>
+            </label>
+          </div>
+          <div class="notification-settings">
+            <h3 style="margin:0 0 8px;">SMS Notifications</h3>
+            <p class="hint" style="margin:0 0 12px;">Get a brief text message when you receive a new DirtLink message. Your phone number from your profile is used.</p>
+            <label class="toggle-label">
+              <input type="checkbox" id="pref-sms-notifications">
+              <span class="toggle-switch"></span>
+              <span>SMS notifications</span>
+            </label>
+            <p class="hint" style="margin-top:8px;" id="sms-phone-hint"></p>
+          </div>
+          <p class="profile-success" id="notification-success"></p>
+          <button class="btn btn-primary" id="btn-save-notifications">Save Notification Preferences</button>
+
+          <div id="proximity-settings-section" class="notification-settings proximity-section" style="display:none">
+            <h3 style="margin:0 0 4px;">Proximity Alerts <span class="perk-badge">Powerhouse+</span></h3>
+            <p class="hint" style="margin:0 0 12px;">Get notified when new sites or development permits appear near your active listings.</p>
+            <div class="form-group">
+              <label for="proximity-default-radius">Default monitoring radius</label>
+              <select id="proximity-default-radius">
+                <option value="5">5 km</option>
+                <option value="10" selected>10 km</option>
+                <option value="25">25 km</option>
+                <option value="50">50 km</option>
+              </select>
+            </div>
+            <label class="toggle-label">
+              <input type="checkbox" id="proximity-global-pause">
+              <span class="toggle-switch"></span>
+              <span>Pause all proximity alerts</span>
+            </label>
+            <div style="margin-top:16px;">
+              <h4 style="margin:0 0 8px;">Monitored Pins</h4>
+              <div id="proximity-monitored-pins" class="monitored-pins-list">
+                <p class="empty-state">No pins are being monitored yet. Go to My Pins and enable monitoring on any active listing.</p>
+              </div>
+            </div>
+            <button class="btn btn-primary" id="btn-save-proximity" style="margin-top:12px;">Save Proximity Settings</button>
+            <p class="profile-success" id="proximity-success"></p>
+          </div>
+        </div>
+
+        <!-- Billing tab -->
+        <div id="billing-tab" class="profile-form account-form" style="display:none; flex-direction:column; gap:16px; position:relative;">
+          <div class="billing-current-plan" id="billing-current-plan"></div>
+          <div class="billing-reveals" id="billing-reveals"></div>
+          <div class="billing-nudge" id="billing-nudge" style="display:none"></div>
+          <div class="billing-history-section">
+            <h4>Billing History</h4>
+            <div id="billing-history-list" class="billing-history-list">
+              <p class="empty-state" style="padding:12px">No billing history yet.</p>
             </div>
           </div>
-          <button class="btn btn-primary" id="btn-save-proximity" style="margin-top:12px;">Save Proximity Settings</button>
-          <p class="profile-success" id="proximity-success"></p>
-        </div>
-      </div>
-
-      <!-- Billing tab -->
-      <div id="billing-tab" class="profile-form" style="display:none; flex-direction:column; gap:16px; position:relative;">
-        <!-- Current Plan -->
-        <div class="billing-current-plan" id="billing-current-plan"></div>
-        <!-- Reveal Usage -->
-        <div class="billing-reveals" id="billing-reveals"></div>
-        <!-- Smart Nudge -->
-        <div class="billing-nudge" id="billing-nudge" style="display:none"></div>
-        <!-- Billing History -->
-        <div class="billing-history-section">
-          <h4>Billing History</h4>
-          <div id="billing-history-list" class="billing-history-list">
-            <p class="empty-state" style="padding:12px">No billing history yet.</p>
-          </div>
-        </div>
-        <!-- Change Plan Popup (shown on top when triggered) -->
-        <div id="billing-plans-popup" class="billing-plans-popup" style="display:none;">
-          <div class="billing-plans-popup-inner">
-            <div class="billing-plans-popup-header">
-              <span>Choose a Plan</span>
-              <button class="billing-plans-popup-close" onclick="DirtLink.closePlanPopup()">&times;</button>
+          <div id="billing-plans-popup" class="billing-plans-popup" style="display:none;">
+            <div class="billing-plans-popup-inner">
+              <div class="billing-plans-popup-header">
+                <span>Choose a Plan</span>
+                <button class="billing-plans-popup-close" onclick="DirtLink.closePlanPopup()">&times;</button>
+              </div>
+              <div class="billing-plans" id="billing-plans"></div>
             </div>
-            <div class="billing-plans" id="billing-plans"></div>
           </div>
         </div>
-      </div>
 
-      <!-- Password tab -->
-      <form id="form-password" class="profile-form" style="display:none">
-        <div class="form-group">
-          <label>Current Password</label>
-          <input type="password" id="pw-current" placeholder="Current password" required>
-        </div>
-        <div class="form-group">
-          <label>New Password</label>
-          <input type="password" id="pw-new" placeholder="New password (min 6 chars)" required minlength="6">
-        </div>
-        <div class="form-group">
-          <label>Confirm New Password</label>
-          <input type="password" id="pw-confirm" placeholder="Confirm new password" required>
-        </div>
-        <p class="auth-error" id="password-error"></p>
-        <p class="profile-success" id="password-success"></p>
-        <button type="submit" class="btn btn-primary">Update Password</button>
-      </form>
-    </div>
-  </div>
+        <!-- Password tab -->
+        <form id="form-password" class="profile-form account-form" style="display:none">
+          <div class="form-group">
+            <label>Current Password</label>
+            <input type="password" id="pw-current" placeholder="Current password" required>
+          </div>
+          <div class="form-group">
+            <label>New Password</label>
+            <input type="password" id="pw-new" placeholder="New password (min 6 chars)" required minlength="6">
+          </div>
+          <div class="form-group">
+            <label>Confirm New Password</label>
+            <input type="password" id="pw-confirm" placeholder="Confirm new password" required>
+          </div>
+          <p class="auth-error" id="password-error"></p>
+          <p class="profile-success" id="password-success"></p>
+          <button type="submit" class="btn btn-primary">Update Password</button>
+        </form>
+
+      </div><!-- /account-tab-content -->
+    </div><!-- /account-page -->
+  </div><!-- /view-account -->
 
   <!-- Modal: Reveal Gate (shown when user has no reveals left) -->
   <div class="modal-overlay" id="modal-reveal-gate" style="display:none">

@@ -1076,6 +1076,47 @@ main {
   min-height: 16px;
 }
 
+/* ─── Account Page View ─────────────────────────────────── */
+.account-page-view {
+  background: var(--bg);
+  overflow-y: auto;
+  height: 100%;
+}
+.account-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 40px 32px 60px;
+}
+.account-page-header {
+  margin-bottom: 32px;
+}
+.account-user-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.account-user-info h2 {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+.account-tabs {
+  margin-bottom: 28px;
+}
+.account-tab-content {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+}
+.account-form {
+  max-width: 480px;
+}
+/* Billing tab is full-width */
+#billing-tab.account-form {
+  max-width: 100%;
+}
+
 /* Welcome / location modal */
 .welcome-logo {
   text-align: center;
