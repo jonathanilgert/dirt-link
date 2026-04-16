@@ -305,6 +305,10 @@ main {
 .view { display: none; flex: 1; overflow: hidden; }
 .view.active { display: flex; }
 
+/* Account view overrides — needs to scroll, not clip */
+#view-account { overflow-y: auto; align-items: flex-start; }
+#view-account.active { display: block; }
+
 #view-map { display: none; flex-direction: row; }
 #view-map.active { display: flex; }
 
@@ -1079,15 +1083,12 @@ main {
 /* ─── Account Page View ─────────────────────────────────── */
 .account-page-view {
   background: var(--bg);
-  overflow-y: auto;
-  height: 100%;
 }
 .account-layout {
   display: grid;
   grid-template-columns: 240px 1fr;
-  min-height: 100%;
   width: 100%;
-  align-items: start;
+  min-height: 100%;
 }
 
 /* Left sidebar */
@@ -1100,7 +1101,7 @@ main {
   gap: 28px;
   position: sticky;
   top: 0;
-  height: 100vh;
+  height: calc(100vh - 62px);
   overflow-y: auto;
   align-self: start;
 }
