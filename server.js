@@ -31,9 +31,22 @@ app.use(session({
   cookie: { secure: isProd, maxAge: 7 * 24 * 60 * 60 * 1000 } // 7 days
 }));
 
-// Static files
-app.use(express.static(path.join(__dirname, 'public')));
+// Static files — index: false so '/' doesn't auto-serve index.html
+app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Root → landing page
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'landing.html'));
+});
+
+// App → SPA (handles /app and any /app/... path for client-side routing)
+app.get(['/app', '/app/*'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Redirect bare /index.html to /app for anyone with old bookmarks
+app.get('/index.html', (req, res) => res.redirect(301, '/app'));
 
 // Geocoding proxy (Nominatim blocks browser requests without proper User-Agent)
 app.get('/api/geocode', async (req, res) => {
@@ -127,10 +140,8 @@ app.post('/api/admin/create-key', (req, res) => {
   });
 });
 
-// SPA fallback
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+// Catch-all → redirect to landing
+app.get('*', (req, res) => res.redirect('/'));
 
 // Initialize database then start server
 getDb().then(() => {

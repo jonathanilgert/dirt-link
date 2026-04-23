@@ -26,7 +26,6 @@
         Messages
         <span class="badge" id="unread-badge" style="display:none">0</span>
       </button>
-      <button class="nav-btn" data-view="account" id="nav-account" style="display:none">Account</button>
     </nav>
     <div class="header-right">
       <!-- Proximity notification bell (Powerhouse/Enterprise only) -->
@@ -490,19 +489,11 @@
           <div class="billing-current-plan" id="billing-current-plan"></div>
           <div class="billing-reveals" id="billing-reveals"></div>
           <div class="billing-nudge" id="billing-nudge" style="display:none"></div>
+          <div id="billing-plans"></div>
           <div class="billing-history-section">
             <h4>Billing History</h4>
             <div id="billing-history-list" class="billing-history-list">
               <p class="empty-state" style="padding:12px">No billing history yet.</p>
-            </div>
-          </div>
-          <div id="billing-plans-popup" class="billing-plans-popup" style="display:none;">
-            <div class="billing-plans-popup-inner">
-              <div class="billing-plans-popup-header">
-                <span>Choose a Plan</span>
-                <button class="billing-plans-popup-close" onclick="DirtLink.closePlanPopup()">&times;</button>
-              </div>
-              <div class="billing-plans" id="billing-plans"></div>
             </div>
           </div>
         </div>

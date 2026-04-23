@@ -80,6 +80,7 @@ body {
   border-bottom: 1px solid var(--header-border);
   z-index: 1000;
   flex-shrink: 0;
+  position: relative;
 }
 
 /* Logo */
@@ -121,6 +122,9 @@ body {
   border: 1px solid rgba(0,0,0,0.08);
   border-radius: 9px;
   padding: 3px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .nav-btn {
@@ -300,6 +304,7 @@ main {
   flex: 1;
   display: flex;
   overflow: hidden;
+  position: relative;
 }
 
 .view { display: none; flex: 1; overflow: hidden; }
@@ -307,7 +312,15 @@ main {
 
 /* Account view overrides — needs to scroll, not clip */
 #view-account { display: none; }
-#view-account.active { display: block !important; overflow-y: auto; }
+#view-account.active {
+  display: block !important;
+  overflow-y: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
 
 #view-map { display: none; flex-direction: row; }
 #view-map.active { display: flex; }
@@ -1081,9 +1094,6 @@ main {
 }
 
 /* ─── Account Page View ─────────────────────────────────── */
-.account-page-view {
-  background: var(--bg);
-}
 .account-layout {
   display: flex;
   width: 100%;
@@ -1168,22 +1178,23 @@ main {
 /* Right content area */
 .account-content {
   margin-left: 240px;
-  padding: 32px 48px 60px;
-  width: 100%;
+  padding: 0 48px 60px;
+  width: calc(100% - 240px);
   min-width: 0;
+  align-self: flex-start;
 }
 .account-form {
-  max-width: 460px;
+  width: 50%;
 }
-#billing-tab.account-form,
-#notifications-tab.account-form {
-  max-width: 100%;
+#billing-tab.account-form {
+  width: 100%;
 }
 
 /* Section headings inside account */
 .account-content h3 {
   font-size: 18px;
   font-weight: 700;
+  margin-top: 32px;
   margin-bottom: 20px;
   color: var(--text);
 }
@@ -2313,48 +2324,6 @@ main {
 
 /* Plan cards grid */
 /* Change Plan popup */
-.billing-plans-popup {
-  position: fixed;
-  inset: 0;
-  background: rgba(26,20,16,0.45);
-  backdrop-filter: blur(4px);
-  z-index: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  animation: modal-in 0.15s ease-out;
-}
-.billing-plans-popup-inner {
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  padding: 24px 24px 28px;
-  width: 100%;
-  max-width: 860px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: var(--shadow-xl);
-  border: 1px solid var(--border);
-}
-.billing-plans-popup-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text);
-}
-.billing-plans-popup-close {
-  background: none;
-  border: none;
-  font-size: 22px;
-  color: var(--text-muted);
-  cursor: pointer;
-  line-height: 1;
-  padding: 0 2px;
-}
-.billing-plans-popup-close:hover { color: var(--text); }
 .billing-plan-card-actions {
   display: flex;
   gap: 8px;
@@ -2455,12 +2424,21 @@ main {
   color: var(--primary-dark);
   text-align: center;
   margin-top: auto;
-  padding: 7px 12px;
+  padding: 0;
+  height: 28px;
+  line-height: 28px;
   border: 1.5px solid var(--primary);
   border-radius: var(--radius);
   background: var(--primary-light);
+  box-sizing: border-box;
 }
-.plan-card .btn { margin-top: auto; }
+.plan-card .btn {
+  margin-top: auto;
+  height: 28px;
+  padding: 0 10px;
+  font-size: 12px;
+  box-sizing: border-box;
+}
 
 /* Billing history */
 .billing-history-section h4 {

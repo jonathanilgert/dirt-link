@@ -117,7 +117,6 @@ window.DirtLink = {
         if (btn.dataset.view === 'messages') this.loadConversations();
         if (btn.dataset.view === 'my-pins') this.loadMyPins();
         if (btn.dataset.view === 'map' && window.map) window.map.invalidateSize();
-        if (btn.dataset.view === 'account') this.showProfileModal();
       });
     });
 
@@ -145,6 +144,7 @@ window.DirtLink = {
         if (tab.dataset.ptab === 'notifications') this.loadNotificationPrefs();
       });
     });
+
 
     // Profile form
     document.getElementById('form-profile').addEventListener('submit', async (e) => {
@@ -368,13 +368,11 @@ window.DirtLink = {
       document.getElementById('user-company').textContent = this.user.company_name;
       const initial = (this.user.company_name || '?')[0].toUpperCase();
       document.querySelectorAll('#profile-avatar, #profile-avatar-lg').forEach(el => el.textContent = initial);
-      document.getElementById('filter-company-group').style.display = 'block';
-      document.getElementById('nav-account').style.display = '';
+      document.getElementById('filter-company-group').style.display = 'flex';
     } else {
       document.getElementById('auth-area').style.display = 'flex';
       document.getElementById('user-area').style.display = 'none';
       document.getElementById('filter-company-group').style.display = 'none';
-      document.getElementById('nav-account').style.display = 'none';
     }
   },
 
@@ -400,8 +398,6 @@ window.DirtLink = {
     // Navigate to account view
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    const accountNav = document.getElementById('nav-account');
-    if (accountNav) accountNav.classList.add('active');
     document.getElementById('view-account').classList.add('active');
   },
 
@@ -1269,8 +1265,7 @@ window.DirtLink = {
           <div class="billing-plan-price">${status.planPrice > 0 ? `$${status.planPrice}<span>/mo</span>` : 'Free forever'}</div>
         </div>
         <div class="billing-plan-card-actions">
-          <button class="btn btn-sm btn-primary" onclick="DirtLink.openPlanPopup()">Change Plan</button>
-          ${status.stripeSubscriptionId ? `<button class="btn btn-sm btn-danger" onclick="DirtLink.cancelSubscription()">Cancel</button>` : ''}
+          ${status.stripeSubscriptionId ? `<button class="btn btn-sm btn-danger" onclick="DirtLink.cancelSubscription()">Cancel Plan</button>` : ''}
         </div>
       </div>
     `;
@@ -1307,6 +1302,9 @@ window.DirtLink = {
     }
     document.getElementById('billing-reveals').innerHTML = revealHtml;
 
+    // Inline plan cards
+    await this._renderPlanCards(status.plan);
+
     // Smart nudge
     const nudgeEl = document.getElementById('billing-nudge');
     if (status.nudge) {
@@ -1338,24 +1336,12 @@ window.DirtLink = {
     }
   },
 
-  async openPlanPopup() {
-    const popup = document.getElementById('billing-plans-popup');
-    popup.style.display = 'flex';
-    const status = await fetch('/api/billing/status').then(r => r.json()).catch(() => null);
-    if (status) await this._renderPlanCards(status.plan);
-  },
-
-  closePlanPopup() {
-    document.getElementById('billing-plans-popup').style.display = 'none';
-  },
-
   async _renderPlanCards(currentPlan) {
     const res = await fetch('/api/billing/plans');
     if (!res.ok) return;
     const plans = await res.json();
 
     document.getElementById('billing-plans').innerHTML = `
-      <div class="billing-plans-header"><h4>Choose a Plan</h4></div>
       <div class="plan-cards-grid">
         ${plans.map(p => `
           <div class="plan-card ${p.key === currentPlan ? 'plan-current' : ''} ${p.key === 'powerhouse' && p.key !== currentPlan ? 'plan-recommended' : ''}">

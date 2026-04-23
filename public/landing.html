@@ -1,1304 +1,760 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DirtLink — Connect Earth Material Sites in Calgary</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap">
-  <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-
-    :root {
-      --bg:           #F3F0EB;
-      --surface:      #FFFFFF;
-      --text:         #1A1410;
-      --muted:        #8A7E74;
-      --subtle:       #B0A49A;
-      --border:       #E2D9CF;
-      --border-mid:   #D0C4BA;
-      --primary:      #F59E0B;
-      --primary-dark: #D97706;
-      --primary-bg:   #FFFBEB;
-      --have:         #DC2626;
-      --have-bg:      #FEF2F2;
-      --need:         #2563EB;
-      --need-bg:      #EFF6FF;
-      --r-sm:  6px;
-      --r:     10px;
-      --r-lg:  14px;
-      --r-xl:  20px;
-      --r-2xl: 28px;
-    }
-
-    body {
-      font-family: 'Figtree', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
-
-    a { color: inherit; text-decoration: none; }
-    img { display: block; max-width: 100%; }
-
-    /* ─── NAV ─────────────────────────────────────────────── */
-    nav {
-      position: sticky;
-      top: 0;
-      z-index: 200;
-      background: rgba(243,240,235,0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      height: 62px;
-      display: flex;
-      align-items: center;
-      padding: 0 32px;
-    }
-    .nav-inner {
-      max-width: 1120px;
-      margin: 0 auto;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      gap: 0;
-    }
-    .nav-logo {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 17px;
-      font-weight: 800;
-      color: var(--text);
-      flex-shrink: 0;
-      word-spacing: 0;
-      letter-spacing: 0;
-    }
-    .nav-logo span, .nav-logo strong { word-spacing: 0; }
-    .nav-logo-icon {
-      display: flex; align-items: center; justify-content: center;
-    }
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      list-style: none;
-      margin: 0 auto;
-    }
-    .nav-links a {
-      padding: 6px 13px;
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--muted);
-      border-radius: var(--r);
-      transition: color 0.15s, background 0.15s;
-    }
-    .nav-links a:hover { color: var(--text); background: rgba(26,20,16,0.05); }
-    .nav-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-
-    .btn {
-      display: inline-flex; align-items: center; justify-content: center;
-      padding: 9px 20px;
-      border-radius: var(--r);
-      font-family: inherit; font-size: 14px; font-weight: 600;
-      cursor: pointer; border: none; transition: all 0.15s;
-      text-decoration: none; white-space: nowrap;
-    }
-    .btn-ghost {
-      background: transparent;
-      border: 1.5px solid var(--border);
-      color: var(--text);
-    }
-    .btn-ghost:hover { border-color: var(--border-mid); background: var(--surface); }
-    .btn-primary { background: var(--primary); color: white; }
-    .btn-primary:hover { background: var(--primary-dark); }
-    .btn-primary-lg {
-      background: var(--primary); color: white;
-      padding: 13px 30px; font-size: 16px; border-radius: var(--r-lg);
-      font-weight: 700;
-    }
-    .btn-primary-lg:hover { background: var(--primary-dark); }
-    .btn-ghost-lg {
-      background: transparent; color: var(--text);
-      border: 1.5px solid var(--border);
-      padding: 13px 30px; font-size: 16px; border-radius: var(--r-lg);
-      font-weight: 600;
-    }
-    .btn-ghost-lg:hover { border-color: var(--border-mid); background: var(--surface); }
-
-    /* ─── PILL BADGE ──────────────────────────────────────── */
-    .pill {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 5px 14px;
-      background: var(--primary-bg);
-      border: 1.5px solid #FDE68A;
-      border-radius: 999px;
-      font-size: 13px; font-weight: 600;
-      color: var(--primary-dark);
-      margin-bottom: 20px;
-    }
-
-    /* ─── SECTION BASE ────────────────────────────────────── */
-    .section { padding: 96px 32px; }
-    .section-sm { padding: 72px 32px; }
-    .wrap { max-width: 1120px; margin: 0 auto; }
-    .section-head { text-align: center; margin-bottom: 56px; }
-    .section-head h2 {
-      font-size: clamp(32px, 4vw, 48px);
-      font-weight: 800;
-      line-height: 1.12;
-      letter-spacing: -0.02em;
-      margin-bottom: 14px;
-    }
-    .section-head p {
-      font-size: 17px;
-      color: var(--muted);
-      line-height: 1.65;
-      max-width: 540px;
-      margin: 0 auto;
-    }
-
-    /* ─── HERO ────────────────────────────────────────────── */
-    #hero {
-      background: var(--surface);
-      padding: 88px 32px 0;
-      border-bottom: 1px solid var(--border);
-      text-align: center;
-    }
-    .hero-inner { max-width: 1000px; margin: 0 auto; }
-    .hero-inner h1 {
-      font-size: clamp(44px, 6.5vw, 82px);
-      font-weight: 900;
-      line-height: 1.04;
-      letter-spacing: -0.035em;
-      margin-bottom: 20px;
-      color: var(--text);
-    }
-    .hero-inner p {
-      font-size: 18px;
-      color: var(--muted);
-      line-height: 1.65;
-      max-width: 520px;
-      margin: 0 auto 32px;
-    }
-    .hero-actions {
-      display: flex; align-items: center; justify-content: center;
-      gap: 12px; margin-bottom: 14px;
-      flex-wrap: wrap;
-    }
-    .hero-trust {
-      font-size: 13px; color: var(--subtle);
-      margin-bottom: 64px;
-    }
-    .hero-trust span { margin: 0 6px; }
-
-    /* Browser chrome + screenshot */
-    .browser-section {
-      perspective: 1400px;
-      perspective-origin: 50% -20%;
-    }
-    .browser-wrap {
-      max-width: 1120px;
-      margin: 0 auto;
-      border-radius: var(--r-2xl) var(--r-2xl) 0 0;
-      overflow: hidden;
-      border: 1px solid var(--border-mid);
-      border-bottom: none;
-      box-shadow: 0 -16px 64px rgba(26,18,13,0.14), 0 -4px 20px rgba(26,18,13,0.08);
-      animation: heroSlideIn 1s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
-      will-change: transform;
-    }
-    @keyframes heroSlideIn {
-      from {
-        opacity: 0;
-        transform: translateY(56px) rotateX(6deg) scale(0.97);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0px) rotateX(0deg) scale(1);
-      }
-    }
-    .browser-bar {
-      background: #2A2420;
-      height: 36px;
-      display: flex; align-items: center;
-      padding: 0 16px; gap: 7px;
-    }
-    .b-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
-    .browser-url {
-      flex: 1; margin: 0 14px;
-      background: rgba(255,255,255,0.07);
-      border-radius: 5px; height: 20px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px; color: rgba(255,255,255,0.35);
-      letter-spacing: 0.02em; font-weight: 500;
-    }
-    .browser-wrap img {
-      width: 100%; display: block;
-    }
-
-    /* ─── HOW IT WORKS ────────────────────────────────────── */
-    #how-it-works { background: var(--bg); }
-    .steps-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-    }
-    .step-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--r-xl);
-      padding: 36px 30px;
-    }
-    .step-num {
-      width: 38px; height: 38px;
-      background: var(--primary);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px; font-weight: 800; color: white;
-      margin-bottom: 22px;
-    }
-    .step-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
-    .step-card p  { font-size: 14px; color: var(--muted); line-height: 1.65; }
-
-    /* ─── WHO IT'S FOR ────────────────────────────────────── */
-    #who-its-for { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-    .who-layout {
-      display: grid;
-      grid-template-columns: 1fr 1.1fr;
-      gap: 72px;
-      align-items: start;
-    }
-    .who-left { position: sticky; top: 80px; }
-    .who-left h2 {
-      font-size: clamp(32px, 3.5vw, 44px);
-      font-weight: 800; letter-spacing: -0.02em;
-      line-height: 1.12; margin-bottom: 16px;
-    }
-    .who-left p {
-      font-size: 16px; color: var(--muted);
-      line-height: 1.65; margin-bottom: 32px;
-      max-width: 320px;
-    }
-    .who-cards { display: flex; flex-direction: column; gap: 14px; }
-    .who-card {
-      border-radius: 20px;
-      padding: 28px 28px 24px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      display: flex; flex-direction: column; gap: 16px;
-      transition: background 0.2s, border-color 0.2s, transform 0.2s;
-      cursor: default;
-    }
-    .who-card:hover {
-      background: var(--primary);
-      border-color: var(--primary-dark);
-      transform: translateX(4px);
-    }
-    .who-card-top {
-      display: flex; align-items: flex-start;
-      justify-content: space-between; gap: 16px;
-    }
-    .who-card-icon {
-      width: 48px; height: 48px; border-radius: 50%;
-      background: #1A1410;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px; flex-shrink: 0;
-    }
-    .who-card.highlight .who-card-icon { background: rgba(0,0,0,0.25); }
-    .who-card h3 {
-      font-size: 20px; font-weight: 800;
-      letter-spacing: -0.02em; line-height: 1.2;
-      margin-bottom: 6px;
-    }
-    .who-card h3 { transition: color 0.2s; }
-    .who-card:hover h3 { color: white; }
-    .who-card p {
-      font-size: 14px; color: var(--muted); line-height: 1.6;
-      transition: color 0.2s;
-    }
-    .who-card:hover p { color: rgba(255,255,255,0.75); }
-    .who-card-bottom {
-      display: flex; align-items: center;
-      justify-content: space-between;
-    }
-    .who-card-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-    .who-card-tag {
-      padding: 4px 11px;
-      background: rgba(26,20,16,0.07);
-      border-radius: 999px;
-      font-size: 11px; font-weight: 600; color: var(--muted);
-      transition: background 0.2s, color 0.2s;
-    }
-    .who-card:hover .who-card-tag {
-      background: rgba(0,0,0,0.15);
-      color: rgba(255,255,255,0.85);
-    }
-    .who-card-arrow {
-      width: 38px; height: 38px; border-radius: 50%;
-      background: #1A1410;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; color: white; font-size: 16px;
-      transition: transform 0.2s, background 0.2s;
-    }
-    .who-card:hover .who-card-arrow {
-      transform: rotate(45deg);
-      background: rgba(0,0,0,0.3);
-    }
-
-    /* ─── FEATURES ────────────────────────────────────────── */
-    #features { background: var(--bg); }
-    .features-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
-    }
-    .feat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--r-xl);
-      padding: 30px 26px;
-      transition: box-shadow 0.2s, transform 0.2s;
-    }
-    .feat-card:hover {
-      box-shadow: 0 8px 32px rgba(26,18,13,0.09);
-      transform: translateY(-2px);
-    }
-    .feat-icon {
-      width: 46px; height: 46px;
-      background: var(--primary-bg);
-      border: 1.5px solid #FDE68A;
-      border-radius: var(--r-lg);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px; margin-bottom: 18px;
-    }
-    .feat-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
-    .feat-card p  { font-size: 14px; color: var(--muted); line-height: 1.6; }
-
-    /* ─── SPLIT FEATURE ───────────────────────────────────── */
-    #split-feature { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-    .split-card {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--r-2xl);
-      padding: 56px 60px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 60px;
-      align-items: center;
-    }
-    .split-text .pill { margin-bottom: 18px; }
-    .split-text h2 {
-      font-size: clamp(28px, 3.5vw, 40px);
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      line-height: 1.12;
-      margin-bottom: 16px;
-    }
-    .split-text p {
-      font-size: 16px; color: var(--muted); line-height: 1.7;
-      margin-bottom: 28px;
-    }
-    .split-points { list-style: none; display: flex; flex-direction: column; gap: 12px; }
-    .split-points li {
-      display: flex; align-items: flex-start; gap: 10px;
-      font-size: 14px; color: var(--muted); line-height: 1.5;
-    }
-    .split-points li::before {
-      content: '✓';
-      width: 20px; height: 20px;
-      background: var(--primary-bg);
-      border: 1.5px solid #FDE68A;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px; font-weight: 800; color: var(--primary-dark);
-      flex-shrink: 0; margin-top: 1px;
-    }
-    .split-visual {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--r-xl);
-      padding: 28px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-    .split-visual-row {
-      display: flex; align-items: center; gap: 12px;
-      padding: 14px 16px;
-      background: var(--bg);
-      border-radius: var(--r-lg);
-      border: 1px solid var(--border);
-    }
-    .split-visual-dot {
-      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
-    }
-    .split-visual-info { flex: 1; }
-    .split-visual-info strong { font-size: 13px; font-weight: 700; display: block; }
-    .split-visual-info span  { font-size: 12px; color: var(--muted); }
-    .split-visual-badge {
-      padding: 3px 10px; border-radius: 999px;
-      font-size: 11px; font-weight: 700;
-    }
-    .badge-have { background: var(--have-bg); color: var(--have); }
-    .badge-need { background: var(--need-bg); color: var(--need); }
-
-    /* ─── PRICING ─────────────────────────────────────────── */
-    .pricing-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      align-items: stretch;
-      margin-top: 48px;
-    }
-    .pricing-card {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--r-xl);
-      padding: 28px 24px 32px;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-      box-shadow: 0 4px 16px rgba(26,20,16,0.06);
-    }
-    .pricing-card-featured {
-      background: var(--bg);
-      border-color: var(--primary);
-      border-width: 2px;
-      box-shadow: 0 8px 32px rgba(245,158,11,0.15);
-    }
-    .pricing-badge {
-      position: absolute;
-      top: -13px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--primary);
-      color: #fff;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      padding: 4px 14px;
-      border-radius: 999px;
-      white-space: nowrap;
-    }
-    .pricing-tier {
-      font-size: 13px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--muted);
-      margin-bottom: 10px;
-    }
-    .pricing-price {
-      font-size: 42px;
-      font-weight: 900;
-      color: var(--text);
-      line-height: 1;
-      margin-bottom: 10px;
-    }
-    .pricing-price span {
-      font-size: 16px;
-      font-weight: 500;
-      color: var(--muted);
-    }
-    .pricing-desc {
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.5;
-      margin-bottom: 20px;
-      min-height: 38px;
-    }
-    .pricing-btn {
-      display: block;
-      text-align: center;
-      padding: 10px 16px;
-      border-radius: var(--r-lg);
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.15s;
-      margin-bottom: 24px;
-    }
-    .pricing-btn-outline {
-      border: 1.5px solid var(--border-mid);
-      color: var(--text);
-      background: transparent;
-    }
-    .pricing-btn-outline:hover { border-color: var(--text); }
-    .pricing-btn-primary {
-      background: var(--primary);
-      color: #fff;
-      border: none;
-    }
-    .pricing-btn-primary:hover { background: var(--primary-dark); }
-    .pricing-features {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      font-size: 13px;
-      color: var(--text);
-      border-top: 1px solid var(--border);
-      padding-top: 20px;
-    }
-    .pricing-features li { display: flex; align-items: flex-start; gap: 8px; line-height: 1.4; }
-    .pf-check { color: var(--primary-dark); font-weight: 700; flex-shrink: 0; }
-    .pf-dash { color: var(--subtle); flex-shrink: 0; }
-    .pf-no { color: var(--subtle); }
-    @media (max-width: 900px) {
-      .pricing-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 560px) {
-      .pricing-grid { grid-template-columns: 1fr; }
-    }
-
-    /* ─── FAQ ─────────────────────────────────────────────── */
-    #faq { background: var(--bg); }
-    .faq-list { max-width: 700px; margin: 0 auto; }
-    .faq-item { border-bottom: 1px solid var(--border); }
-    .faq-item:first-child { border-top: 1px solid var(--border); }
-    .faq-q {
-      width: 100%; background: none; border: none; padding: 22px 0;
-      display: flex; align-items: center; justify-content: space-between;
-      font-family: inherit; font-size: 16px; font-weight: 600;
-      color: var(--text); cursor: pointer; text-align: left; gap: 20px;
-    }
-    .faq-q:hover { color: var(--primary-dark); }
-    .faq-icon {
-      width: 28px; height: 28px; border-radius: 50%;
-      background: var(--surface); border: 1.5px solid var(--border);
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; transition: all 0.2s;
-      font-size: 18px; line-height: 1; color: var(--muted); font-weight: 400;
-    }
-    .faq-item.open .faq-icon {
-      background: var(--primary); border-color: var(--primary); color: white; transform: rotate(45deg);
-    }
-    .faq-a {
-      display: none; padding: 0 0 22px;
-      font-size: 15px; color: var(--muted); line-height: 1.7;
-    }
-    .faq-item.open .faq-a { display: block; }
-
-    /* ─── CONTACT ─────────────────────────────────────────── */
-    #contact { background: var(--surface); border-top: 1px solid var(--border); }
-    .contact-grid {
-      display: grid; grid-template-columns: 1fr 1.4fr; gap: 72px; align-items: start;
-    }
-    .contact-left h2 {
-      font-size: clamp(28px, 3vw, 38px); font-weight: 800;
-      letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 14px;
-    }
-    .contact-left > p {
-      font-size: 16px; color: var(--muted); line-height: 1.65; margin-bottom: 36px;
-    }
-    .contact-detail {
-      display: flex; align-items: center; gap: 12px;
-      margin-bottom: 16px; font-size: 15px;
-    }
-    .contact-detail-icon {
-      width: 38px; height: 38px;
-      background: var(--primary-bg); border: 1.5px solid #FDE68A;
-      border-radius: var(--r); display: flex; align-items: center;
-      justify-content: center; font-size: 17px; flex-shrink: 0;
-    }
-    .contact-detail strong { display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 1px; }
-    .contact-detail span { font-size: 15px; font-weight: 500; }
-    .contact-form-wrap {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--r-2xl);
-      padding: 40px 36px;
-    }
-    .form-group { margin-bottom: 18px; }
-    .form-group label {
-      display: block; font-size: 13px; font-weight: 600;
-      margin-bottom: 7px; color: var(--text);
-    }
-    .form-group input,
-    .form-group textarea {
-      width: 100%; padding: 11px 14px;
-      border: 1.5px solid var(--border); border-radius: var(--r);
-      font-family: inherit; font-size: 14px; color: var(--text);
-      background: var(--surface); transition: border-color 0.15s;
-      resize: vertical;
-    }
-    .form-group input:focus,
-    .form-group textarea:focus { outline: none; border-color: var(--primary); }
-    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    #contact-success {
-      display: none; margin-top: 12px;
-      font-size: 14px; font-weight: 600; color: #16A34A;
-    }
-
-    /* ─── CTA BANNER ──────────────────────────────────────── */
-    #cta { background: var(--bg); }
-    .cta-card {
-      background: var(--primary);
-      border-radius: var(--r-2xl);
-      padding: 72px 40px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .cta-card::before, .cta-card::after {
-      content: '';
-      position: absolute;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.06);
-      pointer-events: none;
-    }
-    .cta-card::before { width: 320px; height: 320px; top: -120px; left: -80px; }
-    .cta-card::after  { width: 240px; height: 240px; bottom: -80px; right: -40px; }
-    .cta-card h2 {
-      font-size: clamp(28px, 4vw, 44px); font-weight: 900;
-      color: white; letter-spacing: -0.025em; margin-bottom: 12px;
-    }
-    .cta-card p { font-size: 17px; color: rgba(255,255,255,0.8); margin-bottom: 32px; }
-    .btn-white {
-      background: white; color: var(--primary-dark);
-      padding: 14px 32px; font-size: 16px; font-weight: 700;
-      border-radius: var(--r-lg); border: none; cursor: pointer;
-      font-family: inherit; transition: all 0.15s; text-decoration: none;
-      display: inline-flex; align-items: center;
-    }
-    .btn-white:hover { background: var(--primary-bg); }
-
-    /* ─── FOOTER ──────────────────────────────────────────── */
-    footer {
-      background: var(--text);
-      padding: 56px 32px 32px;
-      color: rgba(255,255,255,0.55);
-    }
-    .footer-inner {
-      max-width: 1120px; margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1.8fr 1fr 1fr 1fr;
-      gap: 48px;
-      padding-bottom: 40px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      margin-bottom: 28px;
-    }
-    .footer-brand .nav-logo { color: white; margin-bottom: 14px; }
-    .footer-brand .nav-logo-icon { background: var(--primary); }
-    .footer-brand p { font-size: 14px; line-height: 1.65; max-width: 240px; }
-    .footer-col h4 {
-      font-size: 12px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.08em; color: rgba(255,255,255,0.9); margin-bottom: 16px;
-    }
-    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-    .footer-col ul a { font-size: 14px; color: rgba(255,255,255,0.5); transition: color 0.15s; }
-    .footer-col ul a:hover { color: white; }
-    .footer-bottom {
-      max-width: 1120px; margin: 0 auto;
-      display: flex; align-items: center; justify-content: space-between;
-      font-size: 13px;
-    }
-
-    /* ─── RESPONSIVE ──────────────────────────────────────── */
-    @media (max-width: 900px) {
-      .steps-grid { grid-template-columns: 1fr; }
-      .features-grid { grid-template-columns: 1fr 1fr; }
-      .split-card { grid-template-columns: 1fr; gap: 36px; padding: 36px 28px; }
-      .footer-inner { grid-template-columns: 1fr 1fr; gap: 36px; }
-    }
-
-    @media (max-width: 768px) {
-      nav { padding: 0 20px; }
-      .nav-links { display: none; }
-      .section { padding: 64px 20px; }
-      .section-sm { padding: 52px 20px; }
-      #hero { padding: 64px 20px 0; }
-      .hero-inner h1 { font-size: 36px; }
-      .hero-inner p { font-size: 16px; }
-      .who-layout { grid-template-columns: 1fr; gap: 36px; }
-      .who-left { position: static; }
-      .features-grid { grid-template-columns: 1fr; }
-      .contact-grid { grid-template-columns: 1fr; gap: 36px; }
-      .form-row-2 { grid-template-columns: 1fr; }
-      footer { padding: 40px 20px 24px; }
-      .footer-inner { grid-template-columns: 1fr 1fr; gap: 28px; }
-      .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
-      .cta-card { padding: 48px 24px; }
-    }
-
-    @media (max-width: 480px) {
-      .hero-actions { flex-direction: column; align-items: stretch; }
-      .hero-actions .btn-primary-lg,
-      .hero-actions .btn-ghost-lg { text-align: center; }
-      .footer-inner { grid-template-columns: 1fr; }
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DirtLink — Calgary's earth material marketplace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;460;480;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+<style>
+:root {
+  --bg: #F5F2EC;
+  --bg-elev: #FBF9F4;
+  --surface: #FFFFFF;
+  --ink: #1C1F22;
+  --ink-2: #3A3F45;
+  --ink-3: #6B7078;
+  --ink-4: #9CA1A8;
+  --hairline: #E5DFD2;
+  --hairline-2: #EFEAE0;
+  --accent: #C44A1A;
+  --accent-2: #E07A3E;
+  --accent-ink: #FFFFFF;
+  --warn: #3D5A48;
+  --map-bg: #ECE6D9;
+  --map-line: #D7CEBA;
+  --map-water: #D6DCD4;
+  --shadow-sm: 0 1px 2px rgba(28,31,34,0.04), 0 1px 1px rgba(28,31,34,0.03);
+  --shadow-md: 0 8px 24px -12px rgba(28,31,34,0.12), 0 2px 6px rgba(28,31,34,0.04);
+  --shadow-lg: 0 24px 56px -20px rgba(28,31,34,0.22), 0 8px 20px -8px rgba(28,31,34,0.08);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+html, body {
+  margin: 0; padding: 0;
+  background: var(--bg); color: var(--ink);
+  font-family: 'Inter Tight', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-feature-settings: 'ss01','cv11';
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  line-height: 1.45;
+  font-size: 16px;
+}
+.mono { font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-feature-settings: 'ss02','cv01'; }
+.container { max-width: 1320px; margin: 0 auto; padding: 0 32px; }
+@media (max-width: 720px) { .container { padding: 0 20px; } }
+.section { padding: 96px 0; border-top: 1px solid var(--hairline); }
+.eyebrow {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--ink-3); display: inline-flex; align-items: center; gap: 8px;
+}
+.eyebrow::before { content: ''; width: 6px; height: 6px; background: var(--accent); border-radius: 1px; display: inline-block; }
+h1, h2, h3, h4 { font-family: 'Inter Tight','Inter',sans-serif; font-weight: 500; letter-spacing: -0.02em; color: var(--ink); margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(44px, 5.6vw, 80px); line-height: 0.98; letter-spacing: -0.035em; font-weight: 480; }
+h2 { font-size: clamp(32px, 3.8vw, 52px); line-height: 1.02; letter-spacing: -0.028em; }
+h3 { font-size: 22px; line-height: 1.2; letter-spacing: -0.02em; font-weight: 500; }
+p { margin: 0; color: var(--ink-2); }
+.lede { font-size: 18px; line-height: 1.5; color: var(--ink-2); max-width: 56ch; text-wrap: pretty; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; padding: 12px 18px; border-radius: 6px;
+  font-family: inherit; font-size: 14.5px; font-weight: 500; letter-spacing: -0.005em; cursor: pointer;
+  border: 1px solid transparent; background: transparent; color: var(--ink);
+  transition: background .15s ease, border-color .15s ease, transform .15s ease, color .15s ease;
+  text-decoration: none; white-space: nowrap;
+}
+.btn-primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn-primary:hover { transform: translateY(-1px); background: color-mix(in oklab, var(--accent) 90%, black); }
+.btn-secondary { background: var(--surface); border-color: var(--hairline); color: var(--ink); }
+.btn-secondary:hover { border-color: var(--ink-3); }
+.btn-ghost { color: var(--ink-2); }
+.btn-ghost:hover { color: var(--ink); }
+.btn-sm { padding: 8px 12px; font-size: 13px; }
+.nav { position: sticky; top: 0; z-index: 40; background: color-mix(in srgb, var(--bg) 85%, transparent); backdrop-filter: saturate(180%) blur(14px); -webkit-backdrop-filter: saturate(180%) blur(14px); border-bottom: 1px solid var(--hairline); }
+.nav-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+.nav-links { display: flex; gap: 28px; font-size: 14px; color: var(--ink-2); }
+.nav-links a { color: inherit; text-decoration: none; }
+.nav-links a:hover { color: var(--ink); }
+.logo { display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 17px; letter-spacing: -0.02em; color: var(--ink); text-decoration: none; }
+.logo-mark { width: 26px; height: 26px; background: var(--bg-elev); border-radius: 5px; display: grid; place-items: center; overflow: hidden; border: 1px solid var(--hairline); }
+.card { background: var(--surface); border: 1px solid var(--hairline); border-radius: 12px; padding: 24px; }
+.tile { background: var(--surface); border: 1px solid var(--hairline); border-radius: 14px; overflow: hidden; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px; border-radius: 999px; background: var(--bg-elev); border: 1px solid var(--hairline); font-size: 12px; color: var(--ink-2); font-family: 'JetBrains Mono', monospace; letter-spacing: -0.01em; }
+.chip-have { background: color-mix(in oklab, var(--accent) 12%, var(--surface)); border-color: color-mix(in oklab, var(--accent) 30%, var(--hairline)); color: var(--accent); }
+.chip-need { background: color-mix(in oklab, var(--warn) 12%, var(--surface)); border-color: color-mix(in oklab, var(--warn) 30%, var(--hairline)); color: var(--warn); }
+.dot { width: 7px; height: 7px; border-radius: 99px; display: inline-block; background: currentColor; }
+.map-surface { position: relative; background: var(--map-bg); overflow: hidden; }
+.map-surface::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(to right, var(--map-line) 1px, transparent 1px), linear-gradient(to bottom, var(--map-line) 1px, transparent 1px); background-size: 48px 48px; opacity: 0.35; pointer-events: none; }
+.row { display: flex; }
+.col { display: flex; flex-direction: column; }
+.gap-4 { gap: 16px; } .gap-6 { gap: 24px; } .gap-8 { gap: 32px; }
+.grow { flex: 1; }
+.muted { color: var(--ink-3); }
+.ink2 { color: var(--ink-2); }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+@media (max-width: 900px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } .section { padding: 64px 0; } }
+.kv { display: grid; grid-template-columns: 112px 1fr; gap: 6px 14px; font-size: 13px; }
+.kv dt { font-family: 'JetBrains Mono', monospace; color: var(--ink-3); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; padding-top: 2px; }
+.kv dd { margin: 0; color: var(--ink); }
+.reveal { opacity: 0; transform: translateY(40px) scale(0.985); transition: opacity 0.9s cubic-bezier(.2,.7,.2,1), transform 0.9s cubic-bezier(.2,.7,.2,1); will-change: opacity, transform; }
+.reveal.is-visible { opacity: 1; transform: translateY(0) scale(1); }
+.hero-workspace { opacity: 0; transform: translateY(60px) scale(0.985); transition: opacity 900ms cubic-bezier(.2,.7,.2,1), transform 900ms cubic-bezier(.2,.7,.2,1); will-change: transform, opacity; }
+.hero-workspace.is-visible { opacity: 1; transform: translateY(0) scale(1); }
+@keyframes pulse-ring { 0% { transform: scale(1); opacity: 0.65; } 100% { transform: scale(3.2); opacity: 0; } }
+.pulse-ring { position: absolute; border-radius: 999px; background: var(--accent); animation: pulse-ring 2.4s cubic-bezier(.2,.7,.2,1) infinite; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .reveal, .hero-workspace { opacity: 1; transform: none; transition: none; } html { scroll-behavior: auto; } }
+</style>
 </head>
 <body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef, useMemo } = React;
 
-<!-- ─── NAV ──────────────────────────────────────────────── -->
-<nav>
-  <div class="nav-inner">
-    <div class="nav-logo">
-      <div class="nav-logo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 44 44"><polygon points="22,5 41,39 3,39" fill="#F59E0B" stroke="white" stroke-width="2" stroke-linejoin="round"/></svg></div><span>Dirt<strong>Link</strong></span>
-    </div>
-    <ul class="nav-links">
-      <li><a href="#how-it-works">How It Works</a></li>
-      <li><a href="#who-its-for">Who It's For</a></li>
-      <li><a href="#features">Features</a></li>
-      <li><a href="#pricing">Pricing</a></li><li><a href="#faq">FAQ</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-    <div class="nav-actions">
-      <a href="/app" class="btn btn-ghost">Log In</a>
-      <a href="/app" class="btn btn-primary">Sign Up Free</a>
-    </div>
+/* ── Icons ── */
+const Icon = ({ name, size = 16, stroke = 1.6 }) => {
+  const common = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: stroke, strokeLinecap: 'round', strokeLinejoin: 'round' };
+  const paths = {
+    pin: <><path d="M12 21s-7-6.4-7-12a7 7 0 1 1 14 0c0 5.6-7 12-7 12Z"/><circle cx="12" cy="9" r="2.4"/></>,
+    layers: <><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="m3 13 9 5 9-5"/><path d="m3 18 9 5 9-5"/></>,
+    filter: <><path d="M4 5h16"/><path d="M7 12h10"/><path d="M10 19h4"/></>,
+    message: <><path d="M21 12a8 8 0 0 1-11.7 7.1L4 20l1-4.6A8 8 0 1 1 21 12Z"/></>,
+    camera: <><path d="M4 8h3l2-2h6l2 2h3v11H4z"/><circle cx="12" cy="13" r="3.2"/></>,
+    bell: <><path d="M6 9a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6Z"/><path d="M10 19a2 2 0 0 0 4 0"/></>,
+    shield: <><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6l-8-3Z"/></>,
+    truck: <><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></>,
+    compass: <><circle cx="12" cy="12" r="9"/><path d="m14.5 9.5-1.5 5-5 1.5 1.5-5 5-1.5Z"/></>,
+    search: <><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></>,
+    plus: <><path d="M12 5v14"/><path d="M5 12h14"/></>,
+    check: <path d="m5 12 5 5L20 7"/>,
+    arrow: <><path d="M5 12h14"/><path d="m13 5 7 7-7 7"/></>,
+    chevron: <path d="m9 6 6 6-6 6"/>,
+    chevronDown: <path d="m6 9 6 6 6-6"/>,
+    mountain: <><path d="m3 19 6-10 4 6 3-4 5 8Z"/></>,
+    boxes: <><path d="M3 7h8v6H3z"/><path d="M13 11h8v6h-8z"/><path d="M8 13h8v6H8z"/></>,
+    users: <><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17" cy="9" r="2.4"/><path d="M15 20a5 5 0 0 1 6-4.6"/></>,
+    route: <><circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="18" r="2.2"/><path d="M8 7c5 1 4 5 0 6s-5 5 0 5.5"/></>,
+    doc: <><path d="M7 3h8l5 5v13H7z"/><path d="M15 3v5h5"/><path d="M10 13h7M10 17h7"/></>,
+    flag: <><path d="M5 3v18"/><path d="M5 4h13l-2 4 2 4H5"/></>,
+    sparkles: <><path d="M12 4v4M12 16v4M4 12h4M16 12h4"/><path d="m6.5 6.5 2 2M15.5 15.5l2 2M6.5 17.5l2-2M15.5 8.5l2-2"/></>,
+    cube: <><path d="M12 3 3 7.5v9L12 21l9-4.5v-9L12 3Z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/></>,
+  };
+  return <svg {...common}>{paths[name] || null}</svg>;
+};
+
+/* ── Logo ── */
+const Logo = ({ size = 26 }) => (
+  <div className="logo-mark" style={{ width: size, height: size }}>
+    <svg width={size * 0.58} height={size * 0.58} viewBox="0 0 24 24" fill="var(--accent)" stroke="var(--accent)" strokeWidth="3.2" strokeLinejoin="round" strokeLinecap="round">
+      <path d="M12 5 L20 19 L4 19 Z"/>
+    </svg>
   </div>
-</nav>
+);
 
-<!-- ─── HERO ─────────────────────────────────────────────── -->
-<section id="hero">
-  <div class="hero-inner">
-    <div class="pill">📍 Calgary Earth Material Marketplace</div>
-    <h1>Connect Sites. Move Earth.<br>Cut the Waste.</h1>
-    <p>DirtLink connects construction sites that have excess fill with sites that need it — no brokers, no phone tag, no wasted material.</p>
-    <div class="hero-actions">
-      <a href="/app" class="btn-primary-lg">Start for Free</a>
-      <a href="#how-it-works" class="btn-ghost-lg">See How It Works</a>
-    </div>
-    <p class="hero-trust">
-      Free to use <span>·</span> No credit card <span>·</span> Calgary
-    </p>
-  </div>
-  <div style="max-width:1200px; margin:0 auto; padding:0 32px;" class="browser-section">
-    <div class="browser-wrap" id="browser-wrap">
-      <div class="browser-bar">
-        <div class="b-dot" style="background:#FF5F57"></div>
-        <div class="b-dot" style="background:#FEBC2E"></div>
-        <div class="b-dot" style="background:#28C840"></div>
-        <div class="browser-url">dirtlink.ca</div>
-      </div>
-      <img src="/images/dashboard.png" alt="DirtLink — Live map dashboard showing material pins across Calgary">
-    </div>
-  </div>
-</section>
-
-<!-- ─── HOW IT WORKS ──────────────────────────────────────── -->
-<section id="how-it-works" class="section">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="pill">How It Works</div>
-      <h2>Get Connected in<br>3 Simple Steps</h2>
-      <p>From listing your site to coordinating a material transfer — it takes minutes, not days.</p>
-    </div>
-    <div class="steps-grid">
-      <div class="step-card">
-        <div class="step-num">1</div>
-        <h3>Drop a Pin</h3>
-        <p>Mark your site on the map. Tell us what you have or need — material type, quantity, access conditions, and photos.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">2</div>
-        <h3>Browse Nearby Sites</h3>
-        <p>See all active material sites in your area on the live map. Filter by material type, Have vs. Need, and tested status.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">3</div>
-        <h3>Connect Directly</h3>
-        <p>Message the site contact directly through DirtLink. No brokers, no middlemen — just two contractors solving a problem.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ─── WHO IT'S FOR ──────────────────────────────────────── -->
-<section id="who-its-for" class="section">
-  <div class="wrap">
-    <div class="who-layout">
-
-      <!-- Left: sticky heading -->
-      <div class="who-left">
-        <div class="pill">Built For</div>
-        <h2>Built for Everyone on the Job Site</h2>
-        <p>Whether you're offloading excess fill or sourcing material for a project — DirtLink works for you.</p>
-        <a href="/app" class="btn btn-primary" style="font-size:15px; padding:11px 24px;">Get Started Free</a>
-      </div>
-
-      <!-- Right: stacked cards -->
-      <div class="who-cards">
-
-        <div class="who-card">
-          <div class="who-card-top">
-            <div class="who-card-icon">🏗️</div>
-          </div>
-          <div>
-            <h3>Excavation Contractors</h3>
-            <p>Your dig generated thousands of cubic yards you didn't plan for. Find a receiving site nearby — no broker, no landfill fees.</p>
-          </div>
-          <div class="who-card-bottom">
-            <div class="who-card-tags">
-              <span class="who-card-tag">Excess fill</span>
-              <span class="who-card-tag">Cut & fill</span>
-              <span class="who-card-tag">Tested material</span>
-            </div>
-            <div class="who-card-arrow">↗</div>
-          </div>
-        </div>
-
-        <div class="who-card">
-          <div class="who-card-top">
-            <div class="who-card-icon">🏘️</div>
-          </div>
-          <div>
-            <h3>Property Developers</h3>
-            <p>Clearing a site or grading a subdivision? Offload what you don't need and source what you do — from projects already near you.</p>
-          </div>
-          <div class="who-card-bottom">
-            <div class="who-card-tags">
-              <span class="who-card-tag">Land clearing</span>
-              <span class="who-card-tag">Grading</span>
-              <span class="who-card-tag">Topsoil</span>
-            </div>
-            <div class="who-card-arrow">↗</div>
-          </div>
-        </div>
-
-        <div class="who-card">
-          <div class="who-card-top">
-            <div class="who-card-icon">🌱</div>
-          </div>
-          <div>
-            <h3>Landscaping Companies</h3>
-            <p>Need topsoil, organic fill, or aggregate? Browse available material from sites near your job at source price — no markups.</p>
-          </div>
-          <div class="who-card-bottom">
-            <div class="who-card-tags">
-              <span class="who-card-tag">Topsoil</span>
-              <span class="who-card-tag">Organic</span>
-              <span class="who-card-tag">Aggregate</span>
-            </div>
-            <div class="who-card-arrow">↗</div>
-          </div>
-        </div>
-
-        <div class="who-card">
-          <div class="who-card-top">
-            <div class="who-card-icon">🛣️</div>
-          </div>
-          <div>
-            <h3>Road & Infrastructure Crews</h3>
-            <p>Large volumes, specific specs, tight timelines. Source tested aggregate from nearby projects and coordinate directly with the site manager.</p>
-          </div>
-          <div class="who-card-bottom">
-            <div class="who-card-tags">
-              <span class="who-card-tag">Large volumes</span>
-              <span class="who-card-tag">Rock & rubble</span>
-              <span class="who-card-tag">Tested</span>
-            </div>
-            <div class="who-card-arrow">↗</div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ─── SPLIT FEATURE ─────────────────────────────────────── -->
-<section id="split-feature" class="section">
-  <div class="wrap">
-    <div class="split-card">
-      <div class="split-text">
-        <div class="pill">Live Map</div>
-        <h2>See Every Available Site in Your Area</h2>
-        <p>The DirtLink map shows all active Have and Need pins near you in real time. Filter by material type, check test reports, and reach out instantly.</p>
-        <ul class="split-points">
-          <li>Colour-coded pins by material type and direction</li>
-          <li>Filter by Fill, Aggregate, Rock & Rubble, or Organic</li>
-          <li>Show only tested materials with verified reports</li>
-          <li>Works on desktop and mobile</li>
-        </ul>
-      </div>
-      <div class="split-visual">
-        <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); margin-bottom:4px;">Active Sites Near You</div>
-        <div class="split-visual-row">
-          <div class="split-visual-dot" style="background:#DC2626"></div>
-          <div class="split-visual-info">
-            <strong>Downtown Condo Excavation</strong>
-            <span>Fill & Topsoil · 800 cubic yards · Tested</span>
-          </div>
-          <span class="split-visual-badge badge-have">Have</span>
-        </div>
-        <div class="split-visual-row">
-          <div class="split-visual-dot" style="background:#F59E0B"></div>
-          <div class="split-visual-info">
-            <strong>NE Industrial Site</strong>
-            <span>Aggregate · 1,200 tonnes · Tested</span>
-          </div>
-          <span class="split-visual-badge badge-have">Have</span>
-        </div>
-        <div class="split-visual-row">
-          <div class="split-visual-dot" style="background:#2563EB"></div>
-          <div class="split-visual-info">
-            <strong>Residential Dev — SW</strong>
-            <span>Fill & Topsoil · 400 cubic yards needed</span>
-          </div>
-          <span class="split-visual-badge badge-need">Need</span>
-        </div>
-        <div class="split-visual-row">
-          <div class="split-visual-dot" style="background:#16A34A"></div>
-          <div class="split-visual-info">
-            <strong>Springbank Road Project</strong>
-            <span>Organic · 200 truck loads · Untested</span>
-          </div>
-          <span class="split-visual-badge badge-have">Have</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ─── FEATURES ──────────────────────────────────────────── -->
-<section id="features" class="section">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="pill">Platform Features</div>
-      <h2>Everything You Need,<br>Nothing You Don't</h2>
-      <p>Simple tools built specifically for the construction industry — no fluff, no learning curve.</p>
-    </div>
-    <div class="features-grid">
-      <div class="feat-card">
-        <div class="feat-icon">🗺️</div>
-        <h3>Live Map View</h3>
-        <p>Interactive map showing all active pins. Filter by material type, Have vs. Need, and tested status in real time.</p>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">💬</div>
-        <h3>Direct Messaging</h3>
-        <p>Message site contacts directly through DirtLink. All conversations are organized by pin — no email chains.</p>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">📄</div>
-        <h3>Test Reports & Photos</h3>
-        <p>Upload test reports and site photos so other contractors can verify material quality before reaching out.</p>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">🎯</div>
-        <h3>Material Categories</h3>
-        <p>Fill & Topsoil, Aggregate, Rock & Rubble, Organic — each colour-coded on the map for instant identification.</p>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">📍</div>
-        <h3>Precise Pin Placement</h3>
-        <p>Place your pin exactly where your site is. Edit, reposition, or deactivate it any time as conditions change.</p>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">🆓</div>
-        <h3>Free to Use</h3>
-        <p>DirtLink is completely free for all contractors in Calgary. Sign up in under a minute, no credit card needed.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ─── PRICING ────────────────────────────────────────────── -->
-<section id="pricing" class="section" style="background:var(--surface); border-top:1px solid var(--border);">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="pill">Pricing</div>
-      <h2 class="section-title">Simple, transparent plans</h2>
-      <p class="section-sub">Start free and upgrade as your operation grows. No contracts, cancel anytime.</p>
-    </div>
-
-    <div class="pricing-grid">
-
-      <!-- Free -->
-      <div class="pricing-card">
-        <div class="pricing-tier">Free</div>
-        <div class="pricing-price">$0<span>/mo</span></div>
-        <div class="pricing-desc">Get started, post pins and browse the map.</div>
-        <a href="/app" class="pricing-btn pricing-btn-outline">Get Started</a>
-        <ul class="pricing-features">
-          <li><span class="pf-check">✓</span> Post unlimited pins</li>
-          <li><span class="pf-check">✓</span> Browse the full map</li>
-          <li><span class="pf-check">✓</span> 3 reveals / month</li>
-          <li><span class="pf-check">✓</span> Extra reveal: $4.99 each</li>
-          <li class="pf-no"><span class="pf-dash">–</span> Proximity alerts</li>
-          <li class="pf-no"><span class="pf-dash">–</span> Monitoring radius</li>
-          <li class="pf-no"><span class="pf-dash">–</span> Private map view</li>
-          <li class="pf-no"><span class="pf-dash">–</span> Unlimited outreach</li>
-        </ul>
-      </div>
-
-      <!-- Pro -->
-      <div class="pricing-card">
-        <div class="pricing-tier">Pro</div>
-        <div class="pricing-price">$29<span>/mo</span></div>
-        <div class="pricing-desc">More reveals and lower per-reveal cost.</div>
-        <a href="/app" class="pricing-btn pricing-btn-outline">Get Started</a>
-        <ul class="pricing-features">
-          <li><span class="pf-check">✓</span> Post unlimited pins</li>
-          <li><span class="pf-check">✓</span> Browse the full map</li>
-          <li><span class="pf-check">✓</span> 10 reveals / month</li>
-          <li><span class="pf-check">✓</span> Extra reveal: $2.99 each</li>
-          <li class="pf-no"><span class="pf-dash">–</span> Proximity alerts</li>
-          <li class="pf-no"><span class="pf-dash">–</span> Monitoring radius</li>
-          <li class="pf-no"><span class="pf-dash">–</span> Private map view</li>
-          <li class="pf-no"><span class="pf-dash">–</span> Unlimited outreach</li>
-        </ul>
-      </div>
-
-      <!-- Powerhouse — featured -->
-      <div class="pricing-card pricing-card-featured">
-        <div class="pricing-badge">Most Popular</div>
-        <div class="pricing-tier">Powerhouse</div>
-        <div class="pricing-price">$59<span>/mo</span></div>
-        <div class="pricing-desc">Built for active sites that need real-time awareness.</div>
-        <a href="/app" class="pricing-btn pricing-btn-primary">Get Started</a>
-        <ul class="pricing-features">
-          <li><span class="pf-check">✓</span> Post unlimited pins</li>
-          <li><span class="pf-check">✓</span> Browse the full map</li>
-          <li><span class="pf-check">✓</span> 40 reveals / month</li>
-          <li><span class="pf-check">✓</span> Extra reveal: $1.49 each</li>
-          <li><span class="pf-check">✓</span> Proximity alerts</li>
-          <li><span class="pf-check">✓</span> 5–50 km monitoring radius</li>
-          <li><span class="pf-check">✓</span> Email/SMS notifications</li>
-          <li class="pf-no"><span class="pf-dash">–</span> Private map view</li>
-        </ul>
-      </div>
-
-      <!-- Enterprise -->
-      <div class="pricing-card">
-        <div class="pricing-tier">Enterprise</div>
-        <div class="pricing-price">$149<span>/mo</span></div>
-        <div class="pricing-desc">Full control for large contractors and fleet operations.</div>
-        <a href="/app" class="pricing-btn pricing-btn-outline">Get Started</a>
-        <ul class="pricing-features">
-          <li><span class="pf-check">✓</span> Post unlimited pins</li>
-          <li><span class="pf-check">✓</span> Browse the full map</li>
-          <li><span class="pf-check">✓</span> Unlimited reveals</li>
-          <li><span class="pf-check">✓</span> No extra reveal cost</li>
-          <li><span class="pf-check">✓</span> Proximity alerts</li>
-          <li><span class="pf-check">✓</span> 5–50 km monitoring radius</li>
-          <li><span class="pf-check">✓</span> Priority SMS/in-app alerts</li>
-          <li><span class="pf-check">✓</span> Private map view</li>
-          <li><span class="pf-check">✓</span> Unlimited outreach</li>
-        </ul>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ─── FAQ ───────────────────────────────────────────────── -->
-<section id="faq" class="section" style="background:var(--surface); border-top:1px solid var(--border);">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="pill">FAQ</div>
-      <h2>Common Questions</h2>
-      <p>Everything you need to know before getting started.</p>
-    </div>
-    <div class="faq-list">
-
-      <div class="faq-item">
-        <button class="faq-q">
-          Is DirtLink free to use?
-          <span class="faq-icon">+</span>
-        </button>
-        <p class="faq-a">Yes — DirtLink is completely free for all contractors in Calgary. Create an account, drop pins, browse the map, and message other sites at no cost.</p>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-q">
-          What materials can I list?
-          <span class="faq-icon">+</span>
-        </button>
-        <p class="faq-a">You can list Fill & Topsoil, Aggregate (gravel, sand, crushed rock), Rock & Rubble (boulders, broken concrete), and Organic material (wood chips, brush). More categories will be added based on user feedback.</p>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-q">
-          Where is DirtLink available?
-          <span class="faq-icon">+</span>
-        </button>
-        <p class="faq-a">DirtLink is currently serving Calgary and the surrounding area. We're starting local to build a strong, active network — with plans to expand to other Alberta cities and beyond.</p>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-q">
-          Do I need to register a company?
-          <span class="faq-icon">+</span>
-        </button>
-        <p class="faq-a">No formal registration required. Just sign up with a company name, contact name, email, and phone number. You can get started in under a minute.</p>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-q">
-          How do I contact a site I found on the map?
-          <span class="faq-icon">+</span>
-        </button>
-        <p class="faq-a">Click any pin on the map to view its details, then hit "Send Message" to open a direct conversation with the site contact. You need a free account to message other users.</p>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-q">
-          Can I list a site without knowing the exact quantity?
-          <span class="faq-icon">+</span>
-        </button>
-        <p class="faq-a">Yes — the quantity field is an estimate and is optional. You can always update your pin as the project progresses or conditions change on site.</p>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ─── CONTACT ────────────────────────────────────────────── -->
-<section id="contact" class="section">
-  <div class="wrap">
-    <div class="contact-grid">
-      <div class="contact-left">
-        <div class="pill">Get In Touch</div>
-        <h2>We'd Love to Hear From You</h2>
-        <p>Have a question, a feature idea, or want to partner with us? We respond to every message.</p>
-        <div class="contact-detail">
-          <div class="contact-detail-icon">📧</div>
-          <div>
-            <strong>Email</strong>
-            <span>hello@dirtlink.ca</span>
-          </div>
-        </div>
-        <div class="contact-detail">
-          <div class="contact-detail-icon">🌐</div>
-          <div>
-            <strong>Website</strong>
-            <span>dirtlink.ca</span>
-          </div>
-        </div>
-        <div class="contact-detail">
-          <div class="contact-detail-icon">🍁</div>
-          <div>
-            <strong>Location</strong>
-            <span>Calgary, AB</span>
-          </div>
-        </div>
-      </div>
-      <div class="contact-form-wrap">
-        <form onsubmit="handleContact(event)">
-          <div class="form-row-2">
-            <div class="form-group">
-              <label>Your Name</label>
-              <input type="text" placeholder="Jane Smith" required>
-            </div>
-            <div class="form-group">
-              <label>Email</label>
-              <input type="email" placeholder="jane@company.com" required>
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Company</label>
-            <input type="text" placeholder="Smith Excavating Ltd.">
-          </div>
-          <div class="form-group">
-            <label>Message</label>
-            <textarea rows="5" placeholder="Tell us what's on your mind..." required></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary" style="width:100%;padding:12px;font-size:15px;">Send Message</button>
-          <p id="contact-success">Message sent — we'll get back to you soon.</p>
-        </form>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ─── CTA ────────────────────────────────────────────────── -->
-<section id="cta" class="section">
-  <div class="wrap">
-    <div class="cta-card">
-      <h2>Ready to Connect Your Site?</h2>
-      <p>Join contractors in Calgary already using DirtLink. Free to sign up, free to use.</p>
-      <a href="/app" class="btn-white">Start for Free →</a>
-    </div>
-  </div>
-</section>
-
-<!-- ─── FOOTER ─────────────────────────────────────────────── -->
-<footer>
-  <div class="footer-inner">
-    <div class="footer-brand">
-      <div class="nav-logo">
-        <div class="nav-logo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 44 44"><polygon points="22,5 41,39 3,39" fill="#F59E0B" stroke="white" stroke-width="2" stroke-linejoin="round"/></svg></div>
-        <span>Dirt<strong style="color:white;">Link</strong></span>
-      </div>
-      <p>Connect construction sites that have excess earth material with sites that need it — across Calgary.</p>
-    </div>
-    <div class="footer-col">
-      <h4>Platform</h4>
-      <ul>
-        <li><a href="#how-it-works">How It Works</a></li>
-        <li><a href="#features">Features</a></li>
-        <li><a href="#who-its-for">Who It's For</a></li>
-        <li><a href="#pricing">Pricing</a></li><li><a href="#faq">FAQ</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Company</h4>
-      <ul>
-        <li><a href="#contact">Contact</a></li>
-        <li><a href="/app">Sign Up</a></li>
-        <li><a href="/app">Log In</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Contact</h4>
-      <ul>
-        <li><a href="mailto:hello@dirtlink.ca">hello@dirtlink.ca</a></li>
-        <li><a href="#">dirtlink.ca</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <span>&copy; 2026 DirtLink. All rights reserved.</span>
-    <span>📍 Calgary, AB</span>
-  </div>
-</footer>
-
-<script>
-  // FAQ accordion
-  document.querySelectorAll('.faq-q').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const item = btn.closest('.faq-item');
-      const isOpen = item.classList.contains('open');
-      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
-      if (!isOpen) item.classList.add('open');
-    });
-  });
-
-  // Contact form
-  function handleContact(e) {
-    e.preventDefault();
-    document.getElementById('contact-success').style.display = 'block';
-    e.target.reset();
-  }
-
-  // Smooth scroll
-  document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', e => {
-      const target = document.querySelector(a.getAttribute('href'));
-      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
-    });
-  });
-
-  // Parallax scroll on hero screenshot
-  const browserWrap = document.getElementById('browser-wrap');
-  const hero = document.getElementById('hero');
-
-  window.addEventListener('scroll', () => {
-    const scrollY = window.scrollY;
-    const heroBottom = hero.offsetHeight;
-    if (scrollY < heroBottom) {
-      browserWrap.style.transform = `translateY(${scrollY * 0.22}px)`;
+/* ── Map Topo ── */
+const Topo = ({ seed = 1 }) => {
+  const lines = useMemo(() => {
+    const out = [];
+    const rand = (i) => Math.sin((i + seed) * 19.13) * 0.5 + 0.5;
+    for (let i = 0; i < 14; i++) {
+      const cx = 120 + rand(i*3)*480, cy = 120 + rand(i*5+1)*280;
+      const rx = 60 + rand(i*7+2)*180, ry = 40 + rand(i*11+3)*120;
+      const rot = rand(i*13)*180;
+      out.push(<ellipse key={i} cx={cx} cy={cy} rx={rx} ry={ry} transform={`rotate(${rot} ${cx} ${cy})`} fill="none" stroke="var(--map-line)" strokeWidth="1" opacity={0.55}/>);
     }
-  }, { passive: true });
-</script>
+    return out;
+  }, [seed]);
+  return (
+    <svg viewBox="0 0 720 400" preserveAspectRatio="xMidYMid slice" style={{ position:'absolute', inset:0, width:'100%', height:'100%' }}>
+      <path d="M-20,280 C120,240 220,310 340,280 C460,250 560,320 760,280 L760,420 L-20,420 Z" fill="var(--map-water)" opacity="0.7"/>
+      {lines}
+      <path d="M-20,200 C140,200 220,120 360,160 C500,200 580,160 760,180" fill="none" stroke="var(--surface)" strokeWidth="6" opacity="0.9"/>
+      <path d="M-20,200 C140,200 220,120 360,160 C500,200 580,160 760,180" fill="none" stroke="var(--map-line)" strokeWidth="6.5" opacity="0.5"/>
+      <path d="M120,-20 C130,120 200,180 240,300 C260,360 220,420 220,500" fill="none" stroke="var(--surface)" strokeWidth="4" opacity="0.85"/>
+      <path d="M500,-20 C505,100 560,180 540,320" fill="none" stroke="var(--surface)" strokeWidth="3.5" opacity="0.8"/>
+      <g opacity="0.5" stroke="var(--map-line)" strokeWidth="1" fill="none">
+        <rect x="40" y="60" width="90" height="48"/><rect x="130" y="60" width="70" height="48"/>
+        <rect x="40" y="108" width="160" height="52"/><rect x="560" y="60" width="90" height="70"/>
+        <rect x="560" y="130" width="90" height="50"/><rect x="300" y="330" width="120" height="46"/>
+      </g>
+    </svg>
+  );
+};
 
+/* ── Pin ── */
+const Pin = ({ type='have', label, top, left, active=false, size='md', pulse=false, count, onClick }) => {
+  const bg = type==='have' ? 'var(--accent)' : type==='need' ? 'var(--warn)' : 'var(--ink-2)';
+  const sz = size==='sm' ? 22 : size==='lg' ? 34 : 28;
+  return (
+    <div onClick={onClick} style={{ position:'absolute', top, left, transform:'translate(-50%,-100%)', cursor:onClick?'pointer':'default', zIndex:active?3:1 }}>
+      {pulse && <div className="pulse-ring" style={{ width:sz, height:sz, left:'50%', top:0, marginLeft:-sz/2, marginTop:sz/2-2, opacity:0.3 }}/>}
+      <div style={{ width:sz, height:sz, borderRadius:'50% 50% 50% 2px', transform:'rotate(-45deg)', background:bg, border:'2px solid var(--surface)', boxShadow:active?'0 6px 16px -4px rgba(28,31,34,0.4)':'0 4px 10px -3px rgba(28,31,34,0.28)', display:'grid', placeItems:'center', color:'white', transition:'all .2s ease' }}>
+        <div style={{ transform:'rotate(45deg)', fontFamily:'JetBrains Mono,monospace', fontSize:10, fontWeight:600, letterSpacing:'-0.02em' }}>
+          {count || (type==='have'?'H':type==='need'?'N':'•')}
+        </div>
+      </div>
+      {label && <div style={{ position:'absolute', top:sz+4, left:'50%', transform:'translateX(-50%)', background:'var(--surface)', border:'1px solid var(--hairline)', borderRadius:4, padding:'3px 7px', fontSize:11, fontFamily:'JetBrains Mono,monospace', color:'var(--ink-2)', whiteSpace:'nowrap', boxShadow:'var(--shadow-sm)', letterSpacing:'-0.01em' }}>{label}</div>}
+    </div>
+  );
+};
+
+const MapCursor = ({ top, left }) => (
+  <div style={{ position:'absolute', top, left, transform:'translate(-50%,-50%)', width:18, height:18, pointerEvents:'none' }}>
+    <svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="6" fill="none" stroke="var(--ink)" strokeWidth="1.2"/><path d="M9 1v4M9 13v4M1 9h4M13 9h4" stroke="var(--ink)" strokeWidth="1.2"/></svg>
+  </div>
+);
+
+const Placeholder = ({ label='site photo', aspect='4 / 3', radius=8 }) => (
+  <div style={{ aspectRatio:aspect, width:'100%', borderRadius:radius, background:`repeating-linear-gradient(135deg, var(--hairline-2) 0 8px, var(--bg-elev) 8px 16px)`, border:'1px solid var(--hairline)', display:'grid', placeItems:'center', color:'var(--ink-4)', fontFamily:'JetBrains Mono,monospace', fontSize:11, letterSpacing:'0.08em', textTransform:'uppercase' }}>{label}</div>
+);
+
+/* ── Nav ── */
+const Nav = () => (
+  <div className="nav">
+    <div className="container nav-inner">
+      <a href="/app" className="logo">
+        <Logo/>
+        <span>DirtLink</span>
+        <span className="mono" style={{ fontSize:10, color:'var(--ink-4)', letterSpacing:'0.12em', padding:'2px 6px', border:'1px solid var(--hairline)', borderRadius:3, marginLeft:4 }}>BETA</span>
+      </a>
+      <div className="nav-links" style={{ alignItems:'center' }}>
+        <a href="#how">How it works</a>
+        <a href="#features">Features</a>
+        <a href="#showcase">Product</a>
+        <a href="#usecases">Use cases</a>
+        <a href="#pricing" className="muted">Pricing</a>
+      </div>
+      <div className="row gap-4" style={{ alignItems:'center' }}>
+        <a href="/app" className="btn btn-ghost btn-sm">Log in</a>
+        <a href="/app" className="btn btn-primary btn-sm">Get started <Icon name="arrow" size={14}/></a>
+      </div>
+    </div>
+  </div>
+);
+
+/* ── Hero ── */
+const Hero = () => {
+  const [selected, setSelected] = useState(1);
+  const listings = [
+    { id:0, type:'have', title:'Topsoil — screened',  qty:'340 m³',   site:'Rocky View — Lot 7',       dist:'4.2 km', top:'42%', left:'22%' },
+    { id:1, type:'have', title:'Clean fill',          qty:'1,200 m³', site:'Foothills Development',    dist:'6.8 km', top:'28%', left:'44%', active:true },
+    { id:2, type:'need', title:'Structural fill',     qty:'800 m³',   site:'Bow River Foundations',    dist:'3.1 km', top:'55%', left:'58%' },
+    { id:3, type:'have', title:'Rock / boulders',     qty:'220 m³',   site:'Nose Hill Quarry',         dist:'12 km',  top:'38%', left:'74%' },
+    { id:4, type:'need', title:'Granular A/B',        qty:'450 t',    site:'Stoney Trail Infrastructure', dist:'9.5 km', top:'64%', left:'30%' },
+    { id:5, type:'have', title:'Concrete crush',      qty:'180 m³',   site:'East Calgary Yard',        dist:'7.2 km', top:'72%', left:'68%' },
+  ];
+  const current = listings[selected];
+  return (
+    <section style={{ paddingTop:72, paddingBottom:96 }}>
+      <div className="container">
+        <div style={{ display:'grid', gridTemplateColumns:'1.05fr 0.95fr', gap:48, alignItems:'end', marginBottom:36 }} className="hero-head">
+          <div>
+            <div className="eyebrow">Earth material network · Calgary, AB</div>
+            <h1 style={{ marginTop:18 }}>The nearest pile of dirt you need<br/><span style={{ color:'var(--ink-3)' }}>is probably 4 km away.</span></h1>
+          </div>
+          <div className="col gap-6" style={{ paddingBottom:8 }}>
+            <p className="lede">DirtLink is a map-based network for sites that <em style={{ color:'var(--accent)', fontStyle:'normal' }}>have</em> or{' '}<em style={{ color:'var(--warn)', fontStyle:'normal' }}>need</em> earth material. Drop a pin, list what's on the ground, and connect with operators nearby — before the next truck rolls.</p>
+            <div className="row gap-4" style={{ flexWrap:'wrap' }}>
+              <a href="/app" className="btn btn-primary">Get started — it's free <Icon name="arrow" size={14}/></a>
+              <a href="#how" className="btn btn-secondary"><Icon name="chevron" size={15}/> See how it works</a>
+            </div>
+            <div className="row gap-6 mono" style={{ fontSize:12, color:'var(--ink-3)', flexWrap:'wrap' }}>
+              <span><Icon name="check" size={12}/> &nbsp;No card required</span>
+              <span><Icon name="check" size={12}/> &nbsp;Map access in 60s</span>
+              <span><Icon name="check" size={12}/> &nbsp;Built for field use</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="hero-tile hero-workspace" style={{ background:'var(--surface)', boxShadow:'var(--shadow-lg)', padding:0, overflow:'hidden', borderRadius:14, border:'1px solid var(--hairline)' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:14, padding:'12px 16px', borderBottom:'1px solid var(--hairline)', background:'var(--bg-elev)' }}>
+            <div style={{ display:'flex', gap:6 }}>
+              <span style={{ width:10, height:10, borderRadius:99, background:'var(--hairline)' }}/>
+              <span style={{ width:10, height:10, borderRadius:99, background:'var(--hairline)' }}/>
+              <span style={{ width:10, height:10, borderRadius:99, background:'var(--hairline)' }}/>
+            </div>
+            <div className="mono" style={{ fontSize:12, color:'var(--ink-3)', padding:'4px 10px', background:'var(--surface)', border:'1px solid var(--hairline)', borderRadius:5, flex:1, maxWidth:440 }}>app.dirtlink.ca / map · 51.0447° N, 114.0719° W</div>
+            <div className="row gap-4 mono" style={{ fontSize:11, color:'var(--ink-3)' }}>
+              <span><span className="dot" style={{ color:'#3FB27F' }}/> &nbsp;live</span>
+              <span>Calgary, AB</span>
+            </div>
+          </div>
+          <div style={{ display:'grid', gridTemplateColumns:'280px 1fr 320px', height:560 }} className="hero-grid">
+            {/* Filter rail */}
+            <div style={{ borderRight:'1px solid var(--hairline)', padding:'18px 16px', overflow:'auto' }} className="hero-rail">
+              <div className="mono" style={{ fontSize:11, color:'var(--ink-3)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:12 }}>Filters</div>
+              <div style={{ marginBottom:18 }}>
+                <div style={{ display:'flex', gap:0, padding:3, background:'var(--bg-elev)', border:'1px solid var(--hairline)', borderRadius:7 }}>
+                  {['All','Have','Need'].map((t,i) => (
+                    <div key={t} style={{ flex:1, textAlign:'center', padding:'6px 0', fontSize:12.5, cursor:'pointer', background:i===0?'var(--surface)':'transparent', borderRadius:5, boxShadow:i===0?'var(--shadow-sm)':'none', color:i===0?'var(--ink)':'var(--ink-3)', fontWeight:i===0?500:400 }}>{t}</div>
+                  ))}
+                </div>
+              </div>
+              <div style={{ marginBottom:20 }}>
+                <div style={{ fontSize:12, color:'var(--ink-3)', marginBottom:8, fontWeight:500 }}>Material</div>
+                {[['Topsoil',42,true],['Clean fill',128,true],['Structural fill',67,true],['Granular A / B',31,false],['Shale / rock',19,false],['Crushed concrete',24,false],['Sand',12,false]].map(([name,count,on]) => (
+                  <div key={name} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'7px 8px', borderRadius:5, fontSize:13, color:on?'var(--ink)':'var(--ink-3)', background:on?'var(--bg-elev)':'transparent', marginBottom:2, cursor:'pointer' }}>
+                    <span style={{ display:'flex', alignItems:'center', gap:9 }}>
+                      <span style={{ width:14, height:14, borderRadius:3, border:`1.5px solid ${on?'var(--accent)':'var(--hairline)'}`, background:on?'var(--accent)':'var(--surface)', display:'grid', placeItems:'center' }}>{on && <Icon name="check" size={10} stroke={3}/>}</span>
+                      {name}
+                    </span>
+                    <span className="mono" style={{ fontSize:11, color:'var(--ink-4)' }}>{count}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginBottom:20 }}>
+                <div style={{ fontSize:12, color:'var(--ink-3)', marginBottom:8, fontWeight:500 }}>Radius</div>
+                <div style={{ position:'relative', height:28 }}>
+                  <div style={{ position:'absolute', left:0, right:0, top:13, height:2, background:'var(--hairline)', borderRadius:99 }}/>
+                  <div style={{ position:'absolute', left:0, width:'55%', top:13, height:2, background:'var(--ink)', borderRadius:99 }}/>
+                  <div style={{ position:'absolute', left:'calc(55% - 7px)', top:7, width:14, height:14, borderRadius:99, background:'var(--surface)', border:'2px solid var(--ink)', boxShadow:'var(--shadow-sm)' }}/>
+                </div>
+                <div className="mono row" style={{ justifyContent:'space-between', marginTop:4, fontSize:11, color:'var(--ink-4)' }}>
+                  <span>0 km</span><span style={{ color:'var(--ink)' }}>11 km</span><span>20 km</span>
+                </div>
+              </div>
+            </div>
+            {/* Map */}
+            <div className="map-surface" style={{ position:'relative' }}>
+              <Topo seed={3}/>
+              <div style={{ position:'absolute', top:'28%', left:'44%', width:320, height:320, transform:'translate(-50%,-50%)', border:'1.5px dashed color-mix(in oklab, var(--accent) 40%, transparent)', borderRadius:'50%', pointerEvents:'none' }}/>
+              <div style={{ position:'absolute', top:'28%', left:'44%', width:320, height:320, transform:'translate(-50%,-50%)', background:'radial-gradient(circle, color-mix(in oklab, var(--accent) 8%, transparent) 0%, transparent 70%)', borderRadius:'50%', pointerEvents:'none' }}/>
+              {listings.map(l => <Pin key={l.id} type={l.type} top={l.top} left={l.left} active={selected===l.id} pulse={selected===l.id} size={selected===l.id?'lg':'md'} onClick={() => setSelected(l.id)}/>)}
+              <div style={{ position:'absolute', top:16, left:16 }}>
+                <div className="mono" style={{ background:'var(--surface)', border:'1px solid var(--hairline)', borderRadius:6, padding:'6px 10px', fontSize:11.5, color:'var(--ink-2)', display:'flex', alignItems:'center', gap:8, boxShadow:'var(--shadow-sm)' }}>
+                  <Icon name="search" size={13}/> Search address, site, or material…
+                </div>
+              </div>
+              <div style={{ position:'absolute', top:16, right:16 }}>
+                <div style={{ background:'var(--surface)', border:'1px solid var(--hairline)', borderRadius:6, boxShadow:'var(--shadow-sm)', overflow:'hidden' }}>
+                  {['plus','chevronDown','layers'].map((n,i) => (
+                    <div key={i} style={{ width:32, height:32, display:'grid', placeItems:'center', color:'var(--ink-2)', borderTop:i===0?'none':'1px solid var(--hairline-2)', cursor:'pointer' }}><Icon name={n} size={14} stroke={1.8}/></div>
+                  ))}
+                </div>
+              </div>
+              <div className="mono" style={{ position:'absolute', bottom:14, left:16, fontSize:11, color:'var(--ink-3)', display:'flex', alignItems:'center', gap:8 }}>
+                <div style={{ width:48, height:6, borderLeft:'1.5px solid var(--ink-3)', borderRight:'1.5px solid var(--ink-3)', borderBottom:'1.5px solid var(--ink-3)' }}/> 2 km
+              </div>
+              <div className="mono" style={{ position:'absolute', bottom:14, right:16, fontSize:11, color:'var(--ink-2)', background:'var(--surface)', border:'1px solid var(--hairline)', borderRadius:6, padding:'7px 11px', display:'flex', gap:14, boxShadow:'var(--shadow-sm)' }}>
+                <span><span className="dot" style={{ color:'var(--accent)', width:8, height:8 }}/> &nbsp;Have {listings.filter(l=>l.type==='have').length}</span>
+                <span><span className="dot" style={{ color:'var(--warn)', width:8, height:8 }}/> &nbsp;Need {listings.filter(l=>l.type==='need').length}</span>
+              </div>
+            </div>
+            {/* Detail panel */}
+            <div style={{ borderLeft:'1px solid var(--hairline)', display:'flex', flexDirection:'column' }} className="hero-detail">
+              <div style={{ padding:'16px 18px', borderBottom:'1px solid var(--hairline)', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                <div className="mono" style={{ fontSize:11, color:'var(--ink-3)', textTransform:'uppercase', letterSpacing:'0.12em' }}>Listing · #DL-{String(400+current.id).padStart(4,'0')}</div>
+                <span className={'chip '+(current.type==='have'?'chip-have':'chip-need')}><span className="dot"/> {current.type==='have'?'HAVE':'NEED'}</span>
+              </div>
+              <div style={{ padding:'18px', borderBottom:'1px solid var(--hairline)' }}>
+                <div style={{ fontSize:20, fontWeight:500, letterSpacing:'-0.02em' }}>{current.title}</div>
+                <div className="mono" style={{ fontSize:12, color:'var(--ink-3)', marginTop:4 }}>{current.site}</div>
+                <dl className="kv" style={{ marginTop:16 }}>
+                  <dt>Quantity</dt><dd className="mono">{current.qty}</dd>
+                  <dt>Distance</dt><dd className="mono">{current.dist}</dd>
+                  <dt>Posted</dt><dd className="mono">2 days ago</dd>
+                  <dt>Access</dt><dd className="mono">Tri-axle OK</dd>
+                </dl>
+              </div>
+              <div style={{ padding:'14px 18px', borderBottom:'1px solid var(--hairline)' }}>
+                <div className="mono" style={{ fontSize:11, color:'var(--ink-3)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:10 }}>Site photos · 4</div>
+                <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:6 }}>
+                  {[0,1,2,3].map(i => <div key={i} style={{ aspectRatio:'1', background:`repeating-linear-gradient(${45+i*20}deg, var(--hairline-2) 0 6px, var(--bg-elev) 6px 12px)`, border:'1px solid var(--hairline)', borderRadius:4 }}/>)}
+                </div>
+              </div>
+              <div style={{ padding:'14px 18px', flex:1 }}>
+                <div className="mono" style={{ fontSize:11, color:'var(--ink-3)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:8 }}>Owner</div>
+                <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+                  <div style={{ width:32, height:32, borderRadius:99, background:'var(--ink)', color:'var(--bg)', display:'grid', placeItems:'center', fontSize:12, fontWeight:500 }}>OR</div>
+                  <div>
+                    <div style={{ fontSize:13, fontWeight:500 }}>Foothills Contracting</div>
+                    <div className="mono" style={{ fontSize:11, color:'var(--ink-3)' }}>Verified · 12 listings</div>
+                  </div>
+                </div>
+              </div>
+              <div style={{ padding:'14px 18px', borderTop:'1px solid var(--hairline)', display:'flex', gap:8 }}>
+                <a href="/app" className="btn btn-primary btn-sm" style={{ flex:1, justifyContent:'center' }}><Icon name="message" size={13}/> Message site</a>
+                <button className="btn btn-secondary btn-sm"><Icon name="doc" size={13}/></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Early access row */}
+        <div style={{ marginTop:44, textAlign:'center' }}>
+          <div className="mono" style={{ fontSize:11, color:'var(--ink-3)', textTransform:'uppercase', letterSpacing:'0.14em', marginBottom:16 }}>Now live in Calgary, AB · Early access open</div>
+          <div style={{ display:'flex', justifyContent:'center', gap:8, flexWrap:'wrap' }}>
+            {['Free to post & browse','No card required','Calgary construction sites','Direct — no brokers'].map((label,i) => (
+              <span key={i} className="chip">{label}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+      <style>{`
+        @media (max-width: 1100px) { .hero-grid { grid-template-columns: 260px 1fr !important; } .hero-detail { display: none !important; } }
+        @media (max-width: 820px) { .hero-head { grid-template-columns: 1fr !important; gap: 20px !important; } .hero-grid { grid-template-columns: 1fr !important; height: auto !important; } .hero-rail { display: none !important; } .hero-grid .map-surface { height: 360px; } .logo-row { grid-template-columns: repeat(3, 1fr) !important; } }
+      `}</style>
+    </section>
+  );
+};
+
+/* ── How It Works ── */
+const HowItWorks = () => {
+  const steps = [
+    { n:'01', title:'Drop a pin', desc:'Mark your site on the map. Set boundaries, access notes, and truck routes in under a minute.', visual:'pin' },
+    { n:'02', title:'List what you have or need', desc:'Post material type, quantity, timing, and photos. Sites show up instantly on the regional map.', visual:'listing' },
+    { n:'03', title:'Connect with nearby sites', desc:'Filter by proximity, material, and availability. See who is ready to move dirt in your area.', visual:'radar' },
+    { n:'04', title:'Coordinate the move', desc:'Message operators, share reports, and track every conversation against a site — not a spreadsheet.', visual:'chat' },
+  ];
+  const Visual = ({ kind }) => {
+    if (kind==='pin') return <div style={{ position:'relative', height:'100%', width:'100%' }} className="map-surface"><Topo seed={2}/><Pin type="have" top="45%" left="50%" active pulse size="lg"/><MapCursor top="45%" left="50%"/><div style={{ position:'absolute', top:12, left:12, background:'var(--surface)', border:'1px solid var(--hairline)', borderRadius:5, padding:'5px 9px', fontSize:11, fontFamily:'JetBrains Mono,monospace', color:'var(--ink-2)', boxShadow:'var(--shadow-sm)' }}>51.0447° N, 114.0719° W</div></div>;
+    if (kind==='listing') return (
+      <div style={{ padding:18, display:'flex', flexDirection:'column', gap:10, height:'100%' }}>
+        <div style={{ display:'flex', gap:8, marginBottom:4 }}>
+          <div style={{ flex:1, padding:'7px 10px', border:'1px solid var(--ink)', borderRadius:5, fontSize:13, color:'var(--ink)', background:'var(--surface)' }}><span className="mono" style={{ fontSize:10, color:'var(--ink-3)', textTransform:'uppercase', letterSpacing:'0.1em' }}>Type</span><div>Have</div></div>
+          <div style={{ flex:1, padding:'7px 10px', border:'1px solid var(--hairline)', borderRadius:5, fontSize:13, color:'var(--ink-3)', background:'var(--surface)' }}><span className="mono" style={{ fontSize:10, textTransform:'uppercase', letterSpacing:'0.1em' }}>Type</span><div>Need</div></div>
+        </div>
+        <div style={{ padding:'9px 12px', border:'1px solid var(--hairline)', borderRadius:5, fontSize:13, color:'var(--ink)', background:'var(--surface)' }}><div className="mono" style={{ fontSize:10, color:'var(--ink-3)', textTransform:'uppercase', letterSpacing:'0.1em' }}>Material</div>Clean fill</div>
+        <div style={{ display:'flex', gap:8 }}>
+          <div style={{ flex:1, padding:'9px 12px', border:'1px solid var(--hairline)', borderRadius:5, background:'var(--surface)' }}><div className="mono" style={{ fontSize:10, color:'var(--ink-3)', textTransform:'uppercase', letterSpacing:'0.1em' }}>Qty</div><div className="mono" style={{ fontSize:13 }}>1,200 m³</div></div>
+          <div style={{ flex:1, padding:'9px 12px', border:'1px solid var(--hairline)', borderRadius:5, background:'var(--surface)' }}><div className="mono" style={{ fontSize:10, color:'var(--ink-3)', textTransform:'uppercase', letterSpacing:'0.1em' }}>Available</div><div className="mono" style={{ fontSize:13 }}>Apr 28 — Jun 10</div></div>
+        </div>
+        <button className="btn btn-primary btn-sm" style={{ alignSelf:'flex-start', marginTop:4 }}>Publish listing <Icon name="arrow" size={13}/></button>
+      </div>
+    );
+    if (kind==='radar') return <div style={{ position:'relative', height:'100%', width:'100%' }} className="map-surface"><Topo seed={5}/><div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:240, height:240, borderRadius:'50%', border:'1.5px dashed color-mix(in oklab, var(--accent) 50%, transparent)' }}/><div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:140, height:140, borderRadius:'50%', border:'1px dashed color-mix(in oklab, var(--accent) 30%, transparent)' }}/><Pin type="have" top="50%" left="50%" size="md"/><Pin type="have" top="30%" left="35%" size="sm"/><Pin type="need" top="65%" left="68%" size="sm"/><Pin type="have" top="70%" left="30%" size="sm"/><Pin type="need" top="25%" left="70%" size="sm"/></div>;
+    if (kind==='chat') return (
+      <div style={{ padding:18, display:'flex', flexDirection:'column', gap:10, height:'100%', justifyContent:'flex-end' }}>
+        <div style={{ alignSelf:'flex-start', maxWidth:'82%', background:'var(--bg-elev)', border:'1px solid var(--hairline)', borderRadius:'10px 10px 10px 2px', padding:'8px 12px', fontSize:13, color:'var(--ink-2)' }}>Still have that clean fill available? I've got trucks Tuesday.</div>
+        <div style={{ alignSelf:'flex-end', maxWidth:'82%', background:'var(--accent)', color:'var(--accent-ink)', borderRadius:'10px 10px 2px 10px', padding:'8px 12px', fontSize:13 }}>Yes — 600 m³ left. Access from the south gate, I'll send the report.</div>
+        <div style={{ alignSelf:'flex-start', maxWidth:'70%', background:'var(--bg-elev)', border:'1px solid var(--hairline)', borderRadius:'10px 10px 10px 2px', padding:'8px 12px', fontSize:13, color:'var(--ink-2)', display:'flex', alignItems:'center', gap:8 }}><Icon name="doc" size={14}/><span className="mono" style={{ fontSize:11 }}>soils-report-r3.pdf</span></div>
+      </div>
+    );
+    return null;
+  };
+  return (
+    <section id="how" className="section">
+      <div className="container">
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:40, alignItems:'end', marginBottom:48 }} className="sec-head">
+          <div><div className="eyebrow">How it works</div><h2 style={{ marginTop:16 }}>Four steps from pile to placement.</h2></div>
+          <p className="lede" style={{ justifySelf:'end' }}>DirtLink replaces the text-thread-and-spreadsheet loop with a single map of every active site in the Calgary area.</p>
+        </div>
+        <div className="grid-4 how-grid">
+          {steps.map(s => (
+            <div key={s.n} className="tile" style={{ display:'flex', flexDirection:'column' }}>
+              <div style={{ height:180, borderBottom:'1px solid var(--hairline)', background:'var(--bg-elev)', position:'relative', overflow:'hidden' }}><Visual kind={s.visual}/></div>
+              <div style={{ padding:'20px 20px 22px', flex:1, display:'flex', flexDirection:'column', gap:6 }}>
+                <div className="mono" style={{ fontSize:11, color:'var(--ink-3)', letterSpacing:'0.14em' }}>STEP {s.n}</div>
+                <h3>{s.title}</h3>
+                <p className="ink2" style={{ fontSize:14, marginTop:4 }}>{s.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <style>{`@media (max-width: 900px) { .how-grid { grid-template-columns: 1fr 1fr !important; } .sec-head { grid-template-columns: 1fr !important; } } @media (max-width: 600px) { .how-grid { grid-template-columns: 1fr !important; } }`}</style>
+    </section>
+  );
+};
+
+/* ── Features ── */
+const Features = () => {
+  const feats = [
+    { icon:'compass', title:'Map-based discovery', desc:'Every site, pin, listing, and active conversation on one regional map. Pan, zoom, filter.', span:2 },
+    { icon:'layers', title:'Have / Need listings', desc:'Two directions. One system. Material flows match between nearby sites automatically.' },
+    { icon:'filter', title:'Smart filters', desc:"Filter by material, quantity, radius, access, and availability — see only what's relevant to your site." },
+    { icon:'message', title:'Direct messaging', desc:'Thread conversations against the site and listing — not a buried email chain.' },
+    { icon:'camera', title:'Reports & photos', desc:'Upload soils reports, geotech docs, and site photos. Attached to the listing, not lost.' },
+    { icon:'bell', title:'Proximity alerts', desc:'Get notified the moment a match appears inside your working radius.' },
+    { icon:'shield', title:'Claimed ownership', desc:'Verify your site, control edits, and prove who speaks for the material.' },
+  ];
+  return (
+    <section id="features" className="section">
+      <div className="container">
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:40, alignItems:'end', marginBottom:48 }} className="sec-head">
+          <div><div className="eyebrow">Core features</div><h2 style={{ marginTop:16 }}>Built for the way sites actually operate.</h2></div>
+          <p className="lede" style={{ justifySelf:'end' }}>Every feature is there because a project manager, estimator, or foreman asked for it — not because a product designer dreamed it up.</p>
+        </div>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(6, 1fr)', gap:20 }} className="feat-grid">
+          {feats.map((f,i) => (
+            <div key={i} className="card" style={{ gridColumn:`span ${(f.span||1)*2}`, padding:'22px 22px 24px', display:'flex', flexDirection:'column', gap:12, minHeight:180 }}>
+              <div style={{ width:36, height:36, borderRadius:8, background:'var(--bg-elev)', border:'1px solid var(--hairline)', display:'grid', placeItems:'center', color:'var(--accent)' }}><Icon name={f.icon} size={17} stroke={1.7}/></div>
+              <h3 style={{ fontSize:18, marginTop:8 }}>{f.title}</h3>
+              <p className="ink2" style={{ fontSize:14 }}>{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+      <style>{`@media (max-width: 1000px) { .feat-grid { grid-template-columns: repeat(4, 1fr) !important; } .feat-grid .card { grid-column: span 2 !important; } } @media (max-width: 640px) { .feat-grid { grid-template-columns: 1fr !important; } .feat-grid .card { grid-column: span 1 !important; } }`}</style>
+    </section>
+  );
+};
+
+/* ── Why ── */
+const Why = () => {
+  const points = [
+    { stat:'30%+', unit:'of fill', label:'Goes to disposal', body:"Contractors haul perfectly good fill to landfill while sites nearby need it — because nobody has a view across the region." },
+    { stat:'< 5 km', unit:'away', label:'Average match distance', body:'Most fill exchanges can happen within a short drive. The problem is finding each other before the trucks are already booked.' },
+    { stat:'1', unit:'platform', label:'Everything in one place', body:'Sites, listings, messages, reports, and schedules — tied to the map instead of scattered across texts and spreadsheets.' },
+    { stat:'24/7', unit:'visibility', label:'Regional awareness', body:"See what material is moving across Calgary before your schedule gets locked in." },
+  ];
+  return (
+    <section className="section" style={{ background:'var(--bg-elev)', borderTop:'1px solid var(--hairline)', borderBottom:'1px solid var(--hairline)' }}>
+      <div className="container">
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:40, alignItems:'end', marginBottom:48 }} className="sec-head">
+          <div><div className="eyebrow">Why DirtLink</div><h2 style={{ marginTop:16 }}>Earth material shouldn't be the thing that holds your schedule hostage.</h2></div>
+          <p className="lede" style={{ justifySelf:'end' }}>In Calgary, contractors are trucking fill past sites that need it — because nobody has a view across the region. DirtLink fixes that.</p>
+        </div>
+        <div className="grid-4 why-grid">
+          {points.map((p,i) => (
+            <div key={i} style={{ background:'var(--surface)', border:'1px solid var(--hairline)', borderRadius:12, padding:'24px 22px 26px', display:'flex', flexDirection:'column', gap:10, position:'relative', overflow:'hidden' }}>
+              <div className="mono" style={{ fontSize:11, color:'var(--ink-3)', textTransform:'uppercase', letterSpacing:'0.14em' }}>{p.label}</div>
+              <div style={{ display:'flex', alignItems:'baseline', gap:6, margin:'4px 0 6px' }}>
+                <span style={{ fontSize:46, fontWeight:500, letterSpacing:'-0.04em', color:'var(--ink)' }}>{p.stat}</span>
+                <span className="mono" style={{ fontSize:12, color:'var(--ink-3)' }}>{p.unit}</span>
+              </div>
+              <p className="ink2" style={{ fontSize:14 }}>{p.body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+      <style>{`@media (max-width: 900px) { .why-grid { grid-template-columns: 1fr 1fr !important; } } @media (max-width: 560px) { .why-grid { grid-template-columns: 1fr !important; } }`}</style>
+    </section>
+  );
+};
+
+/* ── Showcase ── */
+const Showcase = () => {
+  const [tab, setTab] = useState('map');
+  const tabs = [{ id:'map', label:'Map & dashboard' },{ id:'pin', label:'Pin detail' },{ id:'msg', label:'Messaging' },{ id:'alert', label:'Alerts' },{ id:'report', label:'Reports' }];
+  const Frame = ({ children }) => (
+    <div className="tile" style={{ background:'var(--surface)', boxShadow:'var(--shadow-md)', overflow:'hidden', height:520 }}>
+      <div style={{ padding:'10px 14px', borderBottom:'1px solid var(--hairline)', background:'var(--bg-elev)', display:'flex', alignItems:'center', gap:10 }}>
+        <div style={{ display:'flex', gap:5 }}><span style={{ width:8, height:8, borderRadius:99, background:'var(--hairline)' }}/><span style={{ width:8, height:8, borderRadius:99, background:'var(--hairline)' }}/><span style={{ width:8, height:8, borderRadius:99, background:'var(--hairline)' }}/></div>
+        <div className="mono" style={{ fontSize:11, color:'var(--ink-3)' }}>app.dirtlink.ca</div>
+      </div>
+      <div style={{ height:'calc(100% - 37px)' }}>{children}</div>
+    </div>
+  );
+  return (
+    <section id="showcase" className="section">
+      <div className="container">
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:40, alignItems:'end', marginBottom:36 }} className="sec-head">
+          <div><div className="eyebrow">Product</div><h2 style={{ marginTop:16 }}>A tool that lives on the truck dash and the project desk.</h2></div>
+          <p className="lede" style={{ justifySelf:'end' }}>Everything your team needs to find, negotiate, and move material — without leaving the map.</p>
+        </div>
+        <div style={{ display:'inline-flex', gap:4, padding:4, background:'var(--bg-elev)', border:'1px solid var(--hairline)', borderRadius:8, marginBottom:24, flexWrap:'wrap' }}>
+          {tabs.map(t => <button key={t.id} onClick={() => setTab(t.id)} className="mono" style={{ padding:'8px 14px', fontSize:12, letterSpacing:'-0.01em', border:'none', borderRadius:5, cursor:'pointer', background:tab===t.id?'var(--surface)':'transparent', boxShadow:tab===t.id?'var(--shadow-sm)':'none', color:tab===t.id?'var(--ink)':'var(--ink-3)', fontFamily:'inherit', fontWeight:tab===t.id?500:400 }}>{t.label}</button>)}
+        </div>
+        {tab==='map' && <Frame><div style={{ display:'grid', gridTemplateColumns:'220px 1fr', height:'100%' }} className="show-grid"><div style={{ borderRight:'1px solid var(--hairline)', padding:14, background:'var(--bg-elev)' }}><div className="mono" style={{ fontSize:11, color:'var(--ink-3)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:12 }}>Sites · 12</div>{['Foothills Dev.','Rocky View Site','Stoney Trail Infra','Bow River Found.','Nose Hill Q.','East Calgary Yard','Lot 22 South'].map((s,i) => <div key={i} style={{ padding:'8px 10px', marginBottom:3, borderRadius:5, fontSize:13, cursor:'pointer', background:i===0?'var(--surface)':'transparent', border:i===0?'1px solid var(--hairline)':'1px solid transparent', display:'flex', alignItems:'center', gap:8 }}><span className="dot" style={{ color:i%2?'var(--warn)':'var(--accent)', width:6, height:6 }}/><span style={{ flex:1, color:i===0?'var(--ink)':'var(--ink-2)' }}>{s}</span><span className="mono" style={{ fontSize:11, color:'var(--ink-4)' }}>{i+1}</span></div>)}<div style={{ marginTop:18, padding:'12px', background:'var(--surface)', border:'1px solid var(--hairline)', borderRadius:8 }}><div className="mono" style={{ fontSize:10, color:'var(--ink-3)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:6 }}>This week</div><div style={{ fontSize:24, fontWeight:500, letterSpacing:'-0.03em' }}>4,280<span className="mono" style={{ fontSize:12, color:'var(--ink-3)', marginLeft:4 }}>m³</span></div><div style={{ fontSize:12, color:'var(--ink-3)', marginTop:2 }}>moved via matches</div></div></div><div className="map-surface" style={{ position:'relative' }}><Topo seed={7}/><Pin type="have" top="30%" left="40%" label="Foothills · 1,200 m³" active pulse/><Pin type="need" top="58%" left="55%" label="Bow River · 800 m³"/><Pin type="have" top="45%" left="20%" size="sm"/><Pin type="have" top="72%" left="30%" size="sm"/><Pin type="need" top="25%" left="72%" size="sm"/><Pin type="have" top="62%" left="78%" size="sm"/><svg style={{ position:'absolute', inset:0, width:'100%', height:'100%', pointerEvents:'none' }}><line x1="40%" y1="30%" x2="55%" y2="58%" stroke="var(--accent)" strokeWidth="1.5" strokeDasharray="4 4" opacity="0.65"/></svg></div></div></Frame>}
+        {tab==='pin' && <Frame><div style={{ display:'grid', gridTemplateColumns:'1fr 360px', height:'100%' }} className="show-grid"><div className="map-surface" style={{ position:'relative' }}><Topo seed={2}/><Pin type="have" top="50%" left="50%" size="lg" active pulse label="Foothills Dev."/></div><div style={{ borderLeft:'1px solid var(--hairline)', padding:22, overflow:'auto' }}><div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}><span className="chip chip-have"><span className="dot"/> HAVE</span><span className="mono" style={{ fontSize:11, color:'var(--ink-3)' }}>#DL-0401</span></div><h3 style={{ fontSize:22, marginBottom:2 }}>Clean fill — 1,200 m³</h3><div className="mono" style={{ fontSize:12, color:'var(--ink-3)', marginBottom:18 }}>Foothills Development · 6.8 km away</div><Placeholder label="site overview" aspect="16/9" radius={6}/><dl className="kv" style={{ marginTop:18 }}><dt>Material</dt><dd>Screened clean fill, low clay</dd><dt>Quantity</dt><dd className="mono">1,200 m³ (~1,850 t)</dd><dt>Available</dt><dd className="mono">Apr 28 — Jun 10</dd><dt>Access</dt><dd>Tri-axle, scale on-site</dd><dt>Loading</dt><dd>CAT 336 excavator, 24/7</dd><dt>Soils report</dt><dd><Icon name="doc" size={12}/> report-r3.pdf</dd></dl><div style={{ display:'flex', gap:8, marginTop:22 }}><a href="/app" className="btn btn-primary btn-sm" style={{ flex:1, justifyContent:'center' }}><Icon name="message" size={13}/> Message</a><button className="btn btn-secondary btn-sm"><Icon name="route" size={13}/> Directions</button></div></div></div></Frame>}
+        {tab==='msg' && <Frame><div style={{ display:'grid', gridTemplateColumns:'260px 1fr 260px', height:'100%' }} className="show-grid"><div style={{ borderRight:'1px solid var(--hairline)', padding:14, background:'var(--bg-elev)' }}><div className="mono" style={{ fontSize:11, color:'var(--ink-3)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:12 }}>Threads · 8</div>{[['Foothills Dev.','Yes — 600 m³ left...','2m',true],['Stoney Trail Infra','Can you confirm GA spec?','1h',false],['Bow River Found.','Trucks rolling Tuesday.','3h',false],['Alpine Civil','Attached soils report.','yest',false],['Nose Hill Q.','Quote on rock material?','2d',false]].map(([who,preview,when,active],i) => <div key={i} style={{ padding:'10px 10px', borderRadius:6, background:active?'var(--surface)':'transparent', border:active?'1px solid var(--hairline)':'1px solid transparent', marginBottom:3, cursor:'pointer' }}><div style={{ display:'flex', justifyContent:'space-between', gap:6 }}><span style={{ fontSize:13, fontWeight:500, color:'var(--ink)' }}>{who}</span><span className="mono" style={{ fontSize:10, color:'var(--ink-4)' }}>{when}</span></div><div style={{ fontSize:12, color:'var(--ink-3)', marginTop:2, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{preview}</div></div>)}</div><div style={{ display:'flex', flexDirection:'column' }}><div style={{ padding:'14px 20px', borderBottom:'1px solid var(--hairline)', display:'flex', justifyContent:'space-between', alignItems:'center' }}><div><div style={{ fontSize:14, fontWeight:500 }}>Foothills Development</div><div className="mono" style={{ fontSize:11, color:'var(--ink-3)' }}>Thread on #DL-0401 · Clean fill 1,200 m³</div></div><span className="chip chip-have"><span className="dot"/> LISTING ACTIVE</span></div><div style={{ flex:1, padding:'18px 20px', display:'flex', flexDirection:'column', gap:10, overflow:'auto', background:'var(--bg-elev)' }}><div className="mono" style={{ fontSize:10, color:'var(--ink-4)', textAlign:'center' }}>TODAY · 08:42</div><div style={{ alignSelf:'flex-start', maxWidth:380, background:'var(--surface)', border:'1px solid var(--hairline)', borderRadius:'12px 12px 12px 3px', padding:'10px 14px', fontSize:14 }}>Still have that clean fill available? I've got trucks Tuesday through Thursday, three tri-axles.</div><div style={{ alignSelf:'flex-end', maxWidth:380, background:'var(--accent)', color:'var(--accent-ink)', borderRadius:'12px 12px 3px 12px', padding:'10px 14px', fontSize:14 }}>Yes — 600 m³ left. Access from the south gate. I'll attach the latest soils report.</div><div style={{ alignSelf:'flex-end', maxWidth:260, background:'var(--surface)', border:'1px solid var(--hairline)', borderRadius:10, padding:'10px 12px', fontSize:13, display:'flex', alignItems:'center', gap:10 }}><Icon name="doc" size={18}/><div><div className="mono" style={{ fontSize:12 }}>soils-report-r3.pdf</div><div className="mono" style={{ fontSize:10, color:'var(--ink-3)' }}>2.1 MB · just now</div></div></div></div><div style={{ padding:'12px 16px', borderTop:'1px solid var(--hairline)', display:'flex', gap:8 }}><div style={{ flex:1, padding:'10px 12px', border:'1px solid var(--hairline)', borderRadius:6, fontSize:13, color:'var(--ink-3)', background:'var(--surface)' }}>Reply to Foothills…</div><button className="btn btn-primary btn-sm"><Icon name="arrow" size={13}/></button></div></div><div style={{ borderLeft:'1px solid var(--hairline)', padding:16 }} className="show-aside"><div className="mono" style={{ fontSize:11, color:'var(--ink-3)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:10 }}>Linked listing</div><Placeholder label="site photo" aspect="4/3" radius={6}/><div style={{ fontSize:14, fontWeight:500, marginTop:10 }}>Clean fill — 1,200 m³</div><div className="mono" style={{ fontSize:11, color:'var(--ink-3)' }}>Apr 28 — Jun 10</div></div></div></Frame>}
+        {tab==='alert' && <Frame><div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', height:'100%' }} className="show-grid"><div style={{ padding:28 }}><div className="mono" style={{ fontSize:11, color:'var(--ink-3)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:18 }}>Proximity alerts · live</div>{[['NEW','Topsoil — 340 m³ · 4.2 km','Rocky View — Lot 7','have','just now'],['MATCH','Granular A/B — 450 t · 9.5 km','Stoney Trail Infrastructure','need','12m ago'],['UPDATE','Clean fill — available window extended','Foothills Development','have','1h ago'],['NEW','Rock / boulders — 220 m³ · 12 km','Nose Hill Quarry','have','3h ago']].map(([tag,title,site,type,time],i) => <div key={i} style={{ padding:'14px 0', borderTop:i===0?'1px solid var(--hairline)':'none', borderBottom:'1px solid var(--hairline)', display:'flex', gap:14, alignItems:'flex-start' }}><div style={{ width:44, height:44, borderRadius:8, background:type==='have'?'color-mix(in oklab, var(--accent) 14%, var(--surface))':'color-mix(in oklab, var(--warn) 14%, var(--surface))', color:type==='have'?'var(--accent)':'var(--warn)', display:'grid', placeItems:'center', border:'1px solid var(--hairline)' }}><Icon name={tag==='MATCH'?'sparkles':tag==='UPDATE'?'bell':'pin'} size={18}/></div><div style={{ flex:1 }}><div style={{ display:'flex', gap:8, alignItems:'center' }}><span className="mono" style={{ fontSize:10, letterSpacing:'0.12em', padding:'2px 6px', borderRadius:3, background:'var(--ink)', color:'var(--bg)' }}>{tag}</span><span className="mono" style={{ fontSize:11, color:'var(--ink-4)' }}>{time}</span></div><div style={{ fontSize:15, fontWeight:500, marginTop:6 }}>{title}</div><div className="mono" style={{ fontSize:12, color:'var(--ink-3)', marginTop:2 }}>{site}</div></div></div>)}</div><div className="map-surface" style={{ position:'relative', borderLeft:'1px solid var(--hairline)' }}><Topo seed={9}/><Pin type="have" top="45%" left="50%" size="md" label="You are here" active/><div style={{ position:'absolute', top:'45%', left:'50%', transform:'translate(-50%,-50%)', width:'72%', height:'72%', borderRadius:'50%', border:'1.5px dashed color-mix(in oklab, var(--accent) 40%, transparent)' }}/><Pin type="have" top="28%" left="32%" size="sm" pulse/><Pin type="need" top="62%" left="68%" size="sm" pulse/><Pin type="have" top="70%" left="35%" size="sm"/><Pin type="have" top="25%" left="70%" size="sm"/></div></div></Frame>}
+        {tab==='report' && <Frame><div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', height:'100%' }} className="show-grid"><div style={{ padding:28, overflow:'auto' }}><div className="mono" style={{ fontSize:11, color:'var(--ink-3)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:8 }}>Site file · Foothills Development</div><h3 style={{ fontSize:22, marginBottom:16 }}>Documents & photos</h3><div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:18 }}>{[0,1,2,3].map(i => <Placeholder key={i} label={`photo 0${i+1}`} aspect="4/3" radius={6}/>)}</div>{[['soils-report-r3.pdf','Geotech report · revised','2.1 MB'],['volume-calcs-apr26.xlsx','Cut & fill volumes','412 KB'],['site-access-plan.pdf','Gate + route diagram','1.8 MB'],['truck-log-week17.csv','Haul log this week','88 KB']].map(([name,desc,sz],i) => <div key={i} style={{ display:'flex', alignItems:'center', gap:12, padding:'12px 0', borderTop:'1px solid var(--hairline)' }}><div style={{ width:36, height:36, borderRadius:6, background:'var(--bg-elev)', border:'1px solid var(--hairline)', display:'grid', placeItems:'center', color:'var(--ink-3)' }}><Icon name="doc" size={16}/></div><div style={{ flex:1 }}><div className="mono" style={{ fontSize:13 }}>{name}</div><div style={{ fontSize:12, color:'var(--ink-3)' }}>{desc}</div></div><div className="mono" style={{ fontSize:11, color:'var(--ink-4)' }}>{sz}</div></div>)}</div><div style={{ borderLeft:'1px solid var(--hairline)', padding:28, background:'var(--bg-elev)' }}><div className="mono" style={{ fontSize:11, color:'var(--ink-3)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:14 }}>Site at a glance</div><dl className="kv"><dt>Owner</dt><dd>Foothills Contracting</dd><dt>Claimed</dt><dd className="mono">Mar 08, 2026</dd><dt>Listings</dt><dd className="mono">3 active · 8 closed</dd><dt>Area</dt><dd className="mono">8.4 ha</dd><dt>Active match</dt><dd>Bow River Foundations</dd></dl><div style={{ marginTop:24, padding:16, background:'var(--surface)', border:'1px solid var(--hairline)', borderRadius:8, display:'flex', gap:10, alignItems:'flex-start' }}><div style={{ color:'var(--accent)' }}><Icon name="shield" size={18}/></div><div><div style={{ fontSize:13, fontWeight:500 }}>Ownership verified</div><div style={{ fontSize:12, color:'var(--ink-3)', marginTop:2 }}>Only Foothills can edit listings and respond to inquiries for this pin.</div></div></div></div></div></Frame>}
+      </div>
+      <style>{`@media (max-width: 960px) { .show-grid { grid-template-columns: 1fr !important; } .show-aside { display: none !important; } }`}</style>
+    </section>
+  );
+};
+
+/* ── Use Cases ── */
+const UseCases = () => {
+  const cases = [
+    { icon:'mountain', title:'Excavation teams', desc:'Get piles off-site fast. Match with nearby developments that need fill today.' },
+    { icon:'cube', title:'Developers', desc:'Source structural and clean fill from local sites. Cut haul costs and CO₂ per load.' },
+    { icon:'flag', title:'Site operators', desc:'Claim your site, control messaging, and keep material records in one place.' },
+    { icon:'truck', title:'Trucking & logistics', desc:'See real-time demand across the region. Keep your fleet loaded in both directions.' },
+    { icon:'boxes', title:'Contractors', desc:'Coordinate fill movement across multiple active projects without the spreadsheet.' },
+    { icon:'users', title:'Municipalities', desc:'Visibility into material flow across public works — reduce disposal and CO₂ emissions.' },
+  ];
+  return (
+    <section id="usecases" className="section">
+      <div className="container">
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:40, alignItems:'end', marginBottom:48 }} className="sec-head">
+          <div><div className="eyebrow">Who's on DirtLink</div><h2 style={{ marginTop:16 }}>Every role along the dirt.</h2></div>
+          <p className="lede" style={{ justifySelf:'end' }}>From the excavator operator who wants the pile gone, to the developer estimating fill three months ahead — DirtLink is built for the whole chain.</p>
+        </div>
+        <div className="grid-3 uc-grid">
+          {cases.map((c,i) => (
+            <div key={i} style={{ padding:'26px 24px', borderTop:'1px solid var(--ink)', display:'flex', flexDirection:'column', gap:10 }}>
+              <div style={{ color:'var(--ink)' }}><Icon name={c.icon} size={22} stroke={1.5}/></div>
+              <h3 style={{ fontSize:19, marginTop:10 }}>{c.title}</h3>
+              <p className="ink2" style={{ fontSize:14 }}>{c.desc}</p>
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop:72, display:'grid', gridTemplateColumns:'1fr 2fr', gap:40, alignItems:'center' }} className="quote-grid">
+          <div><div className="eyebrow">Early access · Calgary</div></div>
+          <div>
+            <div style={{ fontSize:'clamp(22px, 2.4vw, 30px)', lineHeight:1.3, letterSpacing:'-0.02em', fontWeight:400, color:'var(--ink)', marginBottom:28 }}>
+              DirtLink is live in Calgary and open to any construction site, excavator, developer, or contractor operating in the area. No subscription required to get started.
+            </div>
+            <a href="/app" className="btn btn-primary">Claim your site — it's free <Icon name="arrow" size={14}/></a>
+          </div>
+        </div>
+      </div>
+      <style>{`@media (max-width: 900px) { .uc-grid { grid-template-columns: 1fr 1fr !important; } .quote-grid { grid-template-columns: 1fr !important; } } @media (max-width: 560px) { .uc-grid { grid-template-columns: 1fr !important; } }`}</style>
+    </section>
+  );
+};
+
+/* ── Pricing ── */
+const Pricing = () => {
+  const tiers = [
+    { id:'free', name:'Free', tagline:'Get started, post pins and browse the map.', price:'$0', unit:'/ mo', cta:'Get Started', ctaStyle:'secondary',
+      features:[['Post unlimited pins',true],['Browse the full map',true],['3 reveals / month',true],['Extra reveal: $4.99 each',true],['Proximity alerts',false],['Monitoring radius',false],['Private map view',false],['Unlimited outreach',false]] },
+    { id:'pro', name:'Pro', tagline:'More reveals and lower per-reveal cost.', price:'$29', unit:'/ mo', cta:'Get Started', ctaStyle:'secondary',
+      features:[['Post unlimited pins',true],['Browse the full map',true],['10 reveals / month',true],['Extra reveal: $2.99 each',true],['Proximity alerts',false],['Monitoring radius',false],['Private map view',false],['Unlimited outreach',false]] },
+    { id:'powerhouse', name:'Powerhouse', tagline:'Built for active sites that need real-time awareness.', price:'$59', unit:'/ mo', cta:'Get Started', ctaStyle:'primary', featured:true,
+      features:[['Post unlimited pins',true],['Browse the full map',true],['40 reveals / month',true],['Extra reveal: $1.49 each',true],['Proximity alerts',true],['5–50 km monitoring radius',true],['Email / SMS notifications',true],['Private map view',false]] },
+    { id:'enterprise', name:'Enterprise', tagline:'Full control for large contractors and fleet operations.', price:'$149', unit:'/ mo', cta:'Get Started', ctaStyle:'secondary',
+      features:[['Post unlimited pins',true],['Browse the full map',true],['Unlimited reveals',true],['No extra reveal cost',true],['Proximity alerts',true],['5–50 km monitoring radius',true],['Priority SMS / in-app alerts',true],['Private map view',true]] },
+  ];
+  return (
+    <section id="pricing" className="section">
+      <div className="container">
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:40, alignItems:'end', marginBottom:40 }} className="sec-head">
+          <div><div className="eyebrow">Pricing</div><h2 style={{ marginTop:16 }}>Free to post. Scale up when you're ready.</h2></div>
+          <p className="lede" style={{ justifySelf:'end' }}>Every tier includes unlimited pin posting and full map browsing. Upgrade for more reveals, proximity alerts, monitoring radius, and private map views as your operation grows.</p>
+        </div>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:0, border:'1px solid var(--hairline)', borderRadius:14, overflow:'hidden', background:'var(--surface)' }} className="price-grid">
+          {tiers.map((t,i) => (
+            <div key={t.id} style={{ padding:'28px 22px 24px', borderLeft:i===0?'none':'1px solid var(--hairline)', background:t.featured?'color-mix(in oklab, var(--accent) 6%, var(--surface))':'transparent', position:'relative', display:'flex', flexDirection:'column' }}>
+              <div style={{ minHeight:20, marginBottom:10 }}>
+                {t.featured && <span className="mono" style={{ fontSize:10, letterSpacing:'0.14em', padding:'3px 7px', borderRadius:3, background:'var(--accent)', color:'var(--accent-ink)', whiteSpace:'nowrap' }}>MOST POPULAR</span>}
+              </div>
+              <div>
+                <div className="mono" style={{ fontSize:11, letterSpacing:'0.14em', textTransform:'uppercase', color:t.featured?'var(--accent)':'var(--ink-3)' }}>{t.name}</div>
+                <div style={{ fontSize:14, color:'var(--ink-2)', marginTop:6, marginBottom:20 }}>{t.tagline}</div>
+              </div>
+              <div style={{ display:'flex', alignItems:'baseline', gap:6, marginBottom:4, whiteSpace:'nowrap' }}>
+                <span style={{ fontSize:44, fontWeight:500, letterSpacing:'-0.035em', color:'var(--ink)', lineHeight:1 }}>{t.price}</span>
+                <span className="mono" style={{ fontSize:12, color:'var(--ink-3)', whiteSpace:'nowrap' }}>{t.unit}</span>
+              </div>
+              <div style={{ height:11, marginBottom:20 }}/>
+              <a href="/app" className={'btn btn-'+t.ctaStyle} style={{ justifyContent:'center', marginBottom:22 }}>{t.cta} <Icon name="arrow" size={13}/></a>
+              <div style={{ borderTop:'1px solid var(--hairline)', paddingTop:16 }}>
+                {t.features.map(([label,on],j) => (
+                  <div key={j} style={{ display:'flex', alignItems:'flex-start', gap:9, padding:'6px 0', fontSize:13, color:on?'var(--ink-2)':'var(--ink-4)' }}>
+                    <span style={{ width:14, height:14, marginTop:2, flexShrink:0, display:'grid', placeItems:'center', color:on?'var(--accent)':'var(--ink-4)' }}>
+                      {on ? <Icon name="check" size={13} stroke={2.2}/> : <svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5h6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>}
+                    </span>
+                    <span style={{ textDecoration:on?'none':'line-through', textDecorationColor:'var(--hairline)' }}>{label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:24, marginTop:40, paddingTop:28, borderTop:'1px solid var(--hairline)' }} className="price-foot">
+          {[['Free forever for posting','Listings never expire. No card required.'],['Transparent per-connect','Connect price shown before you message. No surprises.'],['Cancel anytime','Monthly plans cancel with one click. No lock-in.']].map(([title,body],i) => (
+            <div key={i} style={{ display:'flex', gap:12 }}><div style={{ color:'var(--accent)', paddingTop:2 }}><Icon name="check" size={16} stroke={2.2}/></div><div><div style={{ fontSize:13, fontWeight:500 }}>{title}</div><div style={{ fontSize:13, color:'var(--ink-3)', marginTop:2 }}>{body}</div></div></div>
+          ))}
+        </div>
+      </div>
+      <style>{`@media (max-width: 1080px) { .price-grid { grid-template-columns: 1fr 1fr !important; } .price-grid > div:nth-child(3) { border-top: 1px solid var(--hairline); border-left: none !important; } .price-grid > div:nth-child(4) { border-top: 1px solid var(--hairline); } } @media (max-width: 640px) { .price-grid { grid-template-columns: 1fr !important; } .price-grid > div { border-left: none !important; border-top: 1px solid var(--hairline) !important; } .price-grid > div:first-child { border-top: none !important; } .price-foot { grid-template-columns: 1fr !important; } }`}</style>
+    </section>
+  );
+};
+
+/* ── CTA ── */
+const CTA = () => (
+  <section id="cta" style={{ background:'var(--ink)', color:'var(--bg)', padding:'120px 0' }}>
+    <div className="container" style={{ position:'relative' }}>
+      <div style={{ position:'absolute', inset:0, opacity:0.1, pointerEvents:'none' }}>
+        <svg viewBox="0 0 1320 300" style={{ width:'100%', height:'100%' }} preserveAspectRatio="none">
+          <defs><pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M60 0H0V60" fill="none" stroke="#FFF" strokeWidth="1"/></pattern></defs>
+          <rect width="100%" height="100%" fill="url(#grid)"/>
+        </svg>
+      </div>
+      <div style={{ position:'relative', maxWidth:920 }}>
+        <div className="eyebrow" style={{ color:'rgba(255,255,255,0.55)' }}>Get on the map</div>
+        <h2 style={{ color:'var(--bg)', fontSize:'clamp(40px, 5vw, 68px)', marginTop:18, letterSpacing:'-0.03em' }}>Put your site on DirtLink.<br/><span style={{ color:'rgba(255,255,255,0.48)' }}>Find the nearest match in sixty seconds.</span></h2>
+        <div style={{ display:'flex', gap:10, marginTop:32, flexWrap:'wrap' }}>
+          <a href="/app" className="btn btn-primary" style={{ background:'var(--bg)', color:'var(--ink)', borderColor:'var(--bg)' }}>Sign up free <Icon name="arrow" size={14}/></a>
+          <a href="/app" className="btn btn-secondary" style={{ background:'transparent', color:'var(--bg)', borderColor:'rgba(255,255,255,0.25)' }}>Log in</a>
+        </div>
+        <div style={{ marginTop:56, display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:32, paddingTop:32, borderTop:'1px solid rgba(255,255,255,0.12)' }} className="cta-stats">
+          {[['$0','to get started'],['< 60 s','to first listing'],['Calgary, AB','now live'],['No brokers','direct connections']].map(([n,l],i) => (
+            <div key={i}><div style={{ fontSize:28, fontWeight:500, letterSpacing:'-0.025em' }}>{n}</div><div className="mono" style={{ fontSize:11, color:'rgba(255,255,255,0.55)', textTransform:'uppercase', letterSpacing:'0.14em', marginTop:4 }}>{l}</div></div>
+          ))}
+        </div>
+      </div>
+    </div>
+    <style>{`@media (max-width: 720px) { .cta-stats { grid-template-columns: 1fr 1fr !important; } }`}</style>
+  </section>
+);
+
+/* ── Footer ── */
+const Footer = () => (
+  <footer style={{ background:'var(--ink)', color:'var(--bg)', padding:'56px 0 40px', borderTop:'1px solid rgba(255,255,255,0.08)' }}>
+    <div className="container">
+      <div style={{ display:'grid', gridTemplateColumns:'1.4fr repeat(4, 1fr)', gap:40 }} className="foot-grid">
+        <div>
+          <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:14 }}>
+            <div style={{ width:28, height:28, background:'rgba(255,255,255,0.08)', borderRadius:5, border:'1px solid rgba(255,255,255,0.12)', display:'grid', placeItems:'center' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#C44A1A" stroke="#C44A1A" strokeWidth="3.2" strokeLinejoin="round" strokeLinecap="round"><path d="M12 5 L20 19 L4 19 Z"/></svg>
+            </div>
+            <span style={{ fontSize:17, fontWeight:500 }}>DirtLink</span>
+          </div>
+          <p style={{ fontSize:13, color:'rgba(255,255,255,0.55)', maxWidth:280 }}>Calgary's earth material marketplace for construction, excavation, and development.</p>
+          <div className="mono" style={{ fontSize:11, color:'rgba(255,255,255,0.4)', marginTop:20, letterSpacing:'0.1em' }}>© 2026 DirtLink Systems Inc.</div>
+        </div>
+        {[['Product',['Map','Listings','Messaging','Alerts','Reports']],['Use cases',['Excavation','Developers','Operators','Logistics']],['Company',['About','Pricing','Careers','Press']],['Resources',['Docs','Field guide','Status','Contact']]].map(([title,links],i) => (
+          <div key={i}>
+            <div className="mono" style={{ fontSize:11, color:'rgba(255,255,255,0.45)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:14 }}>{title}</div>
+            {links.map((l,j) => <div key={j} style={{ fontSize:14, color:'rgba(255,255,255,0.78)', marginBottom:7, cursor:'pointer' }}>{l}</div>)}
+          </div>
+        ))}
+      </div>
+    </div>
+    <style>{`@media (max-width: 900px) { .foot-grid { grid-template-columns: 1fr 1fr !important; } }`}</style>
+  </footer>
+);
+
+/* ── App ── */
+function App() {
+  useEffect(() => {
+    const targets = document.querySelectorAll('.hero-workspace');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); } });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    targets.forEach(t => io.observe(t));
+    requestAnimationFrame(() => { targets.forEach(t => { const r = t.getBoundingClientRect(); if (r.top < window.innerHeight * 0.9) t.classList.add('is-visible'); }); });
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const els = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); } });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+    els.forEach(el => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <React.Fragment>
+      <Nav/>
+      <Hero/>
+      <HowItWorks/>
+      <Features/>
+      <Why/>
+      <Showcase/>
+      <UseCases/>
+      <Pricing/>
+      <CTA/>
+      <Footer/>
+    </React.Fragment>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App/>);
+</script>
 </body>
 </html>
