@@ -2,6 +2,14 @@
 
 let map;
 const pinMarkers = L.layerGroup();
+let _activeMarker = null;
+
+window.clearActiveMarker = function() {
+  if (_activeMarker) {
+    _activeMarker.getElement()?.classList.remove('marker-active');
+    _activeMarker = null;
+  }
+};
 
 function initMap() {
   map = L.map('map', {
@@ -269,40 +277,16 @@ window.addPinToMap = function(pin) {
   const icon = createPinIcon(pin.pin_type, pin.material_type, pin.is_tested, isNow);
   const marker = L.marker([pin.latitude, pin.longitude], { icon });
 
-  const color = getPinColor(pin.pin_type, pin.material_type);
-  const materialLabel = MATERIALS[pin.material_type]?.label || pin.material_type;
-  const isHave = pin.pin_type === 'have';
-  const qty = pin.quantity_estimate
-    ? `~${pin.quantity_estimate} ${(pin.quantity_unit || '').replace('_', ' ')}`
-    : null;
-
-  // Timeline display in popup
-  let timelinePopup = '';
-  if (isNow) {
-    timelinePopup = '<div class="pp-now"><span class="pp-now-dot"></span>Active Now</div>';
-  } else if (pin.timeline_date) {
-    const d = new Date(pin.timeline_date + 'T00:00');
-    const today = new Date(); today.setHours(0,0,0,0);
-    const isPast = d < today;
-    timelinePopup = `<div class="pp-timeline ${isPast ? 'pp-stale' : ''}">${isPast ? '⚠ ' : ''}${isHave ? 'Remove by' : 'Need by'}: ${d.toLocaleDateString()}</div>`;
-  }
-
-  marker.bindPopup(`
-    <div class="pin-popup">
-      <div class="pp-header" style="background:${color}">
-        <span class="pp-type">${isHave ? '&#9650; HAVE' : '&#9660; NEED'}</span>
-        <span class="pp-material">${materialLabel}</span>
-        ${pin.is_tested ? '<span class="pp-tested">&#10003; Tested</span>' : ''}
-      </div>
-      <div class="pp-body">
-        <div class="pp-title">${DirtLink.escapeHtml(pin.title)}</div>
-        <div class="pp-company">${DirtLink.escapeHtml(pin.company_name)}</div>
-        ${qty ? `<div class="pp-qty">${qty}</div>` : ''}
-        ${timelinePopup}
-        <a class="pp-action" href="#" onclick="event.preventDefault(); DirtLink.showPinDetail('${pin.id}')" style="color:${color}">View Details &#8594;</a>
-      </div>
-    </div>
-  `, { maxWidth: 260, className: 'dl-popup' });
+  marker.on('click', () => {
+    // Deactivate previous marker
+    if (_activeMarker && _activeMarker !== marker) {
+      _activeMarker.getElement()?.classList.remove('marker-active');
+    }
+    _activeMarker = marker;
+    // Delay slightly so Leaflet has rendered the element
+    setTimeout(() => marker.getElement()?.classList.add('marker-active'), 10);
+    DirtLink.openPinPanel(pin);
+  });
 
   pinMarkers.addLayer(marker);
 };

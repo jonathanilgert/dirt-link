@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 488" width="400" height="488" font-family="Figtree, Inter, -apple-system, sans-serif">
+
+  <defs>
+
+    <!-- Clip front card to rounded rect -->
+    <clipPath id="clip-front">
+      <rect x="32" y="32" width="336" height="192" rx="10"/>
+    </clipPath>
+
+    <!-- Clip back card to rounded rect -->
+    <clipPath id="clip-back">
+      <rect x="32" y="264" width="336" height="192" rx="10"/>
+    </clipPath>
+
+    <!-- Grid pattern for back card -->
+    <pattern id="grid" x="32" y="264" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#E2D9CF" stroke-width="0.7"/>
+    </pattern>
+
+    <!-- Drop shadow filter -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="8" flood-color="#000000" flood-opacity="0.13"/>
+      <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#000000" flood-opacity="0.07"/>
+    </filter>
+
+  </defs>
+
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!--  FRONT CARD                                 -->
+  <!-- ═══════════════════════════════════════════ -->
+
+  <!-- Shadow -->
+  <rect x="32" y="32" width="336" height="192" rx="10" fill="#1A1410" filter="url(#shadow)"/>
+
+  <!-- Background -->
+  <rect x="32" y="32" width="336" height="192" rx="10" fill="#1A1410"/>
+
+  <!-- Decorative triangle top-right (rotated 20°, opacity 0.12) -->
+  <!-- Original: 180×180px element at top:-40 right:-40, triangle apex=(286,-40) base=(196,140)(376,140), rotated 20° around (286,50) -->
+  <polygon
+    points="348.78,-2.57 371.79,197.35 202.65,135.79"
+    fill="#D44E00" opacity="0.12"
+    clip-path="url(#clip-front)"
+    transform="translate(32,32)"
+  />
+
+  <!-- Decorative triangle bottom-left (rotated -15°, opacity 0.07) -->
+  <!-- Original: 140×140px element at bottom:-50 left:-30, apex=(40,102) base=(-30,242)(110,242), rotated -15° around (40,172) -->
+  <polygon
+    points="53.88,136.39 22.51,289.73 157.73,253.49"
+    fill="#D44E00" opacity="0.10"
+    clip-path="url(#clip-back)"
+    transform="translate(0,-128)"
+  />
+
+  <!-- Logo box (white rounded rect) -->
+  <rect x="56" y="56" width="28" height="28" rx="5" fill="#FFFFFF"/>
+  <!-- Triangle inside logo box -->
+  <polygon points="70,61 80,81 60,81" fill="#D44E00"/>
+
+  <!-- Wordmark "Dirt" white -->
+  <text x="93" y="75" font-size="18" font-weight="800" fill="#FFFFFF" letter-spacing="-0.4">Dirt</text>
+  <!-- Wordmark "Link" orange -->
+  <text x="124" y="75" font-size="18" font-weight="800" fill="#D44E00" letter-spacing="-0.4">Link</text>
+
+  <!-- Tagline (3 lines) -->
+  <text x="56" y="114" font-size="10.5" font-weight="400" fill="#FFFFFF" opacity="0.45" letter-spacing="0.1">Canada's earth material marketplace —</text>
+  <text x="56" y="130" font-size="10.5" font-weight="400" fill="#FFFFFF" opacity="0.45" letter-spacing="0.1">connecting sites that have excess fill</text>
+  <text x="56" y="146" font-size="10.5" font-weight="400" fill="#FFFFFF" opacity="0.45" letter-spacing="0.1">with sites that need it.</text>
+
+  <!-- Website bottom-left -->
+  <text x="56" y="206" font-size="11" font-weight="600" fill="#D44E00" letter-spacing="0.3">dirtlink.ca</text>
+
+  <!-- Canada badge bottom-right -->
+  <rect x="313" y="194" width="50" height="17" rx="4" fill="none" stroke="#FFFFFF" stroke-opacity="0.15" stroke-width="1"/>
+  <text x="338" y="206" font-size="9" font-weight="700" fill="#FFFFFF" opacity="0.3" text-anchor="middle" letter-spacing="1.2">CANADA</text>
+
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!--  BACK CARD                                  -->
+  <!-- ═══════════════════════════════════════════ -->
+
+  <!-- Shadow -->
+  <rect x="32" y="264" width="336" height="192" rx="10" fill="#F3F0EB" filter="url(#shadow)"/>
+
+  <!-- Background -->
+  <rect x="32" y="264" width="336" height="192" rx="10" fill="#F3F0EB"/>
+
+  <!-- Grid overlay -->
+  <rect x="32" y="264" width="336" height="192" rx="10" fill="url(#grid)" opacity="0.45"/>
+
+  <!-- Orange left accent stripe -->
+  <rect x="32" y="264" width="4" height="192" rx="2" fill="#D44E00"/>
+
+  <!-- Name -->
+  <text x="58" y="315" font-size="16" font-weight="700" fill="#1A1410" letter-spacing="-0.2">Alex</text>
+
+  <!-- Title -->
+  <text x="58" y="332" font-size="10.5" font-weight="600" fill="#D44E00" letter-spacing="1.4">FOUNDER</text>
+
+  <!-- Divider -->
+  <line x1="58" y1="346" x2="230" y2="346" stroke="#E2D9CF" stroke-width="1"/>
+
+  <!-- Email icon -->
+  <rect x="58" y="357" width="13" height="10" rx="1.5" fill="none" stroke="#D44E00" stroke-width="1.2"/>
+  <polyline points="58,357 64.5,363 71,357" fill="none" stroke="#D44E00" stroke-width="1.2"/>
+  <!-- Email text -->
+  <text x="77" y="366" font-size="11" font-weight="500" fill="#8A7E74">hello@dirtlink.ca</text>
+
+  <!-- Globe icon -->
+  <circle cx="64.5" cy="384" r="6" fill="none" stroke="#D44E00" stroke-width="1.2"/>
+  <line x1="58.5" y1="384" x2="70.5" y2="384" stroke="#D44E00" stroke-width="1.2"/>
+  <path d="M64.5,378 C62,381 62,387 64.5,390 C67,387 67,381 64.5,378Z" fill="none" stroke="#D44E00" stroke-width="1.2"/>
+  <!-- Website text -->
+  <text x="77" y="388" font-size="11" font-weight="500" fill="#8A7E74">dirtlink.ca</text>
+
+  <!-- Watermark logo bottom-right -->
+  <polygon points="336,434 346,450 326,450" fill="#1A1410" opacity="0.12"/>
+  <text x="350" y="450" font-size="11" font-weight="800" fill="#1A1410" opacity="0.12" letter-spacing="-0.2">DirtLink</text>
+
+</svg>

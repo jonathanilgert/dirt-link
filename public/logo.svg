@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 36" width="120" height="36" font-family="Figtree, Inter, -apple-system, sans-serif">
+
+  <!-- Icon box -->
+  <rect x="0" y="0" width="36" height="36" rx="7" fill="#FFFFFF" stroke="#E2D9CF" stroke-width="1"/>
+
+  <!-- Triangle inside box -->
+  <polygon points="18,7 30,29 6,29" fill="#D44E00"/>
+
+  <!-- Wordmark -->
+  <text x="46" y="25" font-size="22" font-weight="800" fill="#1A1410" letter-spacing="-0.5">Dirt<tspan fill="#D44E00">Link</tspan></text>
+
+</svg>

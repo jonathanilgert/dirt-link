@@ -21,7 +21,7 @@
   --ink-4: #9CA1A8;
   --hairline: #E5DFD2;
   --hairline-2: #EFEAE0;
-  --accent: #C44A1A;
+  --accent: #D43E00;
   --accent-2: #E07A3E;
   --accent-ink: #FFFFFF;
   --warn: #3D5A48;
@@ -227,6 +227,7 @@ const Nav = () => (
         <a href="#showcase">Product</a>
         <a href="#usecases">Use cases</a>
         <a href="#pricing" className="muted">Pricing</a>
+        <a href="#faq" className="muted">FAQ</a>
       </div>
       <div className="row gap-4" style={{ alignItems:'center' }}>
         <a href="/app" className="btn btn-ghost btn-sm">Log in</a>
@@ -378,7 +379,7 @@ const Hero = () => {
               </div>
               <div style={{ padding:'14px 18px', borderTop:'1px solid var(--hairline)', display:'flex', gap:8 }}>
                 <a href="/app" className="btn btn-primary btn-sm" style={{ flex:1, justifyContent:'center' }}><Icon name="message" size={13}/> Message site</a>
-                <button className="btn btn-secondary btn-sm"><Icon name="doc" size={13}/></button>
+                <a href="/app" className="btn btn-secondary btn-sm"><Icon name="doc" size={13}/></a>
               </div>
             </div>
           </div>
@@ -423,7 +424,7 @@ const HowItWorks = () => {
           <div style={{ flex:1, padding:'9px 12px', border:'1px solid var(--hairline)', borderRadius:5, background:'var(--surface)' }}><div className="mono" style={{ fontSize:10, color:'var(--ink-3)', textTransform:'uppercase', letterSpacing:'0.1em' }}>Qty</div><div className="mono" style={{ fontSize:13 }}>1,200 m³</div></div>
           <div style={{ flex:1, padding:'9px 12px', border:'1px solid var(--hairline)', borderRadius:5, background:'var(--surface)' }}><div className="mono" style={{ fontSize:10, color:'var(--ink-3)', textTransform:'uppercase', letterSpacing:'0.1em' }}>Available</div><div className="mono" style={{ fontSize:13 }}>Apr 28 — Jun 10</div></div>
         </div>
-        <button className="btn btn-primary btn-sm" style={{ alignSelf:'flex-start', marginTop:4 }}>Publish listing <Icon name="arrow" size={13}/></button>
+        <a href="/app" className="btn btn-primary btn-sm" style={{ alignSelf:'flex-start', marginTop:4 }}>Publish listing <Icon name="arrow" size={13}/></a>
       </div>
     );
     if (kind==='radar') return <div style={{ position:'relative', height:'100%', width:'100%' }} className="map-surface"><Topo seed={5}/><div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:240, height:240, borderRadius:'50%', border:'1.5px dashed color-mix(in oklab, var(--accent) 50%, transparent)' }}/><div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:140, height:140, borderRadius:'50%', border:'1px dashed color-mix(in oklab, var(--accent) 30%, transparent)' }}/><Pin type="have" top="50%" left="50%" size="md"/><Pin type="have" top="30%" left="35%" size="sm"/><Pin type="need" top="65%" left="68%" size="sm"/><Pin type="have" top="70%" left="30%" size="sm"/><Pin type="need" top="25%" left="70%" size="sm"/></div>;
@@ -607,11 +608,11 @@ const Pricing = () => {
   const tiers = [
     { id:'free', name:'Free', tagline:'Get started, post pins and browse the map.', price:'$0', unit:'/ mo', cta:'Get Started', ctaStyle:'secondary',
       features:[['Post unlimited pins',true],['Browse the full map',true],['3 reveals / month',true],['Extra reveal: $4.99 each',true],['Proximity alerts',false],['Monitoring radius',false],['Private map view',false],['Unlimited outreach',false]] },
-    { id:'pro', name:'Pro', tagline:'More reveals and lower per-reveal cost.', price:'$29', unit:'/ mo', cta:'Get Started', ctaStyle:'secondary',
+    { id:'pro', name:'Pro', tagline:'More reveals and lower per-reveal cost.', price:'$29', unit:'/ mo', cta:'Get Started', ctaStyle:'secondary', href:'https://buy.stripe.com/7sY6oGcAO3z8amc3xI3ZK0e',
       features:[['Post unlimited pins',true],['Browse the full map',true],['10 reveals / month',true],['Extra reveal: $2.99 each',true],['Proximity alerts',false],['Monitoring radius',false],['Private map view',false],['Unlimited outreach',false]] },
-    { id:'powerhouse', name:'Powerhouse', tagline:'Built for active sites that need real-time awareness.', price:'$59', unit:'/ mo', cta:'Get Started', ctaStyle:'primary', featured:true,
+    { id:'powerhouse', name:'Powerhouse', tagline:'Built for active sites that need real-time awareness.', price:'$59', unit:'/ mo', cta:'Get Started', ctaStyle:'primary', featured:true, href:'https://buy.stripe.com/00w4gy0S6fhQ8e45FQ3ZK0f',
       features:[['Post unlimited pins',true],['Browse the full map',true],['40 reveals / month',true],['Extra reveal: $1.49 each',true],['Proximity alerts',true],['5–50 km monitoring radius',true],['Email / SMS notifications',true],['Private map view',false]] },
-    { id:'enterprise', name:'Enterprise', tagline:'Full control for large contractors and fleet operations.', price:'$149', unit:'/ mo', cta:'Get Started', ctaStyle:'secondary',
+    { id:'enterprise', name:'Enterprise', tagline:'Full control for large contractors and fleet operations.', price:'$149', unit:'/ mo', cta:'Get Started', ctaStyle:'secondary', href:'https://buy.stripe.com/00w8wO30e8Tsamcecm3ZK0g',
       features:[['Post unlimited pins',true],['Browse the full map',true],['Unlimited reveals',true],['No extra reveal cost',true],['Proximity alerts',true],['5–50 km monitoring radius',true],['Priority SMS / in-app alerts',true],['Private map view',true]] },
   ];
   return (
@@ -636,7 +637,7 @@ const Pricing = () => {
                 <span className="mono" style={{ fontSize:12, color:'var(--ink-3)', whiteSpace:'nowrap' }}>{t.unit}</span>
               </div>
               <div style={{ height:11, marginBottom:20 }}/>
-              <a href="/app" className={'btn btn-'+t.ctaStyle} style={{ justifyContent:'center', marginBottom:22 }}>{t.cta} <Icon name="arrow" size={13}/></a>
+              <a href={t.href || '/app'} className={'btn btn-'+t.ctaStyle} style={{ justifyContent:'center', marginBottom:22 }}>{t.cta} <Icon name="arrow" size={13}/></a>
               <div style={{ borderTop:'1px solid var(--hairline)', paddingTop:16 }}>
                 {t.features.map(([label,on],j) => (
                   <div key={j} style={{ display:'flex', alignItems:'flex-start', gap:9, padding:'6px 0', fontSize:13, color:on?'var(--ink-2)':'var(--ink-4)' }}>
@@ -657,6 +658,174 @@ const Pricing = () => {
         </div>
       </div>
       <style>{`@media (max-width: 1080px) { .price-grid { grid-template-columns: 1fr 1fr !important; } .price-grid > div:nth-child(3) { border-top: 1px solid var(--hairline); border-left: none !important; } .price-grid > div:nth-child(4) { border-top: 1px solid var(--hairline); } } @media (max-width: 640px) { .price-grid { grid-template-columns: 1fr !important; } .price-grid > div { border-left: none !important; border-top: 1px solid var(--hairline) !important; } .price-grid > div:first-child { border-top: none !important; } .price-foot { grid-template-columns: 1fr !important; } }`}</style>
+    </section>
+  );
+};
+
+/* ── FAQ ── */
+const FAQ_SECTIONS = [
+  {
+    label: 'About DirtLink',
+    items: [
+      { q: 'What is DirtLink?', a: 'A map-based platform that connects Calgary\'s development sites with earth-moving professionals. Every approved development permit in Calgary appears as a pin on our map. Site owners can claim their pin and list what material they have or need; haulers, excavators, and landscapers find nearby material matches and save on trucking.' },
+      { q: 'Who is this for?', a: 'Two main groups. First, anyone with an approved development permit in Calgary — your site is already on the map and claiming it lets local crews find you. Second, earth-moving professionals — excavators, haulers, landscapers, demolition crews, builders — who want to find work and material closer to where they already are.' },
+      { q: 'Where do you operate?', a: 'Calgary, Alberta. We may expand to other Canadian cities once the model is proven, but Calgary is the focus.' },
+      { q: 'Who built this?', a: 'DirtLink is operated by Earth Movers Network Inc., a Calgary-based company. We built it because we kept watching trucks haul soil from one development site across town, while another site three blocks away paid to bring the same material in. Solving that mismatch is the entire product.' },
+      { q: 'Are you affiliated with the City of Calgary?', a: 'No. We use the City\'s publicly available open data under the Open Government Licence, but we are an independent company and don\'t represent the City.' },
+    ]
+  },
+  {
+    label: 'My development site is on the map',
+    items: [
+      { q: 'How did you get my permit information?', a: 'From the City of Calgary\'s Open Data Portal, which publishes development permit data publicly. We pull it daily and place each permit on our map automatically. We don\'t get information from any private source.' },
+      { q: 'I never agreed to be listed. Can I remove my pin?', a: 'Permit data is public information, so the basic pin will remain on the map regardless of your involvement — that\'s how the City publishes it. If you don\'t want to be reached, just don\'t claim it. Unclaimed pins show only what the City made public; no contact info, no material details. If you\'ve claimed your site and want to take down your details, you can delete your listing anytime from your account.' },
+      { q: 'What does "claiming" my site mean?', a: 'Claiming is free and tells the platform "I\'m the actual person behind this permit." Once claimed, you can add details about your earth material situation — what you have, what you need, your timeline — and earth-moving companies in the area can connect with you through DirtLink.' },
+      { q: 'What does it cost to list my site?', a: 'Nothing. Listing your site, claiming your pin, and adding material details is always free. We charge earth-moving professionals to view full contact details on listings (called "reveals") — site owners never pay anything to participate.' },
+      { q: 'Will my phone number be public?', a: 'No. Your contact details are protected behind a reveal — only paying users on our platform can access them, and you can update or remove your contact info anytime. Your information is never sold and never appears in public Google searches.' },
+      { q: 'Do I need to know exactly how much material I have?', a: 'No. An estimate is fine. Most claimers list a range (e.g., "200–400 cubic metres of soil") and refine it as the project progresses. The point is to give nearby crews enough info to know whether your site is worth a conversation.' },
+      { q: 'Do I need a soil report?', a: 'Not to list. Many residential and infill projects don\'t have one — just be honest about what you know and don\'t know. If you do have a soil or geotech report, attaching it makes your listing more useful and trustworthy to professional crews.' },
+      { q: 'What\'s the QR code I keep hearing about?', a: 'When you claim your pin, you can download a free printable sign with a QR code that links to your site\'s listing. Post it on your construction fence, and anyone walking or driving by can scan it to see what material you have or need — without you having to repeat the conversation a hundred times.' },
+    ]
+  },
+  {
+    label: 'For earth-moving professionals',
+    items: [
+      { q: 'What does DirtLink actually do for me?', a: 'It puts every active development site in Calgary on one map, filtered by what material is available, what\'s needed, and how far it is from your current jobs. Instead of cold-calling builders or driving around looking for fences with phone numbers, you can see who has soil to move, who needs fill, and who\'s accepting demo material — all in one place.' },
+      { q: 'How is this different from Kijiji or Facebook Marketplace?', a: 'Two things. First, our data is structured — every listing has material type, volume, location, and timeline, so you can filter and find matches that actually fit. Second, the source data comes from City permits, not random posts, so you see the full picture of construction activity, not just the small fraction that gets posted to social platforms.' },
+      { q: 'What\'s a reveal?', a: 'A reveal unlocks the full contact information on a site listing — phone, email, material details, soil reports if attached, photos, and timeline. You only pay to reveal sites that look promising; browsing the map and filtering is always free. Free accounts get 3 reveals per month.' },
+      { q: 'Are the listings real?', a: 'The permits are real — they come straight from the City of Calgary\'s open data. Whether the site owner has claimed and added material details depends on them. Claimed listings (colored pins) have verified, owner-supplied material info. Unclaimed listings (gray pins) confirm a real permit exists at that address but contact info hasn\'t been added yet.' },
+      { q: 'How current is the data?', a: 'We pull new permit approvals from the City of Calgary daily. Site owner-supplied data (claims, material details, timelines) updates whenever the owner edits their listing.' },
+      { q: 'I\'m a one-truck operator. Does this work for me?', a: 'Yes. Small operators are often the best-served by DirtLink because shorter haul distances have the biggest impact on margin when you\'re running lean. Free or Pro ($29/mo) is usually the right fit.' },
+      { q: 'I run a 30-truck fleet. What does Enterprise look like?', a: 'Enterprise ($149/mo) gives you unlimited reveals, a private map view (your sites and routes only — invisible to competitors), proximity notifications when permits drop near your active jobs, and team-wide access. Most enterprise customers find one good material match per month covers the annual subscription.' },
+    ]
+  },
+  {
+    label: 'Pricing',
+    items: [
+      { q: 'What plans do you offer?', a: 'Free ($0) — 3 reveals/mo, $4.99 each extra. Pro ($29/mo) — 10 reveals/mo, $2.99 each extra. Powerhouse ($59/mo) — 40 reveals/mo, $1.49 each extra, proximity alerts. Enterprise ($149/mo) — unlimited reveals, private map view. Posting and claiming a site is always free, on every plan.' },
+      { q: 'What\'s a "reveal" again?', a: 'A reveal unlocks the full contact info, material details, photos, and timeline on a specific site listing. It\'s how we keep posting always free for site owners and only charge professionals who actually use the data.' },
+      { q: 'Can I change plans?', a: 'Yes. Upgrade or downgrade anytime from your account settings. Changes take effect at the start of your next billing cycle.' },
+      { q: 'What if I use up my reveals?', a: 'You can buy additional reveals at the per-unit rate for your plan ($1.49–$4.99 depending on tier). Most users hit their cap once or twice and then upgrade — the per-unit pricing is structured so upgrading is the better deal for regular users.' },
+      { q: 'Can I cancel anytime?', a: 'Yes. Cancel from account settings — your subscription stops at the end of the current billing cycle.' },
+      { q: 'Do you offer a free trial of paid features?', a: 'Free accounts get 3 reveals per month, which is enough to evaluate the platform. We don\'t have time-limited trials of higher tiers right now.' },
+    ]
+  },
+  {
+    label: 'Privacy and trust',
+    items: [
+      { q: 'Do you sell my data?', a: 'No. We do not sell personal information to anyone. Full details in our Privacy Policy.' },
+      { q: 'Can my competitors see my listing?', a: 'Free, Pro, and Powerhouse listings are visible on the public map (claimed listings show as colored pins). Enterprise users have access to a private map view that hides their own sites from the public map — competitors see only public data, not Enterprise users\' internal logistics.' },
+      { q: 'How do I unsubscribe from DirtLink emails?', a: 'Click the unsubscribe link in any email. Requests are processed within 10 business days, as required by Canadian anti-spam law (CASL).' },
+      { q: 'Where is my data stored?', a: 'With our cloud hosting provider, DigitalOcean, on encrypted servers.' },
+      { q: 'Is the platform secure?', a: 'Connections are encrypted in transit (TLS 1.2+) and data is encrypted at rest. We use access controls, audit logs, and standard security practices. If we ever detect a breach affecting your information, we\'ll notify you in accordance with PIPEDA breach-notification requirements.' },
+    ]
+  },
+  {
+    label: 'Material exchange and responsibility',
+    items: [
+      { q: 'Does DirtLink handle the actual material exchange?', a: 'No. We\'re a platform that helps you find each other. Once you connect with another user, the material exchange — quantities, prices, scheduling, hauling, payment — is between you and them. We don\'t take a cut of any transaction.' },
+      { q: 'Who\'s responsible if material is contaminated or doesn\'t match what was listed?', a: 'The user who provides the material. We don\'t inspect or verify any material on the platform. Always inspect before accepting and conduct any environmental testing your project requires.' },
+      { q: 'What about clean fill vs. contaminated soil?', a: 'Site owners are expected to disclose known contamination on their listings, but never accept material based on the listing alone — visual inspection and, where required, lab testing are your responsibility. Alberta Tier 1/Tier 2 Soil and Groundwater Remediation Guidelines apply where contamination is suspected.' },
+      { q: 'Do I need permits to move fill or soil?', a: 'Depends on volume, type, and where it\'s going. Calgary\'s Land Use Bylaw and Alberta environmental regulations may apply. We don\'t provide regulatory advice — check with the City of Calgary or a qualified consultant before moving large volumes.' },
+    ]
+  },
+  {
+    label: 'Account and technical',
+    items: [
+      { q: 'I forgot my password.', a: 'Click "Forgot password" on the sign-in page and we\'ll send a reset link to your registered email.' },
+      { q: 'I can\'t find my development site on the map.', a: 'A few possibilities: the permit may not have been approved yet (only approved permits appear), it may have been approved very recently and not yet pulled, or you may be searching by an address that doesn\'t match the City\'s record. Try searching by permit number or contact us at support@dirtlink.ca.' },
+      { q: 'The map isn\'t loading.', a: 'Refresh first. If it still doesn\'t work, try a different browser or check your internet. For ongoing issues, email support@dirtlink.ca.' },
+      { q: 'I want to change my email address.', a: 'Account Settings → Profile → Update email. We\'ll send a confirmation to the new address.' },
+      { q: 'How do I delete my account?', a: 'Account Settings → Privacy → Delete Account. This removes your contact info, listings, and personal data. Email logs and payment records are retained for the periods required by law.' },
+    ]
+  },
+];
+
+const FAQ = () => {
+  const [openSection, setOpenSection] = React.useState(0);
+  const [openItem, setOpenItem] = React.useState(null);
+
+  const toggle = (sIdx, iIdx) => {
+    const key = `${sIdx}-${iIdx}`;
+    setOpenItem(openItem === key ? null : key);
+  };
+
+  return (
+    <section id="faq" className="section">
+      <div className="container">
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:40, alignItems:'end', marginBottom:56 }} className="sec-head">
+          <div>
+            <div className="eyebrow">FAQ</div>
+            <h2 style={{ marginTop:16 }}>Questions, answered.</h2>
+          </div>
+          <p className="lede" style={{ justifySelf:'end' }}>
+            DirtLink connects Calgary's development sites with the people who move earth. Don't see your question?{' '}
+            <a href="mailto:support@dirtlink.ca" style={{ color:'var(--ink)', borderBottom:'1px solid var(--hairline)' }}>Email us</a> and we'll add it.
+          </p>
+        </div>
+
+        <div style={{ display:'grid', gridTemplateColumns:'220px 1fr', gap:40, alignItems:'start' }} className="faq-grid">
+
+          {/* Section nav */}
+          <div style={{ position:'sticky', top:96 }}>
+            {FAQ_SECTIONS.map((sec, si) => (
+              <button key={si} onClick={() => { setOpenSection(si); setOpenItem(null); document.getElementById(`faq-sec-${si}`)?.scrollIntoView({ behavior:'smooth', block:'start' }); }}
+                style={{ display:'block', width:'100%', textAlign:'left', padding:'8px 12px', marginBottom:2, borderRadius:6, border:'none', cursor:'pointer', fontSize:13,
+                  background: openSection === si ? 'var(--surface)' : 'transparent',
+                  color: openSection === si ? 'var(--ink)' : 'var(--ink-3)',
+                  fontWeight: openSection === si ? 500 : 400,
+                  boxShadow: openSection === si ? 'var(--shadow-sm)' : 'none',
+                  transition:'all .15s' }}>
+                {sec.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Accordion body */}
+          <div>
+            {FAQ_SECTIONS.map((sec, si) => (
+              <div key={si} id={`faq-sec-${si}`} style={{ marginBottom: si < FAQ_SECTIONS.length - 1 ? 40 : 0 }}>
+                <div className="mono" style={{ fontSize:11, letterSpacing:'0.14em', textTransform:'uppercase', color:'var(--ink-3)', marginBottom:14, paddingBottom:12, borderBottom:'1px solid var(--hairline)' }}>
+                  {sec.label}
+                </div>
+                {sec.items.map((item, ii) => {
+                  const key = `${si}-${ii}`;
+                  const isOpen = openItem === key;
+                  return (
+                    <div key={ii} style={{ borderBottom:'1px solid var(--hairline-2)' }}>
+                      <button onClick={() => toggle(si, ii)} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', width:'100%', padding:'16px 0', border:'none', background:'transparent', cursor:'pointer', textAlign:'left', gap:16 }}>
+                        <span style={{ fontSize:15, fontWeight:500, color:'var(--ink)', lineHeight:1.4 }}>{item.q}</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink-3)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                          style={{ flexShrink:0, transition:'transform .2s', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                          <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                      </button>
+                      {isOpen && (
+                        <div style={{ paddingBottom:18, paddingRight:32, fontSize:14, color:'var(--ink-2)', lineHeight:1.75 }}>
+                          {item.a}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ marginTop:56, paddingTop:32, borderTop:'1px solid var(--hairline)', display:'flex', gap:12, alignItems:'center', justifyContent:'center', flexWrap:'wrap' }}>
+          <span style={{ fontSize:14, color:'var(--ink-3)' }}>Still have questions?</span>
+          <a href="mailto:support@dirtlink.ca" className="btn btn-secondary" style={{ fontSize:13 }}>
+            <Icon name="message" size={13}/> support@dirtlink.ca
+          </a>
+        </div>
+      </div>
+      <style>{`
+        @media (max-width: 768px) {
+          .faq-grid { grid-template-columns: 1fr !important; }
+          .faq-grid > div:first-child { position: static !important; display: flex; flex-wrap: wrap; gap: 6px; }
+        }
+      `}</style>
     </section>
   );
 };
@@ -693,26 +862,41 @@ const CTA = () => (
 const Footer = () => (
   <footer style={{ background:'var(--ink)', color:'var(--bg)', padding:'56px 0 40px', borderTop:'1px solid rgba(255,255,255,0.08)' }}>
     <div className="container">
-      <div style={{ display:'grid', gridTemplateColumns:'1.4fr repeat(4, 1fr)', gap:40 }} className="foot-grid">
+      <div style={{ display:'grid', gridTemplateColumns:'1.6fr 1fr 1fr', gap:40, alignItems:'start' }} className="foot-grid">
+
+        {/* Brand */}
         <div>
           <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:14 }}>
             <div style={{ width:28, height:28, background:'rgba(255,255,255,0.08)', borderRadius:5, border:'1px solid rgba(255,255,255,0.12)', display:'grid', placeItems:'center' }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="#C44A1A" stroke="#C44A1A" strokeWidth="3.2" strokeLinejoin="round" strokeLinecap="round"><path d="M12 5 L20 19 L4 19 Z"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#D43E00" stroke="#D43E00" strokeWidth="3.2" strokeLinejoin="round" strokeLinecap="round"><path d="M12 5 L20 19 L4 19 Z"/></svg>
             </div>
             <span style={{ fontSize:17, fontWeight:500 }}>DirtLink</span>
           </div>
-          <p style={{ fontSize:13, color:'rgba(255,255,255,0.55)', maxWidth:280 }}>Calgary's earth material marketplace for construction, excavation, and development.</p>
-          <div className="mono" style={{ fontSize:11, color:'rgba(255,255,255,0.4)', marginTop:20, letterSpacing:'0.1em' }}>© 2026 DirtLink Systems Inc.</div>
+          <p style={{ fontSize:13, color:'rgba(255,255,255,0.55)', maxWidth:260, lineHeight:1.7 }}>Calgary's earth material marketplace for construction, excavation, and development.</p>
+          <div className="mono" style={{ fontSize:11, color:'rgba(255,255,255,0.35)', marginTop:24, letterSpacing:'0.1em' }}>© 2026 DirtLink · Calgary, AB</div>
         </div>
-        {[['Product',['Map','Listings','Messaging','Alerts','Reports']],['Use cases',['Excavation','Developers','Operators','Logistics']],['Company',['About','Pricing','Careers','Press']],['Resources',['Docs','Field guide','Status','Contact']]].map(([title,links],i) => (
-          <div key={i}>
-            <div className="mono" style={{ fontSize:11, color:'rgba(255,255,255,0.45)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:14 }}>{title}</div>
-            {links.map((l,j) => <div key={j} style={{ fontSize:14, color:'rgba(255,255,255,0.78)', marginBottom:7, cursor:'pointer' }}>{l}</div>)}
-          </div>
-        ))}
+
+        {/* Page sections */}
+        <div>
+          <div className="mono" style={{ fontSize:11, color:'rgba(255,255,255,0.45)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:16 }}>Navigate</div>
+          {[['How it works','#how'],['Features','#features'],['Product','#showcase'],['Use cases','#usecases'],['Pricing','#pricing'],['FAQ','#faq']].map(([label, href]) => (
+            <a key={href} href={href} style={{ display:'block', fontSize:14, color:'rgba(255,255,255,0.72)', marginBottom:9, textDecoration:'none', transition:'color .15s' }}
+               onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='rgba(255,255,255,0.72)'}>{label}</a>
+          ))}
+        </div>
+
+        {/* Account */}
+        <div>
+          <div className="mono" style={{ fontSize:11, color:'rgba(255,255,255,0.45)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:16 }}>Account</div>
+          {[['Log In','/app'],['Sign Up Free','/app']].map(([label, href]) => (
+            <a key={label} href={href} style={{ display:'block', fontSize:14, color:'rgba(255,255,255,0.72)', marginBottom:9, textDecoration:'none', transition:'color .15s' }}
+               onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='rgba(255,255,255,0.72)'}>{label}</a>
+          ))}
+        </div>
+
       </div>
     </div>
-    <style>{`@media (max-width: 900px) { .foot-grid { grid-template-columns: 1fr 1fr !important; } }`}</style>
+    <style>{`@media (max-width: 768px) { .foot-grid { grid-template-columns: 1fr 1fr !important; } .foot-grid > div:first-child { grid-column: 1 / -1; } }`}</style>
   </footer>
 );
 
@@ -747,6 +931,7 @@ function App() {
       <Showcase/>
       <UseCases/>
       <Pricing/>
+      <FAQ/>
       <CTA/>
       <Footer/>
     </React.Fragment>

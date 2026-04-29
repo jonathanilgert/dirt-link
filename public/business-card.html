@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DirtLink — Business Card</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --orange:   #D44E00;
+      --cream:    #F3F0EB;
+      --dark:     #1A1410;
+      --muted:    #8A7E74;
+      --border:   #E2D9CF;
+      --white:    #FFFFFF;
+    }
+
+    body {
+      font-family: 'Figtree', sans-serif;
+      background: #EDEBE6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 48px;
+      padding: 48px 24px;
+    }
+
+    h1 {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* Card wrapper — 3.5 × 2 inches at 96dpi = 336 × 192px */
+    .card-set {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .card-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: -16px;
+      align-self: flex-start;
+    }
+
+    .card {
+      width: 336px;
+      height: 192px;
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.08);
+      flex-shrink: 0;
+    }
+
+    /* ── FRONT ─────────────────────────────────────── */
+    .card-front {
+      background: var(--dark);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px 26px 22px;
+    }
+
+    /* Scene illustration */
+    .card-front-scene {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .card-front .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo-icon-card {
+      width: 28px;
+      height: 28px;
+      background: var(--white);
+      border-radius: 5px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .logo-wordmark {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -0.02em;
+    }
+
+    .logo-wordmark strong {
+      color: var(--orange);
+    }
+
+    .card-front .tagline {
+      font-size: 10.5px;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.55;
+      letter-spacing: 0.01em;
+      position: relative;
+      z-index: 1;
+      max-width: 200px;
+    }
+
+    .card-front .bottom-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-front .website {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--orange);
+      letter-spacing: 0.03em;
+    }
+
+    .card-front .badge {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 3px 7px;
+      border-radius: 4px;
+    }
+
+    /* ── BACK ──────────────────────────────────────── */
+    .card-back {
+      background: var(--cream);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 24px 26px;
+    }
+
+    /* Subtle grid texture */
+    .card-back::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 20px 20px;
+      opacity: 0.4;
+    }
+
+    /* Orange left stripe */
+    .card-back::after {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: var(--orange);
+      border-radius: 10px 0 0 10px;
+    }
+
+    .card-back-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .person-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .person-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--dark);
+      letter-spacing: -0.01em;
+    }
+
+    .person-title {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--orange);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .contact-list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .contact-item svg {
+      flex-shrink: 0;
+      color: var(--orange);
+    }
+
+    .back-logo {
+      position: absolute;
+      bottom: 18px;
+      right: 20px;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      opacity: 0.35;
+    }
+
+    .back-logo span {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--dark);
+      letter-spacing: -0.02em;
+    }
+
+    /* ── CONTROLS ──────────────────────────────────── */
+    .controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-print {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 10px 22px;
+      background: var(--orange);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .btn-print:hover { background: #B34200; }
+
+    .btn-secondary {
+      background: var(--white);
+      color: var(--dark);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: var(--cream); }
+
+    /* ── PRINT ─────────────────────────────────────── */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+        gap: 0;
+        justify-content: flex-start;
+      }
+
+      h1, .controls, .card-label { display: none; }
+
+      .card-set {
+        gap: 0;
+        page-break-inside: avoid;
+      }
+
+      .card {
+        /* 3.5 × 2 inches */
+        width: 3.5in;
+        height: 2in;
+        border-radius: 0;
+        box-shadow: none;
+        margin: 0;
+        page-break-after: always;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>DirtLink — Business Card</h1>
+
+  <div class="card-set">
+    <span class="card-label">Front</span>
+
+    <!-- FRONT -->
+    <div class="card card-front">
+
+      <!-- Construction scene illustration -->
+      <div class="card-front-scene">
+        <svg xmlns="http://www.w3.org/2000/svg" width="336" height="192" viewBox="0 0 336 192">
+          <defs>
+            <!-- Fade overlay: dark left, transparent right so scene shows on right half -->
+            <linearGradient id="fade" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%"   stop-color="#1A1410" stop-opacity="1"/>
+              <stop offset="45%"  stop-color="#1A1410" stop-opacity="0.85"/>
+              <stop offset="100%" stop-color="#1A1410" stop-opacity="0.25"/>
+            </linearGradient>
+            <!-- Top-to-bottom fade on scene -->
+            <linearGradient id="fade-v" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%"   stop-color="#1A1410" stop-opacity="0.5"/>
+              <stop offset="100%" stop-color="#1A1410" stop-opacity="0.1"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Sky -->
+          <rect width="336" height="192" fill="#2C2118"/>
+
+          <!-- Distant horizon haze -->
+          <rect x="0" y="100" width="336" height="20" fill="#3D2E1E" opacity="0.6"/>
+
+          <!-- ── Dirt mounds ── -->
+          <!-- Far mound -->
+          <ellipse cx="260" cy="148" rx="90" ry="30" fill="#4A3520"/>
+          <!-- Main central mound (large pile of dirt) -->
+          <path d="M140,192 Q180,118 230,112 Q270,108 300,130 Q320,142 336,150 L336,192 Z" fill="#5C3D1E"/>
+          <!-- Foreground ground -->
+          <path d="M0,175 Q60,160 120,165 Q180,170 240,162 Q290,156 336,162 L336,192 L0,192 Z" fill="#3D2810"/>
+          <!-- Dirt texture lumps -->
+          <ellipse cx="270" cy="162" rx="25" ry="8"  fill="#6B4826" opacity="0.7"/>
+          <ellipse cx="220" cy="170" rx="18" ry="6"  fill="#6B4826" opacity="0.5"/>
+          <ellipse cx="310" cy="155" rx="14" ry="5"  fill="#7A5530" opacity="0.6"/>
+          <ellipse cx="185" cy="168" rx="10" ry="4"  fill="#7A5530" opacity="0.4"/>
+
+          <!-- ── Excavator ── -->
+          <!-- Tracks (base) -->
+          <rect x="230" y="148" width="70" height="14" rx="6" fill="#2A1E0F"/>
+          <rect x="234" y="150" width="62" height="10" rx="4" fill="#3A2A14"/>
+
+          <!-- Cab body -->
+          <rect x="244" y="118" width="44" height="32" rx="3" fill="#2A1E0F"/>
+          <!-- Cab window -->
+          <rect x="250" y="122" width="18" height="14" rx="2" fill="#D44E00" opacity="0.25"/>
+          <!-- Cab roof -->
+          <path d="M242,118 L252,108 L284,108 L288,118 Z" fill="#221608"/>
+
+          <!-- Boom arm (main arm extending left-up) -->
+          <line x1="252" y1="128" x2="208" y2="88"  stroke="#2A1E0F" stroke-width="9" stroke-linecap="round"/>
+          <!-- Stick arm -->
+          <line x1="208" y1="88"  x2="185" y2="118" stroke="#2A1E0F" stroke-width="7" stroke-linecap="round"/>
+          <!-- Bucket -->
+          <path d="M178,118 Q172,128 178,134 Q186,140 196,134 Q200,128 196,118 Z" fill="#221608"/>
+          <!-- Bucket teeth -->
+          <line x1="178" y1="134" x2="175" y2="140" stroke="#221608" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- Bucket teeth -->
+          <line x1="184" y1="137" x2="182" y2="143" stroke="#221608" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="190" y1="137" x2="189" y2="143" stroke="#221608" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="196" y1="134" x2="196" y2="140" stroke="#221608" stroke-width="2.5" stroke-linecap="round"/>
+
+          <!-- Hydraulic cylinders -->
+          <line x1="252" y1="128" x2="220" y2="102" stroke="#3A2A14" stroke-width="4" stroke-linecap="round"/>
+          <line x1="208" y1="88"  x2="196" y2="108" stroke="#3A2A14" stroke-width="3" stroke-linecap="round"/>
+
+          <!-- Dust particles -->
+          <circle cx="175" cy="145" r="3"  fill="#7A5530" opacity="0.3"/>
+          <circle cx="168" cy="152" r="2"  fill="#7A5530" opacity="0.2"/>
+          <circle cx="182" cy="150" r="1.5" fill="#7A5530" opacity="0.25"/>
+          <circle cx="162" cy="146" r="4"  fill="#7A5530" opacity="0.15"/>
+
+          <!-- Horizontal fade overlay (left solid → right faded) -->
+          <rect width="336" height="192" fill="url(#fade)"/>
+          <!-- Vertical fade overlay -->
+          <rect width="336" height="192" fill="url(#fade-v)"/>
+        </svg>
+      </div>
+
+      <div class="logo">
+        <div class="logo-icon-card">
+          <svg width="13" height="12" viewBox="0 0 14 13" fill="none">
+            <polygon points="7,0 14,13 0,13" fill="#D44E00"/>
+          </svg>
+        </div>
+        <span class="logo-wordmark">Dirt<strong>Link</strong></span>
+      </div>
+
+      <p class="tagline">Canada's earth material marketplace — connecting sites that have excess fill with sites that need it.</p>
+
+      <div class="bottom-row">
+        <span class="website">dirtlink.ca</span>
+        <span class="badge">Canada</span>
+      </div>
+    </div>
+
+    <span class="card-label" style="margin-top:8px">Back</span>
+
+    <!-- BACK -->
+    <div class="card card-back">
+      <div class="card-back-inner">
+        <div class="person-block">
+          <div class="person-name">Alex</div>
+          <div class="person-title">Founder</div>
+        </div>
+        <div class="contact-list">
+          <div class="contact-item">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            hello@dirtlink.ca
+          </div>
+          <div class="contact-item">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            dirtlink.ca
+          </div>
+        </div>
+      </div>
+
+      <!-- Watermark logo bottom right -->
+      <div class="back-logo">
+        <svg width="11" height="10" viewBox="0 0 14 13" fill="none">
+          <polygon points="7,0 14,13 0,13" fill="#1A1410"/>
+        </svg>
+        <span>DirtLink</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn-print" onclick="window.print()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Print cards
+    </button>
+  </div>
+
+</body>
+</html>

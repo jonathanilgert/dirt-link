@@ -7,6 +7,7 @@ window.DirtLink = {
 
   _currentPermit: null,
   _pendingPermitAction: null, // 'claim' or 'inquire' — set before auth redirect
+  _materialFilters: new Set(),
 
   async init() {
     this.populateMaterialSelects();
@@ -15,6 +16,7 @@ window.DirtLink = {
     this.bindEvents();
     await this.checkAuth();
     await this.loadPins();
+    this.buildMaterialList();
     await this.loadExternalPins();
     this.pollUnread();
     this.initProximityBell();
@@ -62,9 +64,104 @@ window.DirtLink = {
   },
 
   // Build the color legend — clickable to filter by category
+  buildMaterialList() {
+    const container = document.getElementById('material-filter-list');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const buildSection = (label, colorKey, pinType) => {
+      // Section header
+      const header = document.createElement('div');
+      header.className = 'mat-section-header';
+      header.innerHTML = `
+        <span class="mat-section-title">${label}</span>
+        <svg class="mat-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+      `;
+      container.appendChild(header);
+
+      // Items wrapper (collapsible)
+      const group = document.createElement('div');
+      group.className = 'mat-section-group';
+      container.appendChild(group);
+
+      header.addEventListener('click', () => {
+        const collapsed = group.classList.toggle('collapsed');
+        header.querySelector('.mat-chevron').style.transform = collapsed ? 'rotate(180deg)' : '';
+      });
+
+      Object.entries(CATEGORIES).forEach(([catKey, cat]) => {
+        const color = cat[colorKey];
+        const count = this.pins.filter(p =>
+          MATERIALS[p.material_type]?.category === catKey && p.pin_type === pinType
+        ).length;
+
+        const item = document.createElement('div');
+        item.className = 'mat-filter-item';
+        item.dataset.catKey = catKey;
+        item.dataset.pinType = pinType;
+        item.innerHTML = `
+          <div class="mat-dot-wrap">
+            <span class="mat-dot" style="background:${color}"></span>
+          </div>
+          <span class="mat-filter-name">${cat.label}</span>
+          <span class="mat-filter-count" id="mat-count-${catKey}-${pinType}">${count}</span>
+        `;
+        item.addEventListener('click', () => {
+          this._materialFilters.has(catKey) ? this._materialFilters.delete(catKey) : this._materialFilters.add(catKey);
+          const on = this._materialFilters.has(catKey);
+          // Sync both have + need rows for same category
+          document.querySelectorAll(`.mat-filter-item[data-cat-key="${catKey}"]`).forEach(el => {
+            el.classList.toggle('checked', on);
+          });
+          this.applyFilters();
+        });
+        group.appendChild(item);
+      });
+    };
+
+    buildSection('Have Material', 'haveColor', 'have');
+    buildSection('Need Material', 'needColor', 'need');
+  },
+
+  updateMaterialCounts() {
+    Object.entries(CATEGORIES).forEach(([catKey]) => {
+      ['have', 'need'].forEach(pinType => {
+        const el = document.getElementById(`mat-count-${catKey}-${pinType}`);
+        if (!el) return;
+        el.textContent = this.pins.filter(p =>
+          MATERIALS[p.material_type]?.category === catKey && p.pin_type === pinType
+        ).length;
+      });
+    });
+  },
+
+  syncMaterialSections(filterType) {
+    const headers = document.querySelectorAll('.mat-section-header');
+    headers.forEach(header => {
+      const title = header.querySelector('.mat-section-title')?.textContent || '';
+      const group = header.nextElementSibling;
+      if (!group) return;
+      if (filterType === 'all') {
+        header.style.display = '';
+        group.style.display = '';
+        group.classList.remove('collapsed');
+        header.querySelector('.mat-chevron').style.transform = '';
+      } else if (filterType === 'have') {
+        const hide = title.toLowerCase().includes('need');
+        header.style.display = hide ? 'none' : '';
+        group.style.display = hide ? 'none' : '';
+      } else if (filterType === 'need') {
+        const hide = title.toLowerCase().includes('have');
+        header.style.display = hide ? 'none' : '';
+        group.style.display = hide ? 'none' : '';
+      }
+    });
+  },
+
   buildLegend() {
     const haveContainer = document.getElementById('legend-have-items');
     const needContainer = document.getElementById('legend-need-items');
+    if (!haveContainer || !needContainer) return;
 
     Object.entries(CATEGORIES).forEach(([key, cat]) => {
       const haveItem = document.createElement('div');
@@ -117,7 +214,14 @@ window.DirtLink = {
         if (btn.dataset.view === 'messages') this.loadConversations();
         if (btn.dataset.view === 'my-pins') this.loadMyPins();
         if (btn.dataset.view === 'map' && window.map) window.map.invalidateSize();
+        if (btn.dataset.view !== 'map') this.closePinPanel();
       });
+    });
+
+    // Click on map background closes panel
+    document.getElementById('map').addEventListener('click', e => {
+      if (e.target.closest('.leaflet-marker-icon')) return;
+      this.closePinPanel();
     });
 
     // Auth buttons
@@ -328,14 +432,10 @@ window.DirtLink = {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.pin-type-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+        this.updateMaterialCounts();
+        this.syncMaterialSections(btn.dataset.filterType);
         this.applyFilters();
       });
-    });
-    document.getElementById('filter-material').addEventListener('change', () => {
-      this._legendFilter = null;
-      document.querySelectorAll('.legend-item').forEach(i => i.classList.remove('active'));
-      document.querySelectorAll('.legend-item').forEach(i => i.classList.remove('active'));
-      this.applyFilters();
     });
     document.getElementById('filter-tested').addEventListener('change', () => this.applyFilters());
     document.getElementById('filter-my-company').addEventListener('change', () => this.applyFilters());
@@ -374,6 +474,16 @@ window.DirtLink = {
       document.getElementById('user-area').style.display = 'none';
       document.getElementById('filter-company-group').style.display = 'none';
     }
+  },
+
+  // Fetch and cache reveal status — used by pin panel
+  async getRevealStatus() {
+    try {
+      const res = await fetch('/api/billing/status');
+      if (!res.ok) return null;
+      const { reveals } = await res.json();
+      return reveals;
+    } catch (e) { return null; }
   },
 
   showProfileModal(tab) {
@@ -434,13 +544,83 @@ window.DirtLink = {
     if (res.ok) {
       this.user = await res.json();
       this.updateAuthUI();
-      document.getElementById('modal-auth').style.display = 'none';
       form.reset();
-      this._resumePendingPermitAction();
+      this.showPlanPicker();
     } else {
       const err = await res.json();
       document.getElementById('register-error').textContent = err.error;
     }
+  },
+
+  showPlanPicker() {
+    const PLANS = [
+      {
+        id: 'free',
+        name: 'Free',
+        price: '$0',
+        per: '/mo',
+        features: ['5 active pins', '3 contact reveals/mo', 'Basic map view', 'Direct messaging'],
+        btnText: 'Start Free',
+        btnClass: 'btn-free',
+        href: null,
+      },
+      {
+        id: 'pro',
+        name: 'Pro',
+        price: '$29',
+        per: '/mo',
+        features: ['25 active pins', '30 reveals/mo', 'Test report uploads', 'Priority listing'],
+        btnText: 'Choose Pro',
+        btnClass: 'btn-paid',
+        href: 'https://buy.stripe.com/7sY6oGcAO3z8amc3xI3ZK0e',
+      },
+      {
+        id: 'powerhouse',
+        name: 'Powerhouse',
+        price: '$59',
+        per: '/mo',
+        popular: true,
+        features: ['Unlimited pins', '100 reveals/mo', 'Proximity alerts', 'Analytics dashboard'],
+        btnText: 'Choose Powerhouse',
+        btnClass: 'btn-amber',
+        href: 'https://buy.stripe.com/00w4gy0S6fhQ8e45FQ3ZK0f',
+      },
+      {
+        id: 'enterprise',
+        name: 'Enterprise',
+        price: '$199',
+        per: '/mo',
+        features: ['Everything in Powerhouse', 'Unlimited reveals', 'Dedicated support', 'Custom integrations'],
+        btnText: 'Choose Enterprise',
+        btnClass: 'btn-paid',
+        href: 'https://buy.stripe.com/00w8wO30e8Tsamcecm3ZK0g',
+      },
+    ];
+
+    const container = document.getElementById('mpp-plans');
+    container.innerHTML = PLANS.map(p => `
+      <div class="mpp-plan-card${p.popular ? ' mpp-popular' : ''}">
+        ${p.popular ? '<div class="mpp-plan-badge">MOST POPULAR</div>' : ''}
+        <div class="mpp-plan-name">${p.name}</div>
+        <div class="mpp-plan-price">
+          <span class="price-amt">${p.price}</span>
+          <span class="price-per">${p.per}</span>
+        </div>
+        <ul class="mpp-plan-features">
+          ${p.features.map(f => `<li>${f}</li>`).join('')}
+        </ul>
+        ${p.href
+          ? `<a href="${p.href}" class="mpp-plan-btn ${p.btnClass}">${p.btnText}</a>`
+          : `<button class="mpp-plan-btn ${p.btnClass}" onclick="document.getElementById('modal-auth').style.display='none'; window.DirtLink._resumePendingPermitAction();">${p.btnText}</button>`
+        }
+      </div>
+    `).join('');
+
+    // Switch to step 2 within the same auth modal
+    document.getElementById('auth-step-1').style.display = 'none';
+    document.getElementById('auth-step-2').style.display = '';
+    // Widen modal for 4-column plan grid
+    document.querySelector('#modal-auth .modal').classList.add('modal-plan-picker');
   },
 
   _resumePendingPermitAction() {
@@ -484,6 +664,7 @@ window.DirtLink = {
       if (res.ok) {
         this.pins = await res.json();
         window.renderPins(this.pins);
+        this.updateMaterialCounts();
       }
     } catch (e) { console.error('Failed to load pins', e); }
   },
@@ -593,28 +774,13 @@ window.DirtLink = {
   applyFilters() {
     const typeBtn = document.querySelector('.pin-type-btn.active');
     const pinType = typeBtn ? typeBtn.dataset.filterType : 'all';
-    const materialFilter = document.getElementById('filter-material').value;
     const testedOnly = document.getElementById('filter-tested').checked;
     const myCompanyOnly = document.getElementById('filter-my-company').checked;
     const activeNowOnly = document.getElementById('filter-active-now').classList.contains('active');
-    const legendFilter = this._legendFilter || null;
 
     const filtered = this.pins.filter(p => {
       if (pinType !== 'all' && p.pin_type !== pinType) return false;
-      // Legend filter overrides material select — filters by type AND category independently
-      if (legendFilter) {
-        if (p.pin_type !== legendFilter.pinType) return false;
-        const mat = MATERIALS[p.material_type];
-        if (!mat || mat.category !== legendFilter.cat) return false;
-      } else if (materialFilter) {
-        if (materialFilter.startsWith('cat:')) {
-          const catKey = materialFilter.replace('cat:', '');
-          const mat = MATERIALS[p.material_type];
-          if (!mat || mat.category !== catKey) return false;
-        } else {
-          if (p.material_type !== materialFilter) return false;
-        }
-      }
+      if (this._materialFilters.size > 0 && !this._materialFilters.has(MATERIALS[p.material_type]?.category)) return false;
       if (testedOnly && !p.is_tested) return false;
       if (myCompanyOnly && this.user && p.company_name !== this.user.company_name) return false;
       if (activeNowOnly && p.timeline_date !== 'now') return false;
@@ -846,44 +1012,148 @@ window.DirtLink = {
     this.loadPins();
   },
 
-  // Pin detail popup
-  async showPinDetail(pinId) {
-    const res = await fetch(`/api/pins/${pinId}`);
-    if (!res.ok) return;
-    const pin = await res.json();
-    const color = getPinColor(pin.pin_type, pin.material_type);
+  // Open right-side pin detail panel
+  openPinPanel(pinOrId) {
+    const panel = document.getElementById('pin-panel');
+    const content = document.getElementById('pin-panel-content');
+    content.innerHTML = '<div class="pp-panel-loading">Loading…</div>';
+    panel.classList.add('open');
+    if (window.map) window.map.invalidateSize();
 
-    const timelineDetailHtml = this._getTimelineDetailHtml(pin);
-    document.getElementById('pin-detail-content').innerHTML = `
-      <div class="pin-detail">
-        <div class="pin-detail-header" style="border-left: 4px solid ${color}">
-          <span class="pin-type-badge" style="background:${color}">
-            ${pin.pin_type === 'have' ? '&#9650; HAVE' : '&#9660; NEED'}
-          </span>
-          <span class="pin-material-lg">${MATERIALS[pin.material_type]?.label || pin.material_type}</span>
-          ${pin.is_tested ? '<span class="tested-badge">Tested</span>' : ''}
-          ${pin.timeline_date === 'now' ? '<span class="now-badge">Active Now</span>' : ''}
+    const id = typeof pinOrId === 'object' ? pinOrId.id : pinOrId;
+    this.showPinDetail(id);
+  },
+
+  closePinPanel() {
+    const panel = document.getElementById('pin-panel');
+    panel.classList.remove('open');
+    if (window.map) setTimeout(() => window.map.invalidateSize(), 230);
+    if (window.clearActiveMarker) window.clearActiveMarker();
+  },
+
+  // Pin detail — renders into right panel
+  async showPinDetail(pinId) {
+    const [pinRes, reveals] = await Promise.all([
+      fetch(`/api/pins/${pinId}`),
+      this.user ? this.getRevealStatus() : Promise.resolve(null)
+    ]);
+    if (!pinRes.ok) return;
+    const pin = await pinRes.json();
+    const color = getPinColor(pin.pin_type, pin.material_type);
+    const materialLabel = MATERIALS[pin.material_type]?.label || pin.material_type;
+    const isHave = pin.pin_type === 'have';
+
+    // Timeline
+    let timelineHtml = '';
+    if (pin.timeline_date === 'now') {
+      timelineHtml = `<div class="pp-timeline-panel"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--primary);margin-right:2px"></span>Active Now</div>`;
+    } else if (pin.timeline_date) {
+      const d = new Date(pin.timeline_date + 'T00:00');
+      const today = new Date(); today.setHours(0,0,0,0);
+      const isPast = d < today;
+      timelineHtml = `<div class="pp-timeline-panel${isPast ? ' stale' : ''}">${isPast ? '⚠ ' : ''}${isHave ? 'Remove by' : 'Need by'}: ${d.toLocaleDateString()}</div>`;
+    }
+
+    // Photos
+    const photosHtml = pin.photos && pin.photos.length > 0
+      ? pin.photos.map(ph => `<a href="${ph.file_path}" target="_blank"><img src="${ph.file_path}" alt="Photo"></a>`).join('')
+      : '<div class="pp-no-photos">No photos uploaded</div>';
+
+    // Actions
+    // Reveals remaining note
+    let revealsNote = '';
+    if (this.user && reveals && reveals.limit !== -1 && this.user.id !== pin.user_id) {
+      const low = reveals.remaining <= Math.ceil(reveals.limit * 0.3);
+      const empty = reveals.remaining === 0;
+      const color2 = empty ? '#DC2626' : low ? '#B45309' : 'var(--text-muted)';
+      const buyBtn = (low || empty)
+        ? `<a href="https://buy.stripe.com/7sY6oGcAO3z8amc3xI3ZK0e" target="_blank" class="btn btn-outline btn-sm" style="font-size:11px;padding:3px 10px;height:auto;line-height:1.4">Buy more</a>`
+        : '';
+      revealsNote = `<div style="display:flex;align-items:center;justify-content:center;gap:8px">
+        <span style="font-size:11px;color:${color2}">${empty ? '0 reveals left' : `${reveals.remaining} reveal${reveals.remaining !== 1 ? 's' : ''} left`}</span>
+        ${buyBtn}
+      </div>`;
+    }
+
+    let actionsHtml = '';
+    if (!this.user) {
+      actionsHtml = `<button class="btn btn-outline" onclick="document.getElementById('modal-login').style.display='flex'">Log in to contact</button>`;
+    } else if (this.user.id === pin.user_id) {
+      actionsHtml = `<span style="font-size:13px;color:var(--text-muted);padding:4px 0">This is your pin</span>`;
+    } else {
+      actionsHtml = `
+        <div style="display:flex;flex-direction:column;gap:8px;width:100%">
+          ${revealsNote ? `<div style="text-align:center">${revealsNote}</div>` : ''}
+          <button class="btn btn-primary btn-full" onclick="DirtLink.startConversation('${pin.id}')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Message site
+          </button>
         </div>
-        <h2>${this.escapeHtml(pin.title)}</h2>
-        <p class="pin-company">${this.escapeHtml(pin.company_name)} &mdash; ${this.escapeHtml(pin.contact_name)}</p>
-        ${timelineDetailHtml}
-        ${pin.description ? `<p class="pin-description">${this.escapeHtml(pin.description)}</p>` : ''}
-        ${pin.quantity_estimate ? `<p><strong>Quantity:</strong> ~${pin.quantity_estimate} ${pin.quantity_unit?.replace('_', ' ')}</p>` : ''}
-        ${pin.address ? `<p><strong>Address:</strong> ${this.escapeHtml(pin.address)}</p>` : ''}
-        ${pin.photos && pin.photos.length > 0 ? `
-          <div class="pin-photo-gallery">
-            ${pin.photos.map(ph => `<a href="${ph.file_path}" target="_blank"><img src="${ph.file_path}" alt="Material photo"></a>`).join('')}
+      `;
+    }
+
+    const shortId = pin.id ? pin.id.toString().slice(0,6).toUpperCase() : '——';
+
+    document.getElementById('pin-panel-content').innerHTML = `
+      <div class="pp-meta-row">
+        <span class="pp-listing-id">Listing · #${shortId}</span>
+        <span class="pp-type-badge" style="background:${color}">${isHave ? '▲ HAVE' : '▼ NEED'}</span>
+      </div>
+
+      <div class="pp-main">
+        <div class="pp-title-lg">${this.escapeHtml(pin.title)}</div>
+        <div class="pp-company-lg">${this.escapeHtml(pin.company_name)}</div>
+        ${timelineHtml}
+      </div>
+
+      <div class="pp-stats">
+        <div class="pp-stat-row">
+          <span class="pp-stat-label">Material</span>
+          <span class="pp-stat-value">${this.escapeHtml(materialLabel)}</span>
+        </div>
+        ${pin.quantity_estimate ? `
+        <div class="pp-stat-row">
+          <span class="pp-stat-label">Quantity</span>
+          <span class="pp-stat-value">~${pin.quantity_estimate} ${(pin.quantity_unit || '').replace('_', ' ')}</span>
+        </div>` : ''}
+        ${pin.address ? `
+        <div class="pp-stat-row">
+          <span class="pp-stat-label">Address</span>
+          <span class="pp-stat-value" style="max-width:180px;text-align:right">${this.escapeHtml(pin.address)}</span>
+        </div>` : ''}
+        ${pin.is_tested ? `
+        <div class="pp-stat-row">
+          <span class="pp-stat-label">Access</span>
+          <span class="pp-stat-value" style="color:var(--success);font-weight:600">✓ Tested</span>
+        </div>` : ''}
+        ${pin.description ? `
+        <div class="pp-stat-row" style="align-items:flex-start">
+          <span class="pp-stat-label">Notes</span>
+          <span class="pp-stat-value pp-description" style="max-width:190px;text-align:right">${this.escapeHtml(pin.description)}</span>
+        </div>` : ''}
+      </div>
+
+      <div class="pp-section">
+        <div class="pp-section-title">Site Photos</div>
+        <div class="pp-photos">${photosHtml}</div>
+        ${pin.test_report_path ? `<a href="${pin.test_report_path}" target="_blank" class="btn btn-sm btn-outline" style="margin-top:10px;display:inline-flex">View Test Report</a>` : ''}
+      </div>
+
+      <div class="pp-section">
+        <div class="pp-section-title">Owner</div>
+        <div class="pp-owner">
+          <div class="pp-owner-avatar">${(pin.company_name || '?')[0].toUpperCase()}</div>
+          <div>
+            <div class="pp-owner-name">${this.escapeHtml(pin.company_name)}</div>
+            ${pin.contact_name ? `<div class="pp-owner-sub">${this.escapeHtml(pin.contact_name)}</div>` : ''}
           </div>
-        ` : ''}
-        ${pin.test_report_path ? `<p><a href="${pin.test_report_path}" target="_blank" class="btn btn-sm btn-outline">View Test Report</a></p>` : ''}
-        ${pin.is_tested && !pin.test_report_path ? '<p><em>Material tested (report not uploaded)</em></p>' : ''}
-        <hr>
-        ${this.user && this.user.id !== pin.user_id
-          ? `<button class="btn btn-primary" onclick="DirtLink.startConversation('${pin.id}')">Send Message</button>`
-          : this.user ? '<p class="hint">This is your pin</p>' : '<p class="hint">Log in to send a message</p>'}
+        </div>
+      </div>
+
+      <div class="pp-panel-actions">
+        ${actionsHtml}
       </div>
     `;
-    document.getElementById('modal-pin-detail').style.display = 'flex';
   },
 
   // Permanent pin detail modal — clean grouped layout
@@ -1401,6 +1671,15 @@ window.DirtLink = {
   },
 
   async startCheckout(plan) {
+    const STRIPE_LINKS = {
+      pro:         'https://buy.stripe.com/7sY6oGcAO3z8amc3xI3ZK0e',
+      powerhouse:  'https://buy.stripe.com/00w4gy0S6fhQ8e45FQ3ZK0f',
+      enterprise:  'https://buy.stripe.com/00w8wO30e8Tsamcecm3ZK0g',
+    };
+    if (STRIPE_LINKS[plan]) {
+      window.location.href = STRIPE_LINKS[plan];
+      return;
+    }
     const res = await fetch('/api/billing/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
