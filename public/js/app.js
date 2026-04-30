@@ -21,6 +21,88 @@ window.DirtLink = {
     this.pollUnread();
     this.initProximityBell();
     this.pollProximityAlerts();
+    this._handleListFillIntent();
+  },
+
+  // Detect ?action=list-fill in the URL (set by the disposal-cost calculator's
+  // "List this fill" CTA via the /calgary/list-fill redirect) and kick the
+  // user into the pin-drop flow with stashed pre-fill values for the modal.
+  _handleListFillIntent() {
+    try {
+      const p = new URLSearchParams(window.location.search);
+      if (p.get('action') !== 'list-fill') return;
+      const loads = parseInt(p.get('loads'), 10);
+      const type = p.get('type');
+      const zone = p.get('zone');
+      this._calcPrefill = {
+        loads: Number.isFinite(loads) ? loads : null,
+        type: type || null,
+        zone: zone || null,
+        source: p.get('source') || null
+      };
+      // Strip the action params so refresh / share doesn't re-trigger
+      const clean = window.location.pathname;
+      window.history.replaceState(null, '', clean);
+      // Slight delay so the map is ready before the crosshair shows
+      setTimeout(() => this.startPinDrop(), 250);
+    } catch (e) { /* ignore — never break init on intent parse errors */ }
+  },
+
+  // Calculator material → dirt-link subcategory key (when we're confident).
+  // Returns null for ambiguous cases so the user picks manually.
+  _calcMaterialToSubcategory(type) {
+    return ({
+      'clean-fill': 'clean_fill',
+      'topsoil':    'topsoil',
+      'sod':        'organic_material'
+      // 'mixed' intentionally omitted — too ambiguous, let user pick
+    })[type] || null;
+  },
+
+  // Called from confirmPinLocation() right before the form modal opens.
+  // No-op when there's no stashed pre-fill.
+  _applyCalcPrefill() {
+    if (!this._calcPrefill) return;
+    const pre = this._calcPrefill;
+    this._calcPrefill = null;  // single-shot
+
+    // 1. Force HAVE since they're disposing of fill
+    const haveRadio = document.querySelector('#form-pin input[name="pin_type"][value="have"]');
+    if (haveRadio) haveRadio.checked = true;
+
+    // 2. Pre-fill material when mapping is unambiguous
+    const sub = this._calcMaterialToSubcategory(pre.type);
+    if (sub) {
+      const sel = document.getElementById('pin-material');
+      if (sel) sel.value = sub;
+    }
+
+    // 3. Pre-fill quantity (loads × 14 yd³ per tandem)
+    if (pre.loads != null) {
+      const qty = document.getElementById('pin-qty');
+      const unit = document.getElementById('pin-unit');
+      if (qty && !qty.value) qty.value = String(pre.loads * 14);
+      if (unit && !unit.value) unit.value = 'cubic_yards';
+    }
+
+    // 4. Title hint — only when blank
+    const titleEl = document.getElementById('pin-title');
+    if (titleEl && !titleEl.value) {
+      const typeLabel = ({
+        'clean-fill': 'Clean fill', 'topsoil': 'Topsoil',
+        'sod': 'Sod', 'mixed': 'Mixed fill'
+      })[pre.type] || 'Fill';
+      const zoneSuffix = pre.zone ? ` (${pre.zone} Calgary)` : '';
+      titleEl.value = `${typeLabel} — ~${pre.loads || ''} loads${zoneSuffix}`.replace('~ loads', 'loads');
+    }
+
+    // 5. Surface where the pre-fill came from in the location hint, so the
+    //    user understands why fields are populated.
+    const hint = document.getElementById('pin-location-hint');
+    if (hint) {
+      const existing = hint.textContent;
+      hint.textContent = existing + ' · Pre-filled from disposal cost calculator';
+    }
   },
 
   populateClaimMaterialSelect() {
@@ -724,6 +806,7 @@ window.DirtLink = {
     document.getElementById('pin-location-hint').textContent = `Location: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
 
     document.getElementById('drop-instruction').style.display = 'none';
+    this._applyCalcPrefill();
     document.getElementById('modal-pin').style.display = 'flex';
   },
 

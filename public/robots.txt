@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /uploads/
+Disallow: /calculators/
+
+Sitemap: https://dirtlink.ca/sitemap.xml

@@ -1,0 +1,22 @@
+{
+  "tipping": {
+    "clean-fill": 10,
+    "topsoil": 10,
+    "sod": 113,
+    "mixed": 180
+  },
+  "smallLoadFlat": 25,
+  "smallLoadThresholdKg": 250,
+  "trucking": {
+    "hourly": 120,
+    "tonnesPerLoad": 18
+  },
+  "tripTime": {
+    "NE": 1.5,
+    "NW": 2.0,
+    "SE": 1.0,
+    "SW": 2.5
+  },
+  "ratesVerifiedDate": "2026-04-29",
+  "ratesSource": "City of Calgary — Landfill Commercial materials and rates / Landfill and Eco Centre residential materials and rates"
+}

@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "test": "node --test test/*.test.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -19,5 +20,9 @@
     "stripe": "^22.0.1",
     "twilio": "^5.13.1",
     "uuid": "^11.0.3"
+  },
+  "devDependencies": {
+    "axe-core": "^4.11.4",
+    "jsdom": "^29.1.0"
   }
 }

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Volume Calculator — QA Demo (internal)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #F3F0EB;
+      color: #1A1410;
+      padding: 24px 16px 80px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    .qa-banner {
+      max-width: 720px; margin: 0 auto 28px;
+      background: #FFFBEB; border: 1px solid #FCD34D;
+      border-radius: 10px; padding: 14px 18px;
+      font-size: 13px; color: #78350F;
+    }
+    .qa-banner strong { color: #1A1410; display: block; margin-bottom: 4px; font-size: 14px; }
+    main { max-width: 720px; margin: 0 auto; }
+    h1 { font-size: 22px; font-weight: 800; margin-bottom: 6px; letter-spacing: -0.3px; }
+    .lede { font-size: 14px; color: #8A7E74; margin-bottom: 28px; }
+    section { margin-bottom: 36px; }
+    .section-head {
+      display: flex; align-items: baseline; justify-content: space-between;
+      margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid #E2D9CF;
+    }
+    .section-head h2 { font-size: 15px; font-weight: 700; }
+    .section-head .meta { font-size: 12px; color: #8A7E74; font-family: ui-monospace, SFMono-Regular, monospace; }
+  </style>
+</head>
+<body>
+
+  <div class="qa-banner">
+    <strong>⚙ QA Demo Page (not linked publicly)</strong>
+    Three placeholder divs hydrated by <code>/dist/calculators/volume.js</code>.
+    Each carries different <code>data-material-type</code>, <code>data-cta-label</code>,
+    and <code>data-cta-href</code> values to verify per-instance config.
+  </div>
+
+  <main>
+    <h1>Volume Calculator — multi-instance test</h1>
+    <p class="lede">If everything works, all three widgets render independently with their own state, CTAs, and analytics events.</p>
+
+    <section>
+      <div class="section-head">
+        <h2>1. Topsoil</h2>
+        <div class="meta">data-material-type="topsoil"</div>
+      </div>
+      <div data-calculator="volume"
+           data-material-type="topsoil"
+           data-cta-label="Browse topsoil listings"
+           data-cta-href="/calgary/topsoil#listings"></div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>2. Gravel</h2>
+        <div class="meta">data-material-type="gravel"</div>
+      </div>
+      <div data-calculator="volume"
+           data-material-type="gravel"
+           data-cta-label="Browse gravel listings"
+           data-cta-href="/calgary/gravel#listings"></div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>3. Mulch</h2>
+        <div class="meta">data-material-type="mulch"</div>
+      </div>
+      <div data-calculator="volume"
+           data-material-type="mulch"
+           data-cta-label="Browse mulch listings"
+           data-cta-href="/calgary/mulch#listings"></div>
+    </section>
+  </main>
+
+  <script src="/dist/calculators/volume.js" defer></script>
+</body>
+</html>

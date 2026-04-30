@@ -9,6 +9,27 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="/css/style.css" />
+
+  <!-- Google Analytics 4 — server injects measurement ID from GA_MEASUREMENT_ID env var.
+       If unset, the loader stays empty and analytics no-op silently. -->
+  <meta name="ga-measurement-id" content="{{GA_MEASUREMENT_ID}}">
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+  </script>
+  <script>
+    (function(){
+      var meta = document.querySelector('meta[name="ga-measurement-id"]');
+      var id = meta && meta.getAttribute('content');
+      if (!id) return;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(id);
+      document.head.appendChild(s);
+      gtag('js', new Date());
+      gtag('config', id);
+    })();
+  </script>
 </head>
 <body>
   <!-- Header -->

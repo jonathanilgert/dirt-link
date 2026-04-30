@@ -323,6 +323,22 @@ async function getDb() {
     )
   `);
 
+  // Calculator leads — captured from the disposal-cost calculator (and
+  // future calculator widgets). DB is the system of record; admin email
+  // is the immediate alert. See routes/leads.js + services/leads.js.
+  db.run(`
+    CREATE TABLE IF NOT EXISTS leads (
+      id TEXT PRIMARY KEY,
+      email TEXT NOT NULL,
+      name TEXT,
+      source TEXT NOT NULL,
+      inputs TEXT,
+      result TEXT,
+      status TEXT NOT NULL DEFAULT 'new',
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `);
+
   // Audit log for API calls
   db.run(`
     CREATE TABLE IF NOT EXISTS audit_log (
@@ -358,6 +374,10 @@ async function getDb() {
     'CREATE INDEX IF NOT EXISTS idx_permanent_pins_claimed ON permanent_pins(claimed_by)',
     'CREATE INDEX IF NOT EXISTS idx_audit_log_key ON audit_log(api_key_id)',
     'CREATE INDEX IF NOT EXISTS idx_audit_log_created ON audit_log(created_at)',
+    'CREATE INDEX IF NOT EXISTS idx_leads_source ON leads(source)',
+    'CREATE INDEX IF NOT EXISTS idx_leads_status ON leads(status)',
+    'CREATE INDEX IF NOT EXISTS idx_leads_created ON leads(created_at)',
+    'CREATE INDEX IF NOT EXISTS idx_leads_email ON leads(email)',
     'CREATE INDEX IF NOT EXISTS idx_inquiries_permit ON inquiries(permit_pin_id)',
     'CREATE INDEX IF NOT EXISTS idx_inquiries_user ON inquiries(user_id)',
     'CREATE INDEX IF NOT EXISTS idx_permit_pins_claimed ON permit_pins(claimed_by)',

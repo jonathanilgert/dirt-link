@@ -48,6 +48,13 @@ app.get(['/app', '/app/*'], (req, res) => {
 // Redirect bare /index.html to /app for anyone with old bookmarks
 app.get('/index.html', (req, res) => res.redirect(301, '/app'));
 
+// Public-readable rate sheet — served explicitly so the rest of /data
+// (including dirtlink.db) stays private.
+app.get('/data/calgary-rates.json', (req, res) => {
+  res.sendFile(path.join(__dirname, 'data', 'calgary-rates.json'));
+});
+
+
 // Geocoding proxy (Nominatim blocks browser requests without proper User-Agent)
 app.get('/api/geocode', async (req, res) => {
   const { q } = req.query;
@@ -86,6 +93,7 @@ app.use('/api/keys', require('./routes/apiKeys'));
 app.use('/api/external', require('./routes/externalApi'));
 app.use('/api/inbound', require('./routes/inbound'));
 app.use('/api/proximity', require('./routes/proximity'));
+app.use('/api/leads', require('./routes/leads'));
 
 // Unsubscribe from email notifications (token-based, no auth required)
 app.get('/unsubscribe/:token', (req, res) => {
@@ -138,6 +146,43 @@ app.post('/api/admin/create-key', (req, res) => {
     key,
     message: 'Store this key securely — it will not be shown again.'
   });
+});
+
+// ── /calgary/list-fill — calculator funnel into the pin-creation flow ──────
+// The disposal-cost calculator's primary CTA points here with query params
+// (loads, type, zone, source). We redirect into the SPA at /app with
+// action=list-fill so app.js can detect the intent, open the pin modal,
+// and pre-fill from the calculator. A future static landing page can
+// replace this redirect.
+app.get('/calgary/list-fill', (req, res) => {
+  const params = new URLSearchParams(req.query);
+  params.set('action', 'list-fill');
+  res.redirect(302, '/app?' + params.toString());
+});
+
+// ── Calculator landing pages ────────────────────────────────────────────────
+// Static HTML host pages for the embeddable calculator widgets. We render
+// through this handler (rather than express.static) so we can inject the
+// GA_MEASUREMENT_ID env var into the page at request time.
+const CALCULATOR_PAGES = {
+  '/calgary/dirt-disposal-cost': 'calgary/dirt-disposal-cost.html'
+};
+
+function renderCalculatorPage(req, res, relPath) {
+  const filePath = path.join(__dirname, 'public', relPath);
+  fs.readFile(filePath, 'utf8', (err, html) => {
+    if (err) return res.status(404).send('Not found');
+    const gaId = process.env.GA_MEASUREMENT_ID || '';
+    const out = html
+      .replace(/\{\{GA_MEASUREMENT_ID\}\}/g, gaId)
+      .replace(/\{\{GA_ENABLED\}\}/g, gaId ? 'true' : 'false');
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(out);
+  });
+}
+
+Object.entries(CALCULATOR_PAGES).forEach(([route, file]) => {
+  app.get(route, (req, res) => renderCalculatorPage(req, res, file));
 });
 
 // Catch-all → redirect to landing
