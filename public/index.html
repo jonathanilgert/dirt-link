@@ -232,6 +232,9 @@
           <div id="pin-panel-content" class="pin-panel-content"></div>
         </div>
       </div>
+
+      <!-- Mobile: Sidebar overlay — inside view-map so z-index compares correctly with sidebar -->
+      <div id="mobile-sidebar-overlay" class="mobile-sidebar-overlay" onclick="DirtLink.closeMobileSidebar()"></div>
     </div>
 
     <!-- My Pins View -->
@@ -275,9 +278,6 @@
       </div>
     </div>
   </main>
-
-  <!-- Mobile: Sidebar drawer overlay -->
-  <div id="mobile-sidebar-overlay" class="mobile-sidebar-overlay" onclick="DirtLink.closeMobileSidebar()"></div>
 
   <!-- Mobile: Bottom navigation bar -->
   <nav id="mobile-bottom-nav" class="mobile-bottom-nav">

@@ -2871,7 +2871,7 @@ main {
     overflow: hidden;
     transform: translateY(110%);
     transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    z-index: 480;
+    z-index: 500; /* above sidebar (495) and overlay (490) — all in same view-map stacking context */
   }
   .pin-panel.open {
     width: 100% !important;

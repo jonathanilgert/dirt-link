@@ -296,4 +296,10 @@ window.getSiteConfig = getSiteConfig;
 window.SITE_TYPE_CONFIG = SITE_TYPE_CONFIG;
 
 // Init when DOM is ready
-document.addEventListener('DOMContentLoaded', initMap);
+document.addEventListener('DOMContentLoaded', () => {
+  initMap();
+  // Re-measure after CSS layout settles (fixes pin misalignment on mobile fixed layout)
+  requestAnimationFrame(() => {
+    setTimeout(() => { if (window.map) window.map.invalidateSize(); }, 200);
+  });
+});
