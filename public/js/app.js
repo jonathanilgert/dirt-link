@@ -22,6 +22,8 @@ window.DirtLink = {
     this.initProximityBell();
     this.pollProximityAlerts();
     this._handleListFillIntent();
+    // Mobile: set initial active view class
+    document.body.classList.add('view-map-active');
   },
 
   // Detect ?action=list-fill in the URL (set by the disposal-cost calculator's
@@ -551,10 +553,24 @@ window.DirtLink = {
       const initial = (this.user.company_name || '?')[0].toUpperCase();
       document.querySelectorAll('#profile-avatar, #profile-avatar-lg').forEach(el => el.textContent = initial);
       document.getElementById('filter-company-group').style.display = 'flex';
+      // Mobile drawer: show user section, hide auth section
+      const drawerAuth = document.getElementById('mnd-auth-section');
+      const drawerUser = document.getElementById('mnd-user-section');
+      if (drawerAuth) drawerAuth.style.display = 'none';
+      if (drawerUser) drawerUser.style.display = 'flex';
+      const drawerCompany = document.getElementById('user-company-drawer');
+      const drawerAvatar = document.getElementById('profile-avatar-drawer');
+      if (drawerCompany) drawerCompany.textContent = this.user.company_name;
+      if (drawerAvatar) drawerAvatar.textContent = initial;
     } else {
       document.getElementById('auth-area').style.display = 'flex';
       document.getElementById('user-area').style.display = 'none';
       document.getElementById('filter-company-group').style.display = 'none';
+      // Mobile drawer: show auth section, hide user section
+      const drawerAuth = document.getElementById('mnd-auth-section');
+      const drawerUser = document.getElementById('mnd-user-section');
+      if (drawerAuth) drawerAuth.style.display = 'flex';
+      if (drawerUser) drawerUser.style.display = 'none';
     }
   },
 
@@ -1114,6 +1130,58 @@ window.DirtLink = {
     if (window.clearActiveMarker) window.clearActiveMarker();
   },
 
+  // Mobile: switch view via bottom nav or drawer
+  switchView(viewName, btn) {
+    document.querySelectorAll('.nav-btn, .mobile-nav-item, .mnd-nav-item').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    // Mark desktop nav, bottom nav, AND drawer nav items active
+    document.querySelectorAll(`[data-view="${viewName}"]`).forEach(b => b.classList.add('active'));
+    const viewEl = document.getElementById(`view-${viewName}`);
+    if (viewEl) viewEl.classList.add('active');
+    if (viewName === 'messages') this.loadConversations();
+    if (viewName === 'my-pins') this.loadMyPins();
+    if (viewName === 'account') { this.showProfileModal(); }
+    if (viewName === 'map' && window.map) window.map.invalidateSize();
+    if (viewName !== 'map') this.closePinPanel();
+    document.body.classList.toggle('view-map-active', viewName === 'map');
+  },
+
+  // Mobile: nav drawer (burger menu)
+  toggleMobileMenu() {
+    const drawer = document.getElementById('mobile-nav-drawer');
+    const overlay = document.getElementById('mobile-nav-overlay');
+    const isOpen = drawer.classList.contains('open');
+    drawer.classList.toggle('open', !isOpen);
+    overlay.classList.toggle('active', !isOpen);
+  },
+
+  closeMobileMenu() {
+    document.getElementById('mobile-nav-drawer').classList.remove('open');
+    document.getElementById('mobile-nav-overlay').classList.remove('active');
+  },
+
+  // Mobile: sidebar filter drawer
+  toggleMobileSidebar() {
+    const sidebar = document.getElementById('map-sidebar');
+    const overlay = document.getElementById('mobile-sidebar-overlay');
+    const isOpen = sidebar.classList.contains('mobile-open');
+    sidebar.classList.toggle('mobile-open', !isOpen);
+    overlay.classList.toggle('active', !isOpen);
+  },
+
+  closeMobileSidebar() {
+    document.getElementById('map-sidebar').classList.remove('mobile-open');
+    document.getElementById('mobile-sidebar-overlay').classList.remove('active');
+  },
+
+  // Mobile: messages back button
+  closeMobileThread() {
+    const messagesLayout = document.querySelector('.messages-layout');
+    if (messagesLayout) messagesLayout.classList.remove('thread-open');
+    const backBtn = document.getElementById('btn-back-to-convos');
+    if (backBtn) backBtn.style.display = 'none';
+  },
+
   // Pin detail — renders into right panel
   async showPinDetail(pinId) {
     const [pinRes, reveals] = await Promise.all([
@@ -1387,11 +1455,17 @@ window.DirtLink = {
       if (res.ok) {
         const { count } = await res.json();
         const badge = document.getElementById('unread-badge');
+        const mobileBadge = document.getElementById('mobile-unread-badge');
+        const drawerBadge = document.getElementById('mobile-unread-badge-drawer');
         if (count > 0) {
           badge.textContent = count;
           badge.style.display = 'inline';
+          if (mobileBadge) { mobileBadge.textContent = count; mobileBadge.style.display = 'flex'; }
+          if (drawerBadge) { drawerBadge.textContent = count; drawerBadge.style.display = 'flex'; }
         } else {
           badge.style.display = 'none';
+          if (mobileBadge) mobileBadge.style.display = 'none';
+          if (drawerBadge) drawerBadge.style.display = 'none';
         }
       }
     } catch (e) { /* ignore */ }

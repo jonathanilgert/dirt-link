@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Open Data Attribution — DirtLink</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F5F2EC; --surface: #FFFFFF; --ink: #1C1F22; --ink-2: #3A3F45;
+  --ink-3: #6B7078; --ink-4: #9CA1A8; --hairline: #E5DFD2; --accent: #D43E00;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter Tight', -apple-system, sans-serif; background: var(--bg); color: var(--ink); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+/* Top bar */
+.topbar { background: var(--surface); border-bottom: 1px solid var(--hairline); padding: 0 32px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.topbar-logo { display: flex; align-items: center; gap: 9px; text-decoration: none; color: var(--ink); font-weight: 600; font-size: 16px; }
+.topbar-logo svg { flex-shrink: 0; }
+.topbar-back { font-size: 13px; color: var(--ink-3); text-decoration: none; display: flex; align-items: center; gap: 5px; }
+.topbar-back:hover { color: var(--ink); }
+
+/* Layout */
+.layout { display: grid; grid-template-columns: 240px 1fr; max-width: 1100px; margin: 0 auto; padding: 48px 32px; gap: 64px; align-items: start; }
+
+/* Sidebar */
+.sidebar { position: sticky; top: 80px; }
+.sidebar-label { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-4); margin-bottom: 12px; }
+.legal-nav-link { display: block; font-size: 13px; color: var(--ink-3); text-decoration: none; padding: 7px 10px; border-radius: 5px; margin-bottom: 1px; line-height: 1.4; transition: background .12s, color .12s; }
+.legal-nav-link:hover { background: var(--surface); color: var(--ink); }
+.legal-nav-link.active { background: var(--surface); color: var(--ink); font-weight: 500; box-shadow: 0 1px 3px rgba(0,0,0,0.07); }
+
+/* Content */
+.content { min-width: 0; }
+.doc-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.doc-meta span { font-size: 12px; color: var(--ink-4); }
+.doc-meta span + span::before { content: '·'; margin-right: 12px; }
+h1 { font-size: clamp(26px, 3vw, 38px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 32px; }
+
+/* Placeholder notice */
+.placeholder-notice {
+  background: #FFF8F0; border: 1.5px dashed #F59E0B; border-radius: 10px;
+  padding: 28px 32px; margin-bottom: 40px;
+}
+.placeholder-notice h3 { font-size: 15px; font-weight: 600; color: #92400E; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.placeholder-notice p { font-size: 14px; color: #B45309; line-height: 1.6; }
+.placeholder-notice code { background: rgba(245,158,11,0.15); padding: 1px 5px; border-radius: 3px; font-family: monospace; font-size: 13px; }
+
+/* Prose */
+.prose h2 { font-size: 20px; font-weight: 600; margin: 36px 0 12px; letter-spacing: -0.01em; }
+.prose h3 { font-size: 16px; font-weight: 600; margin: 24px 0 8px; }
+.prose p { font-size: 15px; color: var(--ink-2); margin-bottom: 16px; }
+.prose ul, .prose ol { padding-left: 20px; margin-bottom: 16px; }
+.prose li { font-size: 15px; color: var(--ink-2); margin-bottom: 6px; }
+.prose a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(212,62,0,0.25); }
+.prose a:hover { border-color: var(--accent); }
+.prose table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; }
+.prose th { text-align: left; font-weight: 600; padding: 10px 12px; border-bottom: 2px solid var(--hairline); }
+.prose td { padding: 10px 12px; border-bottom: 1px solid var(--hairline); color: var(--ink-2); }
+.prose strong { font-weight: 600; color: var(--ink); }
+.prose hr { border: none; border-top: 1px solid var(--hairline); margin: 32px 0; }
+
+/* Footer */
+.legal-footer { background: var(--surface); border-top: 1px solid var(--hairline); padding: 24px 32px; margin-top: 80px; }
+.legal-footer-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.legal-footer-inner p { font-size: 13px; color: var(--ink-4); }
+.legal-footer-inner a { font-size: 13px; color: var(--ink-3); text-decoration: none; }
+.legal-footer-inner a:hover { color: var(--ink); }
+
+@media (max-width: 768px) {
+  .layout { grid-template-columns: 1fr; gap: 32px; padding: 32px 20px; }
+  .sidebar { position: static; }
+  .topbar { padding: 0 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="/" class="topbar-logo">
+    <svg width="20" height="18" viewBox="0 0 24 22" fill="none">
+      <polygon points="12,2 23,20 1,20" fill="#D43E00"/>
+    </svg>
+    DirtLink
+  </a>
+  <a href="/" class="topbar-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to site
+  </a>
+</div>
+
+<div class="layout">
+
+  <!-- Sidebar nav -->
+  <aside class="sidebar">
+    <div class="sidebar-label">Legal documents</div>
+        <a href="/legal/terms" class="legal-nav-link" data-slug="terms">Terms and Conditions</a>
+        <a href="/legal/privacy" class="legal-nav-link" data-slug="privacy">Privacy Policy</a>
+        <a href="/legal/disclaimer" class="legal-nav-link" data-slug="disclaimer">Disclaimer</a>
+        <a href="/legal/refunds" class="legal-nav-link" data-slug="refunds">Refund and Cancellation Policy</a>
+        <a href="/legal/acceptable-use" class="legal-nav-link" data-slug="acceptable-use">Acceptable Use Policy</a>
+        <a href="/legal/cookies" class="legal-nav-link" data-slug="cookies">Cookie Notice</a>
+        <a href="/legal/copyright" class="legal-nav-link" data-slug="copyright">Copyright Notice and Takedown</a>
+        <a href="/legal/open-data" class="legal-nav-link" data-slug="open-data">Open Data Attribution</a>
+        <a href="/legal/sub-processors" class="legal-nav-link" data-slug="sub-processors">Sub-Processor List</a>
+  </aside>
+
+  <!-- Document -->
+  <main class="content">
+    <div class="doc-meta">
+      <span>DirtLink · Earth Movers Network Inc.</span>
+      <span>Effective: May 12, 2026</span>
+    </div>
+    <h1>Open Data Attribution Notice</h1>
+
+    <div class="prose">
+
+      <p>DirtLink, operated by Earth Movers Network Inc., operating as 'DirtLink', uses open data published by the City of Calgary. This Notice acknowledges that use as required by the City's open data licence.</p>
+
+      <h2>1. Source data</h2>
+      <p>Development permit information displayed on the Service is sourced from the City of Calgary Open Data Portal, available at <a href="https://data.calgary.ca" target="_blank">data.calgary.ca</a>. Specifically, we use the Development Permits dataset and related metadata.</p>
+
+      <h2>2. Licence</h2>
+      <p>The data is provided under the Open Government Licence – City of Calgary, available at <a href="https://data.calgary.ca/stories/s/Open-Calgary-Terms-of-Use/u45n-7awa" target="_blank">data.calgary.ca/stories/s/Open-Calgary-Terms-of-Use/u45n-7awa</a>. This licence permits us to copy, modify, publish, translate, adapt, distribute, and otherwise use the data, subject to the conditions in the licence.</p>
+
+      <h2>3. Required attribution</h2>
+      <p>In accordance with the licence, we display the following attribution on every page of the Service that uses City of Calgary open data, and in every product, derivative work, or service that incorporates the data:</p>
+      <p style="background:var(--bg);border-left:3px solid var(--hairline);padding:12px 16px;border-radius:0 6px 6px 0;font-style:italic;color:var(--ink-2);">Contains information licensed under the Open Government Licence – City of Calgary.</p>
+
+      <h2>4. Disclaimers</h2>
+      <p>We rely on the City of Calgary as the source of permit information. We do not independently verify, validate, or update permit data beyond what the City publishes.</p>
+      <p>Per the Open Government Licence, the City of Calgary excludes all warranties regarding the data, and is not liable for losses arising from its use. The City does not endorse DirtLink or any other product or service that uses its data.</p>
+      <p>Always verify permit information directly with the City of Calgary before relying on it for business decisions. See our <a href="/legal/disclaimer.html">Disclaimer</a> for more.</p>
+
+      <h2>5. Updates</h2>
+      <p>If the City of Calgary changes its open data licence or terms, we will update this Notice and adjust our use of the data accordingly.</p>
+
+      <h2>6. Contact</h2>
+      <p>Questions about DirtLink's use of open data: <a href="mailto:legal@dirtlink.ca">legal@dirtlink.ca</a></p>
+
+      <hr>
+      <p style="font-size:13px; color:var(--ink-4);">Last updated: May 12, 2026</p>
+
+    </div>
+
+  </main>
+</div>
+
+<footer class="legal-footer">
+  <div class="legal-footer-inner">
+    <p>© 2026 Earth Movers Network Inc. · Calgary, Alberta, Canada</p>
+    <div style="display:flex; gap:20px; flex-wrap:wrap;">
+      <a href="/legal/terms">Terms</a>
+      <a href="/legal/privacy">Privacy</a>
+      <a href="/legal/disclaimer">Disclaimer</a>
+      <a href="/legal/acceptable-use">Acceptable Use</a>
+      <a href="/legal/cookies">Cookies</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Highlight active sidebar link
+  const slug = location.pathname.split('/').pop();
+  document.querySelectorAll('.legal-nav-link').forEach(a => {
+    if (a.dataset.slug === slug) a.classList.add('active');
+  });
+</script>
+
+</body>
+</html>

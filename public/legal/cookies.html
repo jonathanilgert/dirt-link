@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cookie Notice — DirtLink</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F5F2EC; --surface: #FFFFFF; --ink: #1C1F22; --ink-2: #3A3F45;
+  --ink-3: #6B7078; --ink-4: #9CA1A8; --hairline: #E5DFD2; --accent: #D43E00;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter Tight', -apple-system, sans-serif; background: var(--bg); color: var(--ink); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+/* Top bar */
+.topbar { background: var(--surface); border-bottom: 1px solid var(--hairline); padding: 0 32px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.topbar-logo { display: flex; align-items: center; gap: 9px; text-decoration: none; color: var(--ink); font-weight: 600; font-size: 16px; }
+.topbar-logo svg { flex-shrink: 0; }
+.topbar-back { font-size: 13px; color: var(--ink-3); text-decoration: none; display: flex; align-items: center; gap: 5px; }
+.topbar-back:hover { color: var(--ink); }
+
+/* Layout */
+.layout { display: grid; grid-template-columns: 240px 1fr; max-width: 1100px; margin: 0 auto; padding: 48px 32px; gap: 64px; align-items: start; }
+
+/* Sidebar */
+.sidebar { position: sticky; top: 80px; }
+.sidebar-label { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-4); margin-bottom: 12px; }
+.legal-nav-link { display: block; font-size: 13px; color: var(--ink-3); text-decoration: none; padding: 7px 10px; border-radius: 5px; margin-bottom: 1px; line-height: 1.4; transition: background .12s, color .12s; }
+.legal-nav-link:hover { background: var(--surface); color: var(--ink); }
+.legal-nav-link.active { background: var(--surface); color: var(--ink); font-weight: 500; box-shadow: 0 1px 3px rgba(0,0,0,0.07); }
+
+/* Content */
+.content { min-width: 0; }
+.doc-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.doc-meta span { font-size: 12px; color: var(--ink-4); }
+.doc-meta span + span::before { content: '·'; margin-right: 12px; }
+h1 { font-size: clamp(26px, 3vw, 38px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 32px; }
+
+/* Placeholder notice */
+.placeholder-notice {
+  background: #FFF8F0; border: 1.5px dashed #F59E0B; border-radius: 10px;
+  padding: 28px 32px; margin-bottom: 40px;
+}
+.placeholder-notice h3 { font-size: 15px; font-weight: 600; color: #92400E; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.placeholder-notice p { font-size: 14px; color: #B45309; line-height: 1.6; }
+.placeholder-notice code { background: rgba(245,158,11,0.15); padding: 1px 5px; border-radius: 3px; font-family: monospace; font-size: 13px; }
+
+/* Prose */
+.prose h2 { font-size: 20px; font-weight: 600; margin: 36px 0 12px; letter-spacing: -0.01em; }
+.prose h3 { font-size: 16px; font-weight: 600; margin: 24px 0 8px; }
+.prose p { font-size: 15px; color: var(--ink-2); margin-bottom: 16px; }
+.prose ul, .prose ol { padding-left: 20px; margin-bottom: 16px; }
+.prose li { font-size: 15px; color: var(--ink-2); margin-bottom: 6px; }
+.prose a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(212,62,0,0.25); }
+.prose a:hover { border-color: var(--accent); }
+.prose table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; }
+.prose th { text-align: left; font-weight: 600; padding: 10px 12px; border-bottom: 2px solid var(--hairline); }
+.prose td { padding: 10px 12px; border-bottom: 1px solid var(--hairline); color: var(--ink-2); }
+.prose strong { font-weight: 600; color: var(--ink); }
+.prose hr { border: none; border-top: 1px solid var(--hairline); margin: 32px 0; }
+
+/* Footer */
+.legal-footer { background: var(--surface); border-top: 1px solid var(--hairline); padding: 24px 32px; margin-top: 80px; }
+.legal-footer-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.legal-footer-inner p { font-size: 13px; color: var(--ink-4); }
+.legal-footer-inner a { font-size: 13px; color: var(--ink-3); text-decoration: none; }
+.legal-footer-inner a:hover { color: var(--ink); }
+
+@media (max-width: 768px) {
+  .layout { grid-template-columns: 1fr; gap: 32px; padding: 32px 20px; }
+  .sidebar { position: static; }
+  .topbar { padding: 0 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="/" class="topbar-logo">
+    <svg width="20" height="18" viewBox="0 0 24 22" fill="none">
+      <polygon points="12,2 23,20 1,20" fill="#D43E00"/>
+    </svg>
+    DirtLink
+  </a>
+  <a href="/" class="topbar-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to site
+  </a>
+</div>
+
+<div class="layout">
+
+  <!-- Sidebar nav -->
+  <aside class="sidebar">
+    <div class="sidebar-label">Legal documents</div>
+        <a href="/legal/terms" class="legal-nav-link" data-slug="terms">Terms and Conditions</a>
+        <a href="/legal/privacy" class="legal-nav-link" data-slug="privacy">Privacy Policy</a>
+        <a href="/legal/disclaimer" class="legal-nav-link" data-slug="disclaimer">Disclaimer</a>
+        <a href="/legal/refunds" class="legal-nav-link" data-slug="refunds">Refund and Cancellation Policy</a>
+        <a href="/legal/acceptable-use" class="legal-nav-link" data-slug="acceptable-use">Acceptable Use Policy</a>
+        <a href="/legal/cookies" class="legal-nav-link" data-slug="cookies">Cookie Notice</a>
+        <a href="/legal/copyright" class="legal-nav-link" data-slug="copyright">Copyright Notice and Takedown</a>
+        <a href="/legal/open-data" class="legal-nav-link" data-slug="open-data">Open Data Attribution</a>
+        <a href="/legal/sub-processors" class="legal-nav-link" data-slug="sub-processors">Sub-Processor List</a>
+  </aside>
+
+  <!-- Document -->
+  <main class="content">
+    <div class="doc-meta">
+      <span>DirtLink · Earth Movers Network Inc.</span>
+      <span>Effective: May 12, 2026</span>
+    </div>
+    <h1>Cookie Notice</h1>
+
+    <div class="prose">
+
+      <p>This Cookie Notice explains how DirtLink, operated by Earth Movers Network Inc., operating as 'DirtLink', uses cookies and similar technologies on dirtlink.ca. It supplements our <a href="/legal/privacy.html">Privacy Policy</a>.</p>
+
+      <h2>1. What cookies are</h2>
+      <p>Cookies are small text files that a website places on your device when you visit. They allow the site to remember your actions and preferences over time. We also use related technologies (local storage, session storage) for similar purposes; references in this Notice to "cookies" include those technologies.</p>
+
+      <h2>2. Cookies we use</h2>
+
+      <h3>Essential cookies</h3>
+      <p>Required for the Service to function. We use them to:</p>
+      <ul>
+        <li>Keep you logged in across pages.</li>
+        <li>Maintain your session and prevent unauthorized access.</li>
+        <li>Remember your map view, filters, and accessibility preferences.</li>
+        <li>Protect against fraud and security threats (e.g., CSRF tokens).</li>
+      </ul>
+      <p>You cannot turn off essential cookies without breaking core functionality of the Service.</p>
+
+      <h3>Analytics cookies</h3>
+      <p>We do not currently use analytics cookies. If we add an analytics provider in the future, we will:</p>
+      <ul>
+        <li>Update this Notice and our <a href="/legal/privacy.html">Privacy Policy</a>.</li>
+        <li>Add the provider to our <a href="/legal/sub-processors.html">Sub-Processor List</a>.</li>
+        <li>Where required by law, present a consent banner before non-essential analytics cookies are set.</li>
+        <li>Notify existing users by email of the change.</li>
+      </ul>
+
+      <h3>Advertising cookies</h3>
+      <p>We do not use advertising cookies. We do not run ads on DirtLink and we do not allow third-party advertising trackers on the Service.</p>
+
+      <h2>3. How to manage cookies</h2>
+      <p>Most browsers let you control cookies through settings. Common options:</p>
+      <ul>
+        <li><strong>Block all cookies</strong> — will break the Service; not recommended.</li>
+        <li><strong>Block third-party cookies</strong> — has minimal impact on the Service.</li>
+        <li><strong>Delete cookies on browser close</strong> — you will be logged out at the end of each session.</li>
+      </ul>
+      <p>Browser-specific instructions:</p>
+      <ul>
+        <li><strong>Chrome:</strong> Settings → Privacy and security → Cookies and other site data.</li>
+        <li><strong>Firefox:</strong> Settings → Privacy &amp; Security → Cookies and Site Data.</li>
+        <li><strong>Safari:</strong> Preferences → Privacy.</li>
+        <li><strong>Edge:</strong> Settings → Cookies and site permissions → Cookies and site data.</li>
+      </ul>
+
+      <h2>4. Do Not Track signals</h2>
+      <p>Some browsers send a "Do Not Track" (DNT) signal. We currently do not respond differently to DNT signals because we do not use tracking cookies for advertising or cross-site profiling.</p>
+
+      <h2>5. Updates</h2>
+      <p>We may update this Notice from time to time. The current version is always available at <a href="/legal/cookies.html">dirtlink.ca/cookies</a>. Material changes will be communicated as described in our <a href="/legal/privacy.html">Privacy Policy</a>.</p>
+
+      <h2>6. Contact</h2>
+      <p>Questions about cookies on DirtLink: <a href="mailto:privacy@dirtlink.ca">privacy@dirtlink.ca</a></p>
+
+      <hr>
+      <p style="font-size:13px; color:var(--ink-4);">Last updated: May 12, 2026</p>
+
+    </div>
+
+  </main>
+</div>
+
+<footer class="legal-footer">
+  <div class="legal-footer-inner">
+    <p>© 2026 Earth Movers Network Inc. · Calgary, Alberta, Canada</p>
+    <div style="display:flex; gap:20px; flex-wrap:wrap;">
+      <a href="/legal/terms">Terms</a>
+      <a href="/legal/privacy">Privacy</a>
+      <a href="/legal/disclaimer">Disclaimer</a>
+      <a href="/legal/acceptable-use">Acceptable Use</a>
+      <a href="/legal/cookies">Cookies</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Highlight active sidebar link
+  const slug = location.pathname.split('/').pop();
+  document.querySelectorAll('.legal-nav-link').forEach(a => {
+    if (a.dataset.slug === slug) a.classList.add('active');
+  });
+</script>
+
+</body>
+</html>
