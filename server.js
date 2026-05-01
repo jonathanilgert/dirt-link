@@ -48,6 +48,14 @@ app.get(['/app', '/app/*'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Legal pages — clean URLs (no .html extension)
+const LEGAL_SLUGS = ['terms','privacy','disclaimer','refunds','acceptable-use','cookies','copyright','open-data','sub-processors'];
+LEGAL_SLUGS.forEach(slug => {
+  app.get(`/legal/${slug}`, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'legal', `${slug}.html`));
+  });
+});
+
 // Redirect bare /index.html to /app for anyone with old bookmarks
 app.get('/index.html', (req, res) => res.redirect(301, '/app'));
 
@@ -152,11 +160,6 @@ app.post('/api/admin/create-key', (req, res) => {
 });
 
 // ── /calgary/list-fill — calculator funnel into the pin-creation flow ──────
-// The disposal-cost calculator's primary CTA points here with query params
-// (loads, type, zone, source). We redirect into the SPA at /app with
-// action=list-fill so app.js can detect the intent, open the pin modal,
-// and pre-fill from the calculator. A future static landing page can
-// replace this redirect.
 app.get('/calgary/list-fill', (req, res) => {
   const params = new URLSearchParams(req.query);
   params.set('action', 'list-fill');
@@ -225,8 +228,13 @@ Object.entries(LANDING_PAGES).forEach(([route, file]) => {
   app.get(route, (req, res) => renderLandingPage(req, res, file));
 });
 
-// Catch-all → redirect to landing
-app.get('*', (req, res) => res.redirect('/'));
+// Catch-all → redirect to landing (skip API and legal routes)
+app.get('*', (req, res) => {
+  if (req.path.startsWith('/api/') || req.path.startsWith('/legal/')) {
+    return res.status(404).send('Not found');
+  }
+  res.redirect('/');
+});
 
 // Initialize database then start server
 getDb().then(() => {

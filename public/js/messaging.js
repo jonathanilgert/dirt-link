@@ -44,6 +44,12 @@ window.Messaging = {
     const activeEl = document.querySelector(`.conv-item[onclick*="${conversationId}"]`);
     if (activeEl) activeEl.classList.add('active');
 
+    // Mobile: show thread + back button
+    const messagesLayout = document.querySelector('.messages-layout');
+    if (messagesLayout) messagesLayout.classList.add('thread-open');
+    const backBtn = document.getElementById('btn-back-to-convos');
+    if (backBtn) backBtn.style.display = 'flex';
+
     await this.loadMessages(conversationId);
     this.startPolling();
   },

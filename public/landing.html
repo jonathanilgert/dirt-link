@@ -216,11 +216,11 @@ const Placeholder = ({ label='site photo', aspect='4 / 3', radius=8 }) => (
 const Nav = () => (
   <div className="nav">
     <div className="container nav-inner">
-      <a href="/app" className="logo">
+      <div className="logo" style={{ cursor:'default' }}>
         <Logo/>
         <span>DirtLink</span>
         <span className="mono" style={{ fontSize:10, color:'var(--ink-4)', letterSpacing:'0.12em', padding:'2px 6px', border:'1px solid var(--hairline)', borderRadius:3, marginLeft:4 }}>BETA</span>
-      </a>
+      </div>
       <div className="nav-links" style={{ alignItems:'center' }}>
         <a href="#how">How it works</a>
         <a href="#features">Features</a>
@@ -228,6 +228,7 @@ const Nav = () => (
         <a href="#usecases">Use cases</a>
         <a href="#pricing" className="muted">Pricing</a>
         <a href="#faq" className="muted">FAQ</a>
+        <a href="#contact" className="muted">Contact</a>
       </div>
       <div className="row gap-4" style={{ alignItems:'center' }}>
         <a href="/app" className="btn btn-ghost btn-sm">Log in</a>
@@ -830,6 +831,74 @@ const FAQ = () => {
   );
 };
 
+/* ── Contact ── */
+const Contact = () => (
+  <section id="contact" className="section">
+    <div className="container">
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:64, alignItems:'start' }} className="contact-grid">
+
+        {/* Left — info */}
+        <div>
+          <div className="eyebrow">Get in touch</div>
+          <h2 style={{ marginTop:16, marginBottom:20 }}>We're based in Calgary.<br/>We answer fast.</h2>
+          <p className="lede" style={{ marginBottom:40 }}>Questions about the platform, your listing, a partnership, or anything else — reach us directly.</p>
+          <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
+            {[
+              { label:'General & support', value:'support@dirtlink.ca', href:'mailto:support@dirtlink.ca' },
+              { label:'Legal & privacy',   value:'legal@dirtlink.ca',   href:'mailto:legal@dirtlink.ca' },
+              { label:'Website',           value:'dirtlink.ca',         href:'/' },
+              { label:'Location',          value:'Calgary, Alberta, Canada', href:null },
+            ].map(({ label, value, href }) => (
+              <div key={label} style={{ display:'flex', flexDirection:'column', gap:3 }}>
+                <span style={{ fontSize:11, fontWeight:600, letterSpacing:'0.1em', textTransform:'uppercase', color:'var(--ink-4)' }}>{label}</span>
+                {href
+                  ? <a href={href} style={{ fontSize:16, color:'var(--ink)', textDecoration:'none', borderBottom:'1px solid var(--hairline)' }}>{value}</a>
+                  : <span style={{ fontSize:16, color:'var(--ink-2)' }}>{value}</span>
+                }
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right — form */}
+        <div style={{ background:'var(--surface)', border:'1px solid var(--hairline)', borderRadius:14, padding:'32px 28px' }}>
+          <h3 style={{ fontSize:18, marginBottom:20 }}>Send a message</h3>
+          <form onSubmit={e => {
+            e.preventDefault();
+            const fd = new FormData(e.target);
+            window.location.href = `mailto:support@dirtlink.ca?subject=DirtLink inquiry from ${encodeURIComponent(fd.get('name'))}&body=${encodeURIComponent(`Name: ${fd.get('name')}\nCompany: ${fd.get('company')}\nEmail: ${fd.get('email')}\n\n${fd.get('message')}`)}`;
+          }} style={{ display:'flex', flexDirection:'column', gap:14 }}>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+              <div>
+                <label style={{ fontSize:12, fontWeight:500, color:'var(--ink-3)', display:'block', marginBottom:5 }}>Name</label>
+                <input name="name" required placeholder="Your name" style={{ width:'100%', padding:'10px 12px', border:'1px solid var(--hairline)', borderRadius:7, fontSize:14, background:'var(--bg)', outline:'none', fontFamily:'inherit' }}/>
+              </div>
+              <div>
+                <label style={{ fontSize:12, fontWeight:500, color:'var(--ink-3)', display:'block', marginBottom:5 }}>Company</label>
+                <input name="company" placeholder="Company name" style={{ width:'100%', padding:'10px 12px', border:'1px solid var(--hairline)', borderRadius:7, fontSize:14, background:'var(--bg)', outline:'none', fontFamily:'inherit' }}/>
+              </div>
+            </div>
+            <div>
+              <label style={{ fontSize:12, fontWeight:500, color:'var(--ink-3)', display:'block', marginBottom:5 }}>Email</label>
+              <input name="email" type="email" required placeholder="your@email.com" style={{ width:'100%', padding:'10px 12px', border:'1px solid var(--hairline)', borderRadius:7, fontSize:14, background:'var(--bg)', outline:'none', fontFamily:'inherit' }}/>
+            </div>
+            <div>
+              <label style={{ fontSize:12, fontWeight:500, color:'var(--ink-3)', display:'block', marginBottom:5 }}>Message</label>
+              <textarea name="message" required rows={5} placeholder="What can we help with?" style={{ width:'100%', padding:'10px 12px', border:'1px solid var(--hairline)', borderRadius:7, fontSize:14, background:'var(--bg)', outline:'none', resize:'vertical', fontFamily:'inherit' }}/>
+            </div>
+            <button type="submit" className="btn btn-primary" style={{ justifyContent:'center', marginTop:4 }}>
+              Send message <Icon name="arrow" size={14}/>
+            </button>
+            <p style={{ fontSize:12, color:'var(--ink-4)', textAlign:'center' }}>Opens your email client · We reply within 1 business day</p>
+          </form>
+        </div>
+
+      </div>
+    </div>
+    <style>{`@media (max-width: 768px) { .contact-grid { grid-template-columns: 1fr !important; gap: 40px !important; } }`}</style>
+  </section>
+);
+
 /* ── CTA ── */
 const CTA = () => (
   <section id="cta" style={{ background:'var(--ink)', color:'var(--bg)', padding:'120px 0' }}>
@@ -862,7 +931,7 @@ const CTA = () => (
 const Footer = () => (
   <footer style={{ background:'var(--ink)', color:'var(--bg)', padding:'56px 0 40px', borderTop:'1px solid rgba(255,255,255,0.08)' }}>
     <div className="container">
-      <div style={{ display:'grid', gridTemplateColumns:'1.6fr 1fr 1fr', gap:40, alignItems:'start' }} className="foot-grid">
+      <div style={{ display:'grid', gridTemplateColumns:'1.4fr 1fr 1fr 1fr', gap:40, alignItems:'start' }} className="foot-grid">
 
         {/* Brand */}
         <div>
@@ -879,7 +948,7 @@ const Footer = () => (
         {/* Page sections */}
         <div>
           <div className="mono" style={{ fontSize:11, color:'rgba(255,255,255,0.45)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:16 }}>Navigate</div>
-          {[['How it works','#how'],['Features','#features'],['Product','#showcase'],['Use cases','#usecases'],['Pricing','#pricing'],['FAQ','#faq']].map(([label, href]) => (
+          {[['How it works','#how'],['Features','#features'],['Product','#showcase'],['Use cases','#usecases'],['Pricing','#pricing'],['FAQ','#faq'],['Contact','#contact']].map(([label, href]) => (
             <a key={href} href={href} style={{ display:'block', fontSize:14, color:'rgba(255,255,255,0.72)', marginBottom:9, textDecoration:'none', transition:'color .15s' }}
                onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='rgba(255,255,255,0.72)'}>{label}</a>
           ))}
@@ -894,7 +963,37 @@ const Footer = () => (
           ))}
         </div>
 
+        {/* Legal */}
+        <div>
+          <div className="mono" style={{ fontSize:11, color:'rgba(255,255,255,0.45)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:16 }}>Legal</div>
+          {[
+            ['Terms & Conditions','/legal/terms.html'],
+            ['Privacy Policy','/legal/privacy.html'],
+            ['Disclaimer','/legal/disclaimer.html'],
+            ['Refund Policy','/legal/refunds.html'],
+            ['Acceptable Use','/legal/acceptable-use.html'],
+            ['Cookie Notice','/legal/cookies.html'],
+          ].map(([label, href]) => (
+            <a key={label} href={href} style={{ display:'block', fontSize:14, color:'rgba(255,255,255,0.72)', marginBottom:9, textDecoration:'none', transition:'color .15s' }}
+               onMouseEnter={e => e.target.style.color='#fff'} onMouseLeave={e => e.target.style.color='rgba(255,255,255,0.72)'}>{label}</a>
+          ))}
+        </div>
+
       </div>
+
+      {/* Legal bottom strip */}
+      <div style={{ marginTop:40, paddingTop:24, borderTop:'1px solid rgba(255,255,255,0.08)', display:'flex', gap:20, flexWrap:'wrap', justifyContent:'space-between', alignItems:'center' }}>
+        <div className="mono" style={{ fontSize:11, color:'rgba(255,255,255,0.28)', letterSpacing:'0.08em' }}>
+          © 2026 Earth Movers Network Inc. · Calgary, Alberta, Canada
+        </div>
+        <div style={{ display:'flex', gap:16, flexWrap:'wrap' }}>
+          {[['Open Data','/legal/open-data.html'],['Copyright','/legal/copyright.html'],['Sub-Processors','/legal/sub-processors.html']].map(([label,href]) => (
+            <a key={label} href={href} style={{ fontSize:12, color:'rgba(255,255,255,0.35)', textDecoration:'none' }}
+               onMouseEnter={e => e.target.style.color='rgba(255,255,255,0.65)'} onMouseLeave={e => e.target.style.color='rgba(255,255,255,0.35)'}>{label}</a>
+          ))}
+        </div>
+      </div>
+
     </div>
     <style>{`@media (max-width: 768px) { .foot-grid { grid-template-columns: 1fr 1fr !important; } .foot-grid > div:first-child { grid-column: 1 / -1; } }`}</style>
   </footer>
@@ -932,6 +1031,7 @@ function App() {
       <UseCases/>
       <Pricing/>
       <FAQ/>
+      <Contact/>
       <CTA/>
       <Footer/>
     </React.Fragment>
