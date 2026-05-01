@@ -13,6 +13,12 @@
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://dirtlink.ca/calgary/dirt-disposal-cost">
 
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Dirt Disposal Cost Calgary — Tipping Fees vs. Dirtlink">
+  <meta name="twitter:description" content="Free calculator: estimate Calgary tipping fees, trucking, and savings from listing fill on Dirtlink.">
+  <meta name="twitter:image" content="https://dirtlink.ca/images/calgary/dirt-disposal-cost-og.jpg">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap">
@@ -134,6 +140,21 @@
   }
   </script>
 
+  <!-- Schema: WebApplication (the embedded disposal-cost calculator) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Calgary Dirt Disposal Cost Calculator",
+    "url": "https://dirtlink.ca/calgary/dirt-disposal-cost",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Any",
+    "browserRequirements": "Requires JavaScript",
+    "description": "Free Calgary dirt disposal cost calculator — estimates landfill tipping, trucking, and time, then compares to listing the fill on Dirtlink.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CAD" }
+  }
+  </script>
+
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
@@ -245,6 +266,14 @@
     </div>
   </header>
 
+  <nav aria-label="Breadcrumb" style="max-width:760px; margin:0 auto; padding:14px 20px 0; font-family:'Figtree',sans-serif; font-size:13px; color:var(--text-subtle);">
+    <a href="/" style="color:var(--text-subtle); text-decoration:none;">Home</a>
+    <span style="margin:0 6px; color:var(--text-subtle);">/</span>
+    <a href="/calgary" style="color:var(--text-subtle); text-decoration:none;">Calgary</a>
+    <span style="margin:0 6px; color:var(--text-subtle);">/</span>
+    <span aria-current="page">Dirt Disposal Cost</span>
+  </nav>
+
   <main>
 
   <section class="hero">
@@ -294,7 +323,7 @@
     </div>
   </section>
 
-  <section class="related">
+  <aside class="related" aria-label="Related Calgary pages">
     <h2>Related Calgary resources</h2>
     <ul>
       <li><a href="/calgary">Calgary materials hub</a></li>
@@ -302,7 +331,7 @@
       <li><a href="/calgary/dirt-disposal">Dirt disposal in Calgary</a></li>
       <li><a href="/calgary/free-fill-dirt">Free fill dirt in Calgary</a></li>
     </ul>
-  </section>
+  </aside>
 
   </main>
 
@@ -311,6 +340,7 @@
     <p style="margin-top:8px"><a href="/">Back to Dirtlink</a></p>
   </footer>
 
+  <script src="/js/calgary-ctas.js" defer></script>
   <script src="/dist/calculators/disposal-cost.js" defer></script>
 </body>
 </html>

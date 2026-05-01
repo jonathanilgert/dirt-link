@@ -1,13 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://dirtlink.ca/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://dirtlink.ca/calgary/dirt-disposal-cost</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
+  <url><loc>https://dirtlink.ca/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+
+  <!-- Calgary surface — parent hub -->
+  <url><loc>https://dirtlink.ca/calgary</loc><lastmod>2026-04-30</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+
+  <!-- Calgary material pages (priority 0.7) -->
+  <url><loc>https://dirtlink.ca/calgary/topsoil</loc><lastmod>2026-04-30</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://dirtlink.ca/calgary/gravel</loc><lastmod>2026-04-30</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://dirtlink.ca/calgary/fill-dirt</loc><lastmod>2026-04-30</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://dirtlink.ca/calgary/sand</loc><lastmod>2026-04-30</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://dirtlink.ca/calgary/landscape-rock</loc><lastmod>2026-04-30</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://dirtlink.ca/calgary/mulch</loc><lastmod>2026-04-30</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://dirtlink.ca/calgary/compost</loc><lastmod>2026-04-30</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://dirtlink.ca/calgary/road-crush</loc><lastmod>2026-04-30</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://dirtlink.ca/calgary/pit-run</loc><lastmod>2026-04-30</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://dirtlink.ca/calgary/river-rock</loc><lastmod>2026-04-30</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://dirtlink.ca/calgary/recycled-concrete</loc><lastmod>2026-04-30</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://dirtlink.ca/calgary/loam</loc><lastmod>2026-04-30</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://dirtlink.ca/calgary/boulders</loc><lastmod>2026-04-30</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+
+  <!-- Calgary service / cost pages (priority 0.6) -->
+  <url><loc>https://dirtlink.ca/calgary/dirt-disposal</loc><lastmod>2026-04-30</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://dirtlink.ca/calgary/free-fill-dirt</loc><lastmod>2026-04-30</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://dirtlink.ca/calgary/landfill-tipping-fees</loc><lastmod>2026-04-30</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://dirtlink.ca/calgary/clean-fill-wanted</loc><lastmod>2026-04-30</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://dirtlink.ca/calgary/dirt-disposal-cost</loc><lastmod>2026-04-30</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
 </urlset>

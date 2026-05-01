@@ -32,7 +32,10 @@ app.use(session({
 }));
 
 // Static files — index: false so '/' doesn't auto-serve index.html
-app.use(express.static(path.join(__dirname, 'public'), { index: false }));
+// `redirect: false` prevents express.static from issuing a 301 to add a
+// trailing slash on directory paths (e.g. /calgary → /calgary/). We want
+// our explicit LANDING_PAGES routes to handle `/calgary` directly.
+app.use(express.static(path.join(__dirname, 'public'), { index: false, redirect: false }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Root → landing page
@@ -163,26 +166,66 @@ app.get('/calgary/list-fill', (req, res) => {
   res.redirect(302, '/app?' + params.toString());
 });
 
-// ── Calculator landing pages ────────────────────────────────────────────────
-const CALCULATOR_PAGES = {
-  '/calgary/dirt-disposal-cost': 'calgary/dirt-disposal-cost.html'
+// ── Calgary landing pages (SEO surface) ─────────────────────────────────────
+// Static HTML host pages, server-rendered through this handler so we can
+// substitute shared partials and inject env vars at request time. These
+// pages MUST be fully rendered server-side — they exist to capture organic
+// search traffic, and SPA-rendered SEO pages consistently underperform.
+const LANDING_PAGES = {
+  '/calgary':                          'calgary/index.html',
+  '/calgary/topsoil':                  'calgary/topsoil.html',
+  '/calgary/gravel':                   'calgary/gravel.html',
+  '/calgary/fill-dirt':                'calgary/fill-dirt.html',
+  '/calgary/sand':                     'calgary/sand.html',
+  '/calgary/landscape-rock':           'calgary/landscape-rock.html',
+  '/calgary/dirt-disposal':            'calgary/dirt-disposal.html',
+  '/calgary/free-fill-dirt':           'calgary/free-fill-dirt.html',
+  '/calgary/landfill-tipping-fees':    'calgary/landfill-tipping-fees.html',
+  '/calgary/mulch':                    'calgary/mulch.html',
+  '/calgary/compost':                  'calgary/compost.html',
+  '/calgary/road-crush':               'calgary/road-crush.html',
+  '/calgary/pit-run':                  'calgary/pit-run.html',
+  '/calgary/river-rock':               'calgary/river-rock.html',
+  '/calgary/recycled-concrete':        'calgary/recycled-concrete.html',
+  '/calgary/loam':                     'calgary/loam.html',
+  '/calgary/boulders':                 'calgary/boulders.html',
+  '/calgary/clean-fill-wanted':        'calgary/clean-fill-wanted.html',
+  '/calgary/dirt-disposal-cost':       'calgary/dirt-disposal-cost.html'
 };
 
-function renderCalculatorPage(req, res, relPath) {
+// In-memory cache for shared partials. Headers/footers don't change per
+// request, so we read them once at first use.
+const PARTIAL_CACHE = {};
+function readPartial(name) {
+  if (PARTIAL_CACHE[name] !== undefined) return PARTIAL_CACHE[name];
+  try {
+    PARTIAL_CACHE[name] = fs.readFileSync(
+      path.join(__dirname, 'public', 'calgary', '_partials', name + '.html'),
+      'utf8'
+    );
+  } catch {
+    PARTIAL_CACHE[name] = '';
+  }
+  return PARTIAL_CACHE[name];
+}
+
+function renderLandingPage(req, res, relPath) {
   const filePath = path.join(__dirname, 'public', relPath);
   fs.readFile(filePath, 'utf8', (err, html) => {
     if (err) return res.status(404).send('Not found');
     const gaId = process.env.GA_MEASUREMENT_ID || '';
     const out = html
       .replace(/\{\{GA_MEASUREMENT_ID\}\}/g, gaId)
-      .replace(/\{\{GA_ENABLED\}\}/g, gaId ? 'true' : 'false');
+      .replace(/\{\{GA_ENABLED\}\}/g, gaId ? 'true' : 'false')
+      .replace(/\{\{HEADER\}\}/g, readPartial('header'))
+      .replace(/\{\{FOOTER\}\}/g, readPartial('footer'));
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.send(out);
   });
 }
 
-Object.entries(CALCULATOR_PAGES).forEach(([route, file]) => {
-  app.get(route, (req, res) => renderCalculatorPage(req, res, file));
+Object.entries(LANDING_PAGES).forEach(([route, file]) => {
+  app.get(route, (req, res) => renderLandingPage(req, res, file));
 });
 
 // Catch-all → redirect to landing (skip API and legal routes)
