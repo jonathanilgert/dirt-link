@@ -1332,38 +1332,39 @@ main {
 
 /* Plan Picker Modal */
 .modal-plan-picker {
-  max-width: 780px;
-  padding: 32px 32px 24px;
+  max-width: 960px;
+  width: 95vw;
+  padding: 40px 40px 32px;
 }
 .mpp-header {
   text-align: center;
-  margin-bottom: 28px;
+  margin-bottom: 32px;
 }
 .mpp-header .logo-icon { margin-right: 6px; }
-.mpp-header .logo-text { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+.mpp-header .logo-text { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
 .mpp-title {
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 800;
   color: var(--text);
   margin-top: 14px;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 .mpp-sub {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--text-muted);
 }
 .mpp-plans {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  gap: 16px;
 }
 .mpp-plan-card {
   border: 1.5px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 18px 14px 16px;
+  padding: 24px 20px 20px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
   background: var(--surface);
   cursor: pointer;
   transition: border-color 0.15s, box-shadow 0.15s, transform 0.12s;
@@ -1393,7 +1394,7 @@ main {
   white-space: nowrap;
 }
 .mpp-plan-name {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -1405,29 +1406,29 @@ main {
   gap: 3px;
 }
 .mpp-plan-price .price-amt {
-  font-size: 26px;
+  font-size: 32px;
   font-weight: 800;
   color: var(--text);
   line-height: 1;
 }
 .mpp-plan-price .price-per {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-muted);
 }
 .mpp-plan-features {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 7px;
   flex: 1;
 }
 .mpp-plan-features li {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-muted);
   display: flex;
   align-items: flex-start;
   gap: 6px;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 .mpp-plan-features li::before {
   content: '✓';
@@ -1440,9 +1441,9 @@ main {
 .mpp-plan-btn {
   display: block;
   width: 100%;
-  padding: 9px 0;
+  padding: 12px 0;
   border-radius: var(--radius);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   text-align: center;
   cursor: pointer;
