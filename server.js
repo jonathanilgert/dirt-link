@@ -95,6 +95,9 @@ app.get('/api/geocode', async (req, res) => {
   }
 });
 
+// Admin dashboard
+app.use('/admin', require('./routes/admin'));
+
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/pins', require('./routes/pins'));
@@ -230,7 +233,7 @@ Object.entries(LANDING_PAGES).forEach(([route, file]) => {
 
 // Catch-all → redirect to landing (skip API and legal routes)
 app.get('*', (req, res) => {
-  if (req.path.startsWith('/api/') || req.path.startsWith('/legal/')) {
+  if (req.path.startsWith('/api/') || req.path.startsWith('/legal/') || req.path.startsWith('/admin')) {
     return res.status(404).send('Not found');
   }
   res.redirect('/');
