@@ -450,7 +450,10 @@
         <div class="form-row">
           <div class="form-group">
             <label for="pin-address">Address (optional)</label>
-            <input type="text" name="address" id="pin-address" placeholder="123 Main St, City">
+            <div style="position:relative">
+              <input type="text" name="address" id="pin-address" placeholder="123 Main St, City" autocomplete="off">
+              <div id="pin-address-status" style="font-size:11px;margin-top:4px;min-height:14px"></div>
+            </div>
           </div>
         </div>
 

@@ -431,6 +431,42 @@ window.DirtLink = {
       document.getElementById('test-report-row').style.display = e.target.checked ? 'block' : 'none';
     });
 
+    // Address geocoding — when user types an address, move the pin to match
+    let _addrTimer = null;
+    document.getElementById('pin-address').addEventListener('input', () => {
+      clearTimeout(_addrTimer);
+      const val = document.getElementById('pin-address').value.trim();
+      const status = document.getElementById('pin-address-status');
+      if (!val) { status.textContent = ''; return; }
+      status.style.color = '#8A7E74';
+      status.textContent = 'Locating…';
+      _addrTimer = setTimeout(async () => {
+        try {
+          const res = await fetch(`/api/geocode?q=${encodeURIComponent(val)}`);
+          const results = await res.json();
+          if (results.length > 0) {
+            const lat = parseFloat(results[0].lat);
+            const lng = parseFloat(results[0].lon);
+            document.getElementById('pin-lat').value = lat;
+            document.getElementById('pin-lng').value = lng;
+            document.getElementById('pin-location-hint').textContent = `Location: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+            // Move the temporary marker on the map
+            if (window.DirtLink.tempMarker) {
+              window.DirtLink.tempMarker.setLatLng([lat, lng]);
+              window.map.panTo([lat, lng], { animate: true });
+            }
+            status.style.color = '#059669';
+            status.textContent = '✓ Pin moved to this address';
+          } else {
+            status.style.color = '#8A7E74';
+            status.textContent = 'Address not found — pin stays at map location';
+          }
+        } catch (e) {
+          status.textContent = '';
+        }
+      }, 800);
+    });
+
     // Photo preview
     document.getElementById('pin-photos').addEventListener('change', e => {
       const preview = document.getElementById('photo-preview');
