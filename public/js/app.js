@@ -1356,14 +1356,13 @@ window.DirtLink = {
 
       ${pin.notes ? `<div class="pp-section"><div class="pp-section-title">Notes</div><p style="font-size:13px;color:var(--text-muted);line-height:1.5;margin:0">${this.escapeHtml(pin.notes)}</p></div>` : ''}
 
-      <div class="pp-section">
-        <div class="pp-section-title">Contact</div>
-        <div class="pp-stats" style="margin-top:4px">
-          ${pin.contact_phone ? `<div class="pp-stat-row"><span class="pp-stat-label">Phone</span><span class="pp-stat-value"><a href="tel:${this.escapeHtml(pin.contact_phone)}" style="color:${cfg.color}">${this.escapeHtml(pin.contact_phone)}</a></span></div>` : ''}
-          ${pin.contact_email ? `<div class="pp-stat-row"><span class="pp-stat-label">Email</span><span class="pp-stat-value"><a href="mailto:${this.escapeHtml(pin.contact_email)}" style="color:${cfg.color};word-break:break-all">${this.escapeHtml(pin.contact_email)}</a></span></div>` : ''}
-          ${pin.website_url ? `<div class="pp-stat-row"><span class="pp-stat-label">Web</span><span class="pp-stat-value"><a href="${this.escapeHtml(pin.website_url)}" target="_blank" rel="noopener" style="color:${cfg.color};word-break:break-all">${this.escapeHtml(pin.website_url)}</a></span></div>` : ''}
-        </div>
-      </div>
+      ${(pin.contact_phone || pin.contact_email || pin.website_url) ? `
+      <div class="pp-stats">
+        <div class="pp-stat-row" style="padding-top:0"><span class="pp-stat-label" style="font-size:10px;letter-spacing:.06em">CONTACT</span></div>
+        ${pin.contact_phone ? `<div class="pp-stat-row"><span class="pp-stat-label">Phone</span><span class="pp-stat-value"><a href="tel:${this.escapeHtml(pin.contact_phone)}" style="color:${cfg.color}">${this.escapeHtml(pin.contact_phone)}</a></span></div>` : ''}
+        ${pin.contact_email ? `<div class="pp-stat-row"><span class="pp-stat-label">Email</span><span class="pp-stat-value"><a href="mailto:${this.escapeHtml(pin.contact_email)}" style="color:${cfg.color};word-break:break-all">${this.escapeHtml(pin.contact_email)}</a></span></div>` : ''}
+        ${pin.website_url ? `<div class="pp-stat-row"><span class="pp-stat-label">Web</span><span class="pp-stat-value"><a href="${this.escapeHtml(pin.website_url)}" target="_blank" rel="noopener" style="color:${cfg.color};word-break:break-all">${this.escapeHtml(pin.website_url)}</a></span></div>` : ''}
+      </div>` : ''}
 
       <div class="pp-panel-actions" style="flex-direction:column;gap:8px">
         ${canClaim ? `<button class="btn btn-primary btn-full" onclick="DirtLink.claimPermanentPin('${pin.id}')">Claim This Listing</button>` : ''}
