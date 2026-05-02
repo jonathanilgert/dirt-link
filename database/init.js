@@ -339,6 +339,15 @@ async function getDb() {
     )
   `);
 
+  // Persistent sessions — survives server restarts and deployments
+  db.run(`
+    CREATE TABLE IF NOT EXISTS sessions (
+      sid TEXT PRIMARY KEY,
+      data TEXT NOT NULL,
+      expires_at TEXT NOT NULL
+    )
+  `);
+
   // Audit log for API calls
   db.run(`
     CREATE TABLE IF NOT EXISTS audit_log (
