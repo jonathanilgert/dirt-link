@@ -1333,48 +1333,48 @@ window.DirtLink = {
     const isMine = this.user && pin.claimed_by === this.user.id;
     const canClaim = this.user && !pin.claimed_by;
 
-    document.getElementById('pin-detail-content').innerHTML = `
-      <div class="perm-detail">
-        <div class="perm-detail-header" style="background:${cfg.color}">
-          <span class="perm-detail-type">${cfg.tooltip}</span>
-          ${pin.claimed_company ? `<span class="perm-detail-claimed">Claimed</span>` : ''}
-        </div>
-        <h2 class="perm-detail-name">${this.escapeHtml(pin.site_name)}</h2>
-        ${pin.description ? `<p class="perm-detail-desc">${this.escapeHtml(pin.description)}</p>` : ''}
+    document.getElementById('pin-panel-content').innerHTML = `
+      <div class="pp-meta-row">
+        <span class="pp-listing-id">${cfg.tooltip}</span>
+        <span class="pp-type-badge" style="background:${cfg.color}">&#9632; SITE</span>
+      </div>
 
-        <div class="perm-detail-section">
-          <div class="perm-detail-section-title">Location & Contact</div>
-          ${row('Address', pin.address)}
-          ${pin.contact_phone ? `<div class="perm-detail-row"><span class="perm-detail-label">Phone</span><span class="perm-detail-value">${phoneLink}</span></div>` : ''}
-          ${pin.contact_email ? `<div class="perm-detail-row"><span class="perm-detail-label">Email</span><span class="perm-detail-value">${emailLink}</span></div>` : ''}
-          ${row('Website', pin.website_url, true)}
-        </div>
+      <div class="pp-main">
+        <div class="pp-title-lg">${this.escapeHtml(pin.site_name)}</div>
+        ${pin.address ? `<div class="pp-company-lg">${this.escapeHtml(pin.address)}</div>` : ''}
+        ${pin.claimed_company ? `<div class="pp-timeline-panel" style="color:var(--success)">&#10003; Managed by ${this.escapeHtml(pin.claimed_company)}</div>` : ''}
+      </div>
 
-        <div class="perm-detail-section">
-          <div class="perm-detail-section-title">Details</div>
-          ${row('Hours', pin.hours_of_operation)}
-          ${row('Accepted Materials', pin.accepted_materials)}
-          ${row('Services', pin.services)}
-          ${row('Rates & Fees', pin.rates_fees)}
-          ${row('Category', pin.category)}
-        </div>
+      <div class="pp-stats">
+        ${pin.hours_of_operation ? `<div class="pp-stat-row"><span class="pp-stat-label">Hours</span><span class="pp-stat-value">${this.escapeHtml(pin.hours_of_operation)}</span></div>` : ''}
+        ${pin.accepted_materials ? `<div class="pp-stat-row"><span class="pp-stat-label">Accepts</span><span class="pp-stat-value" style="max-width:180px;text-align:right">${this.escapeHtml(pin.accepted_materials)}</span></div>` : ''}
+        ${pin.rates_fees ? `<div class="pp-stat-row"><span class="pp-stat-label">Rates</span><span class="pp-stat-value" style="max-width:180px;text-align:right">${this.escapeHtml(pin.rates_fees)}</span></div>` : ''}
+        ${pin.services ? `<div class="pp-stat-row"><span class="pp-stat-label">Services</span><span class="pp-stat-value" style="max-width:180px;text-align:right">${this.escapeHtml(pin.services)}</span></div>` : ''}
+      </div>
 
-        ${pin.notes ? `
-        <div class="perm-detail-section">
-          <div class="perm-detail-section-title">Notes</div>
-          <p class="perm-detail-notes">${this.escapeHtml(pin.notes)}</p>
-        </div>` : ''}
+      ${pin.description ? `<div class="pp-section"><div class="pp-section-title">About</div><p style="font-size:13px;color:var(--text-muted);line-height:1.5;margin:0">${this.escapeHtml(pin.description)}</p></div>` : ''}
 
-        ${pin.claimed_company ? `<div class="perm-detail-claimed-by">Managed by <strong>${this.escapeHtml(pin.claimed_company)}</strong></div>` : ''}
+      ${pin.notes ? `<div class="pp-section"><div class="pp-section-title">Notes</div><p style="font-size:13px;color:var(--text-muted);line-height:1.5;margin:0">${this.escapeHtml(pin.notes)}</p></div>` : ''}
 
-        <div class="perm-detail-actions">
-          ${canClaim ? `<button class="btn btn-primary" onclick="DirtLink.claimPermanentPin('${pin.id}')">Claim This Listing</button>` : ''}
-          ${isMine ? `<button class="btn btn-outline" onclick="DirtLink.editPermanentPin('${pin.id}')">Edit Listing</button>` : ''}
-          ${!pin.claimed_by && !this.user ? `<p class="hint">Log in to claim this listing</p>` : ''}
+      <div class="pp-section">
+        <div class="pp-section-title">Contact</div>
+        <div class="pp-stats" style="margin-top:4px">
+          ${pin.contact_phone ? `<div class="pp-stat-row"><span class="pp-stat-label">Phone</span><span class="pp-stat-value"><a href="tel:${this.escapeHtml(pin.contact_phone)}" style="color:${cfg.color}">${this.escapeHtml(pin.contact_phone)}</a></span></div>` : ''}
+          ${pin.contact_email ? `<div class="pp-stat-row"><span class="pp-stat-label">Email</span><span class="pp-stat-value"><a href="mailto:${this.escapeHtml(pin.contact_email)}" style="color:${cfg.color};word-break:break-all">${this.escapeHtml(pin.contact_email)}</a></span></div>` : ''}
+          ${pin.website_url ? `<div class="pp-stat-row"><span class="pp-stat-label">Web</span><span class="pp-stat-value"><a href="${this.escapeHtml(pin.website_url)}" target="_blank" rel="noopener" style="color:${cfg.color};word-break:break-all">${this.escapeHtml(pin.website_url)}</a></span></div>` : ''}
         </div>
       </div>
+
+      <div class="pp-panel-actions" style="flex-direction:column;gap:8px">
+        ${canClaim ? `<button class="btn btn-primary btn-full" onclick="DirtLink.claimPermanentPin('${pin.id}')">Claim This Listing</button>` : ''}
+        ${isMine ? `<button class="btn btn-outline btn-full" onclick="DirtLink.editPermanentPin('${pin.id}')">Edit Listing</button>` : ''}
+        ${!pin.claimed_by && !this.user ? `<button class="btn btn-primary btn-full" onclick="DirtLink.showAuthModal('register')">Log in to claim</button>` : ''}
+        ${pin.claimed_by && !isMine ? `<button class="btn btn-outline btn-full" onclick="DirtLink.startConversation('${pin.id}')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Message Site
+        </button>` : ''}
+      </div>
     `;
-    document.getElementById('modal-pin-detail').style.display = 'flex';
   },
 
   async claimPermanentPin(pinId) {
@@ -1481,6 +1481,66 @@ window.DirtLink = {
   // ============================================================
   // PERMIT PIN — Claim & Inquiry Flows
   // ============================================================
+
+  // Open permit pin in the right panel
+  openPermitPanel(permit) {
+    this._currentPermit = permit;
+    const panel = document.getElementById('pin-panel');
+    const content = document.getElementById('pin-panel-content');
+    panel.classList.add('open');
+    if (window.map) window.map.invalidateSize();
+
+    const claimBtn = this.user
+      ? `<button class="btn btn-primary btn-full" onclick="DirtLink.startClaim()">
+           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+           This Is My Site
+         </button>
+         <button class="btn btn-outline btn-full" onclick="DirtLink.startInquiry()">
+           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+           Connect With This Site
+         </button>`
+      : `<button class="btn btn-primary btn-full" onclick="DirtLink.showAuthModal('register')">
+           Log in to connect
+         </button>`;
+
+    content.innerHTML = `
+      <div class="pp-meta-row">
+        <span class="pp-listing-id">Development Permit</span>
+        <span class="pp-type-badge" style="background:#6B7280">&#9650; SITE</span>
+      </div>
+
+      <div class="pp-main">
+        <div class="pp-title-lg">${this.escapeHtml(permit.address)}</div>
+        ${permit.project_description ? `<div class="pp-company-lg">${this.escapeHtml(permit.project_description)}</div>` : ''}
+      </div>
+
+      <div class="pp-stats">
+        ${permit.permit_number ? `<div class="pp-stat-row"><span class="pp-stat-label">Permit #</span><span class="pp-stat-value">${this.escapeHtml(permit.permit_number)}</span></div>` : ''}
+        ${permit.permit_type ? `<div class="pp-stat-row"><span class="pp-stat-label">Type</span><span class="pp-stat-value">${this.escapeHtml(permit.permit_type)}</span></div>` : ''}
+        ${permit.permit_date ? `<div class="pp-stat-row"><span class="pp-stat-label">Issued</span><span class="pp-stat-value">${this.escapeHtml(permit.permit_date)}</span></div>` : ''}
+        ${permit.estimated_project_size ? `<div class="pp-stat-row"><span class="pp-stat-label">Est. Size</span><span class="pp-stat-value">${this.escapeHtml(permit.estimated_project_size)}</span></div>` : ''}
+      </div>
+
+      <div class="pp-section">
+        <div class="pp-section-title">About This Pin</div>
+        <p style="font-size:13px;color:var(--text-muted);line-height:1.5;margin:0">This site has an active development permit. If this is your project, claim it to list available or needed material. Otherwise, connect to inquire about fill opportunities.</p>
+      </div>
+
+      <div class="pp-panel-actions" style="flex-direction:column;gap:8px">
+        ${claimBtn}
+      </div>
+    `;
+  },
+
+  // Open permanent site pin in the right panel
+  openPermanentPanel(pin) {
+    const panel = document.getElementById('pin-panel');
+    const content = document.getElementById('pin-panel-content');
+    content.innerHTML = '<div class="pp-panel-loading">Loading…</div>';
+    panel.classList.add('open');
+    if (window.map) window.map.invalidateSize();
+    this.showPermanentPinDetail(pin.id);
+  },
 
   openPermitModal(permit) {
     this._currentPermit = permit;

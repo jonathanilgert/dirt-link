@@ -236,38 +236,34 @@ window.renderPins = function(pins) {
   if (window._permanentPins) window._permanentPins.forEach(p => addPermanentPinToMap(p));
 };
 
-// Add permit pin to map — click opens the claim/inquire modal
+// Add permit pin to map — click opens right panel
 window.addPermitPinToMap = function(pin) {
   if (pin.status === 'claimed') return;
   const icon = createPermitPinIcon();
   const marker = L.marker([pin.latitude, pin.longitude], { icon });
   marker.on('click', () => {
-    DirtLink.openPermitModal(pin);
+    if (_activeMarker && _activeMarker !== marker) {
+      _activeMarker.getElement()?.classList.remove('marker-active');
+    }
+    _activeMarker = marker;
+    setTimeout(() => marker.getElement()?.classList.add('marker-active'), 10);
+    DirtLink.openPermitPanel(pin);
   });
   pinMarkers.addLayer(marker);
 };
 
-// Add permanent site pin to map — click opens detail modal
+// Add permanent site pin to map — click opens right panel
 window.addPermanentPinToMap = function(pin) {
   const icon = createPermanentPinIcon(pin.site_type);
   const marker = L.marker([pin.latitude, pin.longitude], { icon });
-  const cfg = getSiteConfig(pin.site_type);
-
-  // Compact popup with "View Details" link
-  marker.bindPopup(`
-    <div class="pin-popup">
-      <div class="pp-header" style="background:${cfg.color}">
-        <span class="pp-type">&#9632; ${cfg.tooltip}</span>
-      </div>
-      <div class="pp-body">
-        <div class="pp-title">${DirtLink.escapeHtml(pin.site_name)}</div>
-        <div class="pp-company">${DirtLink.escapeHtml(pin.address)}</div>
-        ${pin.accepted_materials ? `<div class="pp-qty" style="margin-top:4px">${DirtLink.escapeHtml(pin.accepted_materials)}</div>` : ''}
-        ${pin.claimed_company ? `<div style="margin-top:4px;font-size:11px;color:var(--success);font-weight:600;">Claimed by ${DirtLink.escapeHtml(pin.claimed_company)}</div>` : ''}
-        <a class="pp-action" href="#" onclick="event.preventDefault(); DirtLink.showPermanentPinDetail('${pin.id}')" style="color:${cfg.color}">View Details &#8594;</a>
-      </div>
-    </div>
-  `, { maxWidth: 280, className: 'dl-popup' });
+  marker.on('click', () => {
+    if (_activeMarker && _activeMarker !== marker) {
+      _activeMarker.getElement()?.classList.remove('marker-active');
+    }
+    _activeMarker = marker;
+    setTimeout(() => marker.getElement()?.classList.add('marker-active'), 10);
+    DirtLink.openPermanentPanel(pin);
+  });
   pinMarkers.addLayer(marker);
 };
 
