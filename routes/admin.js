@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { all, get } = require('../database/init');
+const { all, get, run } = require('../database/init');
+const { PLANS, getRevealStatus } = require('../config/pricing');
 
 // ── Auth middleware ──────────────────────────────────────────────────────────
 function requireAdmin(req, res, next) {
@@ -44,7 +45,7 @@ router.get('/', requireAdmin, (req, res) => {
   const users = all(`
     SELECT
       u.id, u.company_name, u.contact_name, u.email, u.phone,
-      u.user_type, u.created_at, u.reveals_used,
+      u.user_type, u.created_at, u.reveals_used, u.reveals_reset_at,
       u.stripe_subscription_id, u.plan_started_at,
       (SELECT COUNT(*) FROM pins p WHERE p.user_id = u.id AND p.is_active = 1) AS active_pins,
       (SELECT COUNT(*) FROM pins p WHERE p.user_id = u.id) AS total_pins,
@@ -55,6 +56,11 @@ router.get('/', requireAdmin, (req, res) => {
     FROM users u
     ORDER BY u.created_at DESC
   `);
+
+  // Attach live reveal status to each user
+  users.forEach(u => {
+    u._reveals = getRevealStatus(u, { all, run });
+  });
 
   // Recent pins
   const recentPins = all(`
@@ -147,19 +153,37 @@ function dashboardPage(d) {
   const statCard = (label, value, color = '#F59E0B') =>
     `<div class="stat-card"><div class="stat-value" style="color:${color}">${value}</div><div class="stat-label">${label}</div></div>`;
 
-  const usersRows = d.users.map(u => `
+  const usersRows = d.users.map(u => {
+    const rv = u._reveals;
+    const isUnlimited = rv.limit === -1;
+    const revealBar = isUnlimited
+      ? `<span style="color:#059669;font-weight:600">∞ Unlimited</span>`
+      : (() => {
+          const pct = rv.limit > 0 ? Math.round((rv.remaining / rv.limit) * 100) : 0;
+          const barColor = rv.remaining === 0 ? '#DC2626' : rv.remaining <= Math.ceil(rv.limit * 0.3) ? '#F59E0B' : '#059669';
+          return `
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="flex:1;min-width:60px;background:#F3F0EB;border-radius:99px;height:6px;overflow:hidden">
+                <div style="width:${pct}%;height:100%;background:${barColor};border-radius:99px"></div>
+              </div>
+              <span style="color:${barColor};font-weight:600;white-space:nowrap">${rv.remaining} / ${rv.limit}</span>
+            </div>
+            <div style="font-size:11px;color:#8A7E74;margin-top:2px">Used ${rv.used} · ${rv.overagePurchasedThisCycle} overage bought</div>
+          `;
+        })();
+    return `
     <tr>
       <td><strong>${esc(u.company_name)}</strong><br><span class="muted">${esc(u.contact_name)}</span></td>
       <td><a href="mailto:${esc(u.email)}">${esc(u.email)}</a>${u.phone ? `<br><span class="muted">${esc(u.phone)}</span>` : ''}</td>
       <td>${planBadge(u.user_type)}</td>
       <td class="num">${u.active_pins} <span class="muted">/ ${u.total_pins}</span></td>
-      <td class="num">${u.reveals_used}</td>
-      <td class="num">${u.reveal_purchases}</td>
+      <td style="min-width:160px">${revealBar}</td>
       <td class="num">${u.conversations}</td>
       <td class="num">${u.messages_sent}</td>
       <td class="num">${fmtMoney(u.total_spent)}</td>
       <td class="muted small">${fmtDate(u.created_at)}</td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
 
   const pinRows = d.recentPins.map(p => `
     <tr>
@@ -293,9 +317,9 @@ function dashboardPage(d) {
       <table>
         <thead><tr>
           <th>Company</th><th>Contact</th><th>Plan</th>
-          <th class="num">Active Pins</th><th class="num">Reveals Used</th>
-          <th class="num">Rev. Purchases</th><th class="num">Convos</th>
-          <th class="num">Msgs</th><th class="num">Spent</th><th>Joined</th>
+          <th class="num">Active Pins</th><th>Reveals Remaining</th>
+          <th class="num">Convos</th><th class="num">Msgs</th>
+          <th class="num">Spent</th><th>Joined</th>
         </tr></thead>
         <tbody>${usersRows || '<tr><td colspan="10" style="text-align:center;padding:24px;color:#8A7E74">No members yet</td></tr>'}</tbody>
       </table>
