@@ -4,6 +4,7 @@ const { all, get } = require('../database/init');
 
 // ── Auth middleware ──────────────────────────────────────────────────────────
 function requireAdmin(req, res, next) {
+  if (!process.env.ADMIN_SECRET) return next(); // no password set — open access
   if (req.session.isAdmin) return next();
   res.redirect('/admin/login');
 }
@@ -17,10 +18,11 @@ router.get('/login', (req, res) => {
 router.post('/login', (req, res) => {
   const { password } = req.body;
   const secret = process.env.ADMIN_SECRET;
-  if (!secret) return res.send(loginPage('ADMIN_SECRET not configured on server.'));
-  if (password !== secret) return res.send(loginPage('Incorrect password.'));
-  req.session.isAdmin = true;
-  res.redirect('/admin');
+  if (!secret || password === secret) {
+    req.session.isAdmin = true;
+    return res.redirect('/admin');
+  }
+  res.send(loginPage('Incorrect password.'));
 });
 
 router.get('/logout', (req, res) => {
