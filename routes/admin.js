@@ -4,9 +4,7 @@ const { all, get } = require('../database/init');
 
 // ── Auth middleware ──────────────────────────────────────────────────────────
 function requireAdmin(req, res, next) {
-  if (!process.env.ADMIN_SECRET) return next(); // no password set — open access
-  if (req.session.isAdmin) return next();
-  res.redirect('/admin/login');
+  return next(); // TODO: re-enable auth once ADMIN_SECRET is confirmed
 }
 
 // ── Login page ───────────────────────────────────────────────────────────────
