@@ -1,0 +1,8 @@
+pin_id,business_name,current_entity_type,suggested_category,decision,notes
+eb4a6a92-6d05-456b-b407-cdd7965dd648,"123 4th Ave SW, Calgary, AB (permit DP2024-0001)",permit,,,
+daebe572-6e53-4a27-b699-4d34f5bd9511,Bluegrass Aggregate,supplier,aggregate-pits,,
+70630e3e-3f4a-450b-a327-b5ab30709e37,Cornerstone Haul,supplier,hauling-trucking,,
+9e389bf2-818f-4f6d-84ef-04233ba4605a,Foothills Pit Co.,supplier,aggregate-pits,,
+be7c5189-f619-4ada-b0d0-69dac245b854,Manchester Stone & Mulch,supplier,landscape-supply,,
+725e365b-ea10-4d2c-a6b8-8a55d80529b2,Shepard Soil Yards,supplier,topsoil-yards,,
+9a717f81-14b6-44d2-91e6-61d9ca3ddf76,Spyhill Landfill,reference,,,
