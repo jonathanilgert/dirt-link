@@ -1264,7 +1264,7 @@ window.DirtLink = {
 
     let actionsHtml = '';
     if (!this.user) {
-      actionsHtml = `<button class="btn btn-outline" onclick="document.getElementById('modal-login').style.display='flex'">Log in to contact</button>`;
+      actionsHtml = `<button class="btn btn-outline" onclick="DirtLink.showAuthModal('login')">Log in to contact</button>`;
     } else if (this.user.id === pin.user_id) {
       actionsHtml = `<span style="font-size:13px;color:var(--text-muted);padding:4px 0">This is your pin</span>`;
     } else {
