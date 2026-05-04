@@ -301,12 +301,18 @@ async function getDb() {
       id TEXT PRIMARY KEY,
       user_id TEXT NOT NULL,
       amount INTEGER NOT NULL,
+      quantity INTEGER NOT NULL DEFAULT 1,
       stripe_payment_intent_id TEXT,
       status TEXT NOT NULL DEFAULT 'completed',
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       FOREIGN KEY (user_id) REFERENCES users(id)
     )
   `);
+  // Add quantity column to existing reveal_purchases if missing
+  const rpCols = all(`PRAGMA table_info(reveal_purchases)`).map(c => c.name);
+  if (!rpCols.includes('quantity')) {
+    db.run(`ALTER TABLE reveal_purchases ADD COLUMN quantity INTEGER NOT NULL DEFAULT 1`);
+  }
 
   // Billing history (subscriptions + one-time purchases)
   db.run(`

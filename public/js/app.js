@@ -1779,6 +1779,9 @@ window.DirtLink = {
     const status = await statusRes.json();
     const history = historyRes.ok ? await historyRes.json() : [];
 
+    // Cache reveal rate for picker
+    if (status.reveals?.overageRate) this._lastRevealRate = status.reveals.overageRate;
+
     // Current Plan card
     document.getElementById('billing-current-plan').innerHTML = `
       <div class="billing-plan-card current">
@@ -1811,7 +1814,7 @@ window.DirtLink = {
               <div class="billing-reveals-label">Monthly Reveals</div>
               <div class="billing-reveals-value"><strong>${rev.remaining}</strong> remaining</div>
             </div>
-            <button class="btn btn-sm btn-primary" onclick="DirtLink.buyReveal()">+ Buy Reveal — $${rev.overageRate.toFixed(2)}</button>
+            <button class="btn btn-sm btn-primary" onclick="DirtLink._lastRevealRate=${rev.overageRate};DirtLink.showRevealPicker()">+ Buy Reveals — $${rev.overageRate.toFixed(2)} each</button>
           </div>
           <div class="billing-progress-track" style="margin-top:10px">
             <div class="billing-progress-fill" style="width:${pct}%; background:${pctColor}"></div>
@@ -1898,8 +1901,8 @@ window.DirtLink = {
     const upgrade = plans[plan];
 
     let html = `
-      <button class="btn btn-primary btn-full reveal-gate-buy" onclick="DirtLink.buyReveal()">
-        Buy 1 Reveal — $${rate.toFixed(2)}
+      <button class="btn btn-primary btn-full reveal-gate-buy" onclick="DirtLink._lastRevealRate=${rate};DirtLink.showRevealPicker()">
+        Buy Reveals — $${rate.toFixed(2)} each
       </button>
     `;
 
@@ -1950,30 +1953,104 @@ window.DirtLink = {
     }
   },
 
-  async buyReveal() {
-    const btn = document.querySelector('.reveal-gate-buy');
-    if (btn) { btn.disabled = true; btn.textContent = 'Processing...'; }
+  showRevealPicker() {
+    // Get current overage rate from cached billing status
+    const rate = this._lastRevealRate || 4.99;
+    const packs = [
+      { qty: 1, label: '1 Reveal', savings: null },
+      { qty: 3, label: '3 Reveals', savings: '~save a trip' },
+      { qty: 5, label: '5 Reveals', savings: 'most popular' },
+      { qty: 10, label: '10 Reveals', savings: 'best value' }
+    ];
 
-    const res = await fetch('/api/billing/buy-reveal', { method: 'POST' });
-    if (res.ok) {
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else if (data.devMode) {
-        // Dev mode — reveal granted immediately
-        alert('Reveal purchased (dev mode). You can now use it.');
-        // Close the gate and re-attempt the inquiry
-        document.getElementById('inquiry-no-reveals').style.display = 'none';
-        document.getElementById('inquiry-confirm').style.display = 'block';
-        document.getElementById('reveal-counter').innerHTML = `<strong>${data.reveals.remaining}</strong> reveals remaining.`;
-        // Also close standalone gate modal if open
-        document.getElementById('modal-reveal-gate').style.display = 'none';
+    const existing = document.getElementById('modal-reveal-picker');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'modal-reveal-picker';
+    modal.className = 'modal-overlay';
+    modal.style.cssText = 'display:flex;z-index:9999';
+    modal.innerHTML = `
+      <div class="modal-box" style="max-width:420px;width:92%">
+        <button class="modal-close" onclick="document.getElementById('modal-reveal-picker').remove()">✕</button>
+        <h3 style="margin:0 0 6px;font-size:1.2rem">Buy Reveals</h3>
+        <p style="margin:0 0 20px;color:var(--text-muted);font-size:0.9rem">$${rate.toFixed(2)} each at your plan rate</p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          ${packs.map(p => `
+            <button class="reveal-pack-btn" data-qty="${p.qty}" onclick="DirtLink._confirmRevealPurchase(${p.qty})" style="
+              display:flex;align-items:center;justify-content:space-between;
+              padding:14px 18px;border:1.5px solid var(--border);border-radius:10px;
+              background:#fff;cursor:pointer;font-size:1rem;font-family:inherit;
+              transition:border-color 0.15s,background 0.15s
+            ">
+              <span style="font-weight:600">${p.label}</span>
+              <span style="display:flex;align-items:center;gap:10px">
+                ${p.savings ? `<span style="font-size:0.78rem;color:var(--primary-dark);background:#FEF3C7;padding:2px 8px;border-radius:12px">${p.savings}</span>` : ''}
+                <span style="font-weight:700;color:var(--text)">$${(rate * p.qty).toFixed(2)}</span>
+              </span>
+            </button>
+          `).join('')}
+        </div>
+      </div>`;
+
+    // Hover effect
+    modal.addEventListener('mouseover', e => {
+      const btn = e.target.closest('.reveal-pack-btn');
+      if (btn) { btn.style.borderColor = 'var(--primary)'; btn.style.background = '#FFFBF0'; }
+    });
+    modal.addEventListener('mouseout', e => {
+      const btn = e.target.closest('.reveal-pack-btn');
+      if (btn) { btn.style.borderColor = 'var(--border)'; btn.style.background = '#fff'; }
+    });
+    modal.addEventListener('click', e => {
+      if (e.target === modal) modal.remove();
+    });
+
+    document.body.appendChild(modal);
+  },
+
+  async _confirmRevealPurchase(qty) {
+    document.getElementById('modal-reveal-picker')?.remove();
+
+    const allBtns = document.querySelectorAll('.reveal-gate-buy');
+    allBtns.forEach(b => { b.disabled = true; b.textContent = 'Processing…'; });
+
+    try {
+      const res = await fetch('/api/billing/buy-reveal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quantity: qty })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.url) {
+          window.location.href = data.url;
+        } else if (data.devMode) {
+          // Dev mode — reveals granted immediately
+          document.getElementById('inquiry-no-reveals') && (document.getElementById('inquiry-no-reveals').style.display = 'none');
+          document.getElementById('inquiry-confirm') && (document.getElementById('inquiry-confirm').style.display = 'block');
+          if (document.getElementById('reveal-counter')) {
+            document.getElementById('reveal-counter').innerHTML = `<strong>${data.reveals.remaining}</strong> reveals remaining.`;
+          }
+          document.getElementById('modal-reveal-gate') && (document.getElementById('modal-reveal-gate').style.display = 'none');
+          // Refresh billing tab if open
+          if (document.getElementById('tab-billing')?.classList.contains('active') ||
+              document.querySelector('[data-ptab="billing"]')?.classList.contains('active')) {
+            this.loadBillingTab();
+          }
+        }
+      } else {
+        const err = await res.json();
+        alert(err.error || 'Failed to purchase reveal');
       }
-    } else {
-      const err = await res.json();
-      alert(err.error || 'Failed to purchase reveal');
+    } catch (e) {
+      alert('Network error — please try again');
     }
-    if (btn) { btn.disabled = false; btn.textContent = `Buy 1 Reveal`; }
+    allBtns.forEach(b => { b.disabled = false; b.textContent = 'Buy Reveals'; });
+  },
+
+  buyReveal() {
+    this.showRevealPicker();
   },
 
   async cancelSubscription() {

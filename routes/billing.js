@@ -134,16 +134,18 @@ router.post('/buy-reveal', requireAuth, async (req, res) => {
     return res.status(400).json({ error: 'You have unlimited reveals' });
   }
 
-  const amountCents = Math.round(plan.overageRate * 100);
+  // Quantity: 1, 3, 5, or 10 — default 1
+  const qty = [1, 3, 5, 10].includes(Number(req.body.quantity)) ? Number(req.body.quantity) : 1;
+  const unitCents = Math.round(plan.overageRate * 100);
+  const totalCents = unitCents * qty;
   const s = getStripe();
 
   if (!s) {
-    // Dev mode: grant reveal without payment
-    const id = uuidv4();
-    run(`INSERT INTO reveal_purchases (id, user_id, amount, status) VALUES (?, ?, ?, 'completed')`,
-      [id, user.id, amountCents]);
+    // Dev mode: grant reveals without payment
+    run(`INSERT INTO reveal_purchases (id, user_id, amount, quantity, status) VALUES (?, ?, ?, ?, 'completed')`,
+      [uuidv4(), user.id, totalCents, qty]);
     run(`INSERT INTO billing_history (id, user_id, type, description, amount, status) VALUES (?, ?, 'reveal_purchase', ?, ?, 'completed')`,
-      [uuidv4(), user.id, `1 additional reveal (${plan.name} rate)`, amountCents]);
+      [uuidv4(), user.id, `${qty} additional reveal${qty > 1 ? 's' : ''} (${plan.name} rate)`, totalCents]);
 
     const updatedUser = get('SELECT * FROM users WHERE id = ?', [user.id]);
     const reveals = getRevealStatus(updatedUser, { all, run });
@@ -169,17 +171,17 @@ router.post('/buy-reveal', requireAuth, async (req, res) => {
       line_items: [{
         price_data: {
           currency: 'usd',
-          unit_amount: amountCents,
+          unit_amount: unitCents,
           product_data: {
-            name: 'DirtLink Reveal',
-            description: `1 additional reveal at ${plan.name} plan rate`
+            name: `DirtLink Reveal${qty > 1 ? 's' : ''}`,
+            description: `${qty} reveal${qty > 1 ? 's' : ''} at ${plan.name} plan rate ($${plan.overageRate} each)`
           }
         },
-        quantity: 1
+        quantity: qty
       }],
-      success_url: `${req.protocol}://${req.get('host')}/?reveal=success`,
-      cancel_url: `${req.protocol}://${req.get('host')}/?reveal=cancelled`,
-      metadata: { dirtlink_user_id: user.id, type: 'reveal_purchase' }
+      success_url: `${req.protocol}://${req.get('host')}/app?reveal=success`,
+      cancel_url:  `${req.protocol}://${req.get('host')}/app?reveal=cancelled`,
+      metadata: { dirtlink_user_id: user.id, type: 'reveal_purchase', quantity: String(qty) }
     });
 
     res.json({ url: session.url });
@@ -254,11 +256,12 @@ router.post('/webhook', async (req, res) => {
 
       if (session.metadata.type === 'reveal_purchase') {
         // One-time reveal purchase completed
+        const qty = parseInt(session.metadata.quantity, 10) || 1;
         const id = uuidv4();
-        run(`INSERT INTO reveal_purchases (id, user_id, amount, stripe_payment_intent_id, status) VALUES (?, ?, ?, ?, 'completed')`,
-          [id, userId, session.amount_total, session.payment_intent]);
-        run(`INSERT INTO billing_history (id, user_id, type, description, amount, stripe_id, status) VALUES (?, ?, 'reveal_purchase', '1 additional reveal', ?, ?, 'completed')`,
-          [uuidv4(), userId, session.amount_total, session.payment_intent]);
+        run(`INSERT INTO reveal_purchases (id, user_id, amount, quantity, stripe_payment_intent_id, status) VALUES (?, ?, ?, ?, ?, 'completed')`,
+          [id, userId, session.amount_total, qty, session.payment_intent]);
+        run(`INSERT INTO billing_history (id, user_id, type, description, amount, stripe_id, status) VALUES (?, ?, 'reveal_purchase', ?, ?, ?, 'completed')`,
+          [uuidv4(), userId, `${qty} additional reveal${qty > 1 ? 's' : ''}`, session.amount_total, session.payment_intent]);
       } else if (session.mode === 'subscription') {
         // Subscription started
         const plan = session.metadata.plan;

@@ -121,7 +121,7 @@ function getRevealStatus(user, db) {
     : new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 
   const overages = all(
-    `SELECT COUNT(*) as count, COALESCE(SUM(amount), 0) as total FROM reveal_purchases WHERE user_id = ? AND created_at >= ?`,
+    `SELECT COALESCE(SUM(quantity), 0) as count, COALESCE(SUM(amount), 0) as total FROM reveal_purchases WHERE user_id = ? AND created_at >= ? AND status = 'completed'`,
     [user.id, cycleStart]
   );
   const overageCount = overages[0]?.count || 0;
