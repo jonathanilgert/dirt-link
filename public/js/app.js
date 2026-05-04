@@ -1814,7 +1814,7 @@ window.DirtLink = {
               <div class="billing-reveals-label">Monthly Reveals</div>
               <div class="billing-reveals-value"><strong>${rev.remaining}</strong> remaining</div>
             </div>
-            <button class="btn btn-sm btn-primary" onclick="DirtLink._lastRevealRate=${rev.overageRate};DirtLink.showRevealPicker()">+ Buy Reveals — $${rev.overageRate.toFixed(2)} each</button>
+            <button class="btn btn-sm btn-primary" onclick="DirtLink.buyReveal()">+ Buy Reveal — $${rev.overageRate.toFixed(2)}</button>
           </div>
           <div class="billing-progress-track" style="margin-top:10px">
             <div class="billing-progress-fill" style="width:${pct}%; background:${pctColor}"></div>
@@ -1901,8 +1901,8 @@ window.DirtLink = {
     const upgrade = plans[plan];
 
     let html = `
-      <button class="btn btn-primary btn-full reveal-gate-buy" onclick="DirtLink._lastRevealRate=${rate};DirtLink.showRevealPicker()">
-        Buy Reveals — $${rate.toFixed(2)} each
+      <button class="btn btn-primary btn-full reveal-gate-buy" onclick="DirtLink.buyReveal()">
+        Buy 1 Reveal — $${rate.toFixed(2)}
       </button>
     `;
 
@@ -2050,7 +2050,7 @@ window.DirtLink = {
   },
 
   buyReveal() {
-    this.showRevealPicker();
+    this._confirmRevealPurchase(1);
   },
 
   async cancelSubscription() {
