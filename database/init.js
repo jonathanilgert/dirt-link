@@ -295,6 +295,143 @@ async function getDb() {
     db.run(`ALTER TABLE permanent_pins ADD COLUMN services TEXT`);
   }
 
+  // Calgary suppliers directory (Stage 2 of /calgary/suppliers build).
+  // entity_kind separates true suppliers from reference sites (landfills,
+  // recyclers, city facilities) that share this table. directory_listing
+  // is the explicit opt-in flag — Jonathan flips this per row after review.
+  if (!permPinCols.includes('entity_kind')) {
+    db.run(`ALTER TABLE permanent_pins ADD COLUMN entity_kind TEXT NOT NULL DEFAULT 'reference'`);
+  }
+  if (!permPinCols.includes('directory_listing')) {
+    db.run(`ALTER TABLE permanent_pins ADD COLUMN directory_listing INTEGER NOT NULL DEFAULT 0`);
+  }
+  if (!permPinCols.includes('slug')) {
+    db.run(`ALTER TABLE permanent_pins ADD COLUMN slug TEXT`);
+  }
+  if (!permPinCols.includes('tier')) {
+    db.run(`ALTER TABLE permanent_pins ADD COLUMN tier TEXT NOT NULL DEFAULT 'free'`);
+  }
+  if (!permPinCols.includes('tier_expires_at')) {
+    db.run(`ALTER TABLE permanent_pins ADD COLUMN tier_expires_at TEXT`);
+  }
+  if (!permPinCols.includes('logo_url')) {
+    db.run(`ALTER TABLE permanent_pins ADD COLUMN logo_url TEXT`);
+  }
+  if (!permPinCols.includes('service_area')) {
+    db.run(`ALTER TABLE permanent_pins ADD COLUMN service_area TEXT`);
+  }
+  if (!permPinCols.includes('business_hours')) {
+    db.run(`ALTER TABLE permanent_pins ADD COLUMN business_hours TEXT`);
+  }
+  if (!permPinCols.includes('photos')) {
+    db.run(`ALTER TABLE permanent_pins ADD COLUMN photos TEXT`);
+  }
+  if (!permPinCols.includes('public_phone')) {
+    db.run(`ALTER TABLE permanent_pins ADD COLUMN public_phone INTEGER NOT NULL DEFAULT 0`);
+  }
+  if (!permPinCols.includes('public_address')) {
+    db.run(`ALTER TABLE permanent_pins ADD COLUMN public_address INTEGER NOT NULL DEFAULT 0`);
+  }
+  if (!permPinCols.includes('vanity_url')) {
+    db.run(`ALTER TABLE permanent_pins ADD COLUMN vanity_url TEXT`);
+  }
+  if (!permPinCols.includes('included_in_blast')) {
+    db.run(`ALTER TABLE permanent_pins ADD COLUMN included_in_blast INTEGER NOT NULL DEFAULT 0`);
+  }
+  if (!permPinCols.includes('is_sponsored_slot')) {
+    db.run(`ALTER TABLE permanent_pins ADD COLUMN is_sponsored_slot INTEGER NOT NULL DEFAULT 0`);
+  }
+
+  // Extend leads for the Stage 5 routing scaffolding. The base table is
+  // calculator-only today; these columns generalize it for any inbound lead.
+  const leadCols = all(`PRAGMA table_info(leads)`).map(c => c.name);
+  if (!leadCols.includes('phone')) {
+    db.run(`ALTER TABLE leads ADD COLUMN phone TEXT`);
+  }
+  if (!leadCols.includes('materials_needed')) {
+    db.run(`ALTER TABLE leads ADD COLUMN materials_needed TEXT`);
+  }
+  if (!leadCols.includes('quantity')) {
+    db.run(`ALTER TABLE leads ADD COLUMN quantity TEXT`);
+  }
+  if (!leadCols.includes('location_lat')) {
+    db.run(`ALTER TABLE leads ADD COLUMN location_lat REAL`);
+  }
+  if (!leadCols.includes('location_lng')) {
+    db.run(`ALTER TABLE leads ADD COLUMN location_lng REAL`);
+  }
+  if (!leadCols.includes('location_area')) {
+    db.run(`ALTER TABLE leads ADD COLUMN location_area TEXT`);
+  }
+  if (!leadCols.includes('matched_suppliers')) {
+    db.run(`ALTER TABLE leads ADD COLUMN matched_suppliers TEXT`);
+  }
+  if (!leadCols.includes('categories')) {
+    db.run(`ALTER TABLE leads ADD COLUMN categories TEXT`);
+  }
+
+  // Supplier directory claim flow (Stage 4). One row per claim attempt.
+  // status transitions: 'email_sent' → 'approved' (after token click) OR
+  // 'manual_review_pending' → 'approved' (after admin approval) OR
+  // 'rejected' (admin reject).
+  db.run(`
+    CREATE TABLE IF NOT EXISTS supplier_claims (
+      id TEXT PRIMARY KEY,
+      supplier_pin_id TEXT NOT NULL,
+      user_id TEXT NOT NULL,
+      status TEXT NOT NULL,
+      verification_token TEXT,
+      verification_sent_to TEXT,
+      verification_channel TEXT,
+      approved_at TEXT,
+      approved_by TEXT,
+      rejected_reason TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (supplier_pin_id) REFERENCES permanent_pins(id),
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )
+  `);
+
+  // Per-supplier lead notifications. Source of truth for "who got told
+  // about which lead, at what tier, when, via what channel, and what
+  // happened next". Schema follows the C2 confirmation in the Stage 1
+  // open-questions reply, with `scheduled_for` added so the same row
+  // doubles as the scheduler queue (status='pending' until sent).
+  //
+  // Production migration path: swap the in-process setTimeout scheduler
+  // in services/lead-routing.js for a durable queue (BullMQ / SQS) that
+  // polls WHERE notified_at IS NULL AND scheduled_for <= now().
+  //
+  // Note: an earlier `lead_notifications` table exists from a prior
+  // Stage 2 iteration; it is unused and will be dropped in a future
+  // migration once we're confident no rows exist anywhere.
+  db.run(`
+    CREATE TABLE IF NOT EXISTS supplier_lead_notifications (
+      id TEXT PRIMARY KEY,
+      lead_id TEXT NOT NULL,
+      supplier_id TEXT NOT NULL,
+      tier_at_routing TEXT NOT NULL,
+      scheduled_for TEXT NOT NULL,
+      notified_at TEXT,
+      channel TEXT NOT NULL,
+      email_opened_at TEXT,
+      in_app_opened_at TEXT,
+      status TEXT NOT NULL DEFAULT 'pending',
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (lead_id)    REFERENCES leads(id),
+      FOREIGN KEY (supplier_id) REFERENCES permanent_pins(id)
+    )
+  `);
+
+  // Scopes for API keys (JSON array of strings, e.g. ["external:supplier-ingest"]).
+  // NULL/missing means "no scope restrictions" — backwards-compat for keys
+  // issued before E3 landed.
+  const apiKeyCols = all(`PRAGMA table_info(api_keys)`).map(c => c.name);
+  if (!apiKeyCols.includes('scopes')) {
+    db.run(`ALTER TABLE api_keys ADD COLUMN scopes TEXT`);
+  }
+
   // Reveal purchases (one-time overage buys)
   db.run(`
     CREATE TABLE IF NOT EXISTS reveal_purchases (
@@ -396,7 +533,25 @@ async function getDb() {
     'CREATE INDEX IF NOT EXISTS idx_pins_lat ON pins(latitude)',
     'CREATE INDEX IF NOT EXISTS idx_pins_lng ON pins(longitude)',
     'CREATE INDEX IF NOT EXISTS idx_permit_pins_lat ON permit_pins(latitude)',
-    'CREATE INDEX IF NOT EXISTS idx_permit_pins_lng ON permit_pins(longitude)'
+    'CREATE INDEX IF NOT EXISTS idx_permit_pins_lng ON permit_pins(longitude)',
+    // Suppliers directory
+    'CREATE INDEX IF NOT EXISTS idx_permanent_pins_directory ON permanent_pins(directory_listing, entity_kind)',
+    'CREATE INDEX IF NOT EXISTS idx_permanent_pins_category ON permanent_pins(category)',
+    'CREATE UNIQUE INDEX IF NOT EXISTS idx_permanent_pins_slug ON permanent_pins(slug) WHERE slug IS NOT NULL',
+    'CREATE UNIQUE INDEX IF NOT EXISTS idx_permanent_pins_vanity ON permanent_pins(vanity_url) WHERE vanity_url IS NOT NULL',
+    // Lead notifications scheduler (legacy; superseded by supplier_lead_notifications)
+    'CREATE INDEX IF NOT EXISTS idx_lead_notifications_pending ON lead_notifications(sent_at, scheduled_for)',
+    'CREATE INDEX IF NOT EXISTS idx_lead_notifications_lead ON lead_notifications(lead_id)',
+    // Supplier lead notifications (Stage 5)
+    'CREATE INDEX IF NOT EXISTS idx_sln_pending  ON supplier_lead_notifications(notified_at, scheduled_for)',
+    'CREATE INDEX IF NOT EXISTS idx_sln_lead     ON supplier_lead_notifications(lead_id)',
+    'CREATE INDEX IF NOT EXISTS idx_sln_supplier ON supplier_lead_notifications(supplier_id)',
+    'CREATE INDEX IF NOT EXISTS idx_sln_status   ON supplier_lead_notifications(status)',
+    // Supplier claims
+    'CREATE UNIQUE INDEX IF NOT EXISTS idx_supplier_claims_token ON supplier_claims(verification_token) WHERE verification_token IS NOT NULL',
+    'CREATE INDEX IF NOT EXISTS idx_supplier_claims_pin ON supplier_claims(supplier_pin_id)',
+    'CREATE INDEX IF NOT EXISTS idx_supplier_claims_user ON supplier_claims(user_id)',
+    'CREATE INDEX IF NOT EXISTS idx_supplier_claims_status ON supplier_claims(status)'
   ];
   indexes.forEach(sql => { try { db.run(sql); } catch(e) {} });
 

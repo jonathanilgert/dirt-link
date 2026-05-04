@@ -5,6 +5,9 @@
   <!-- Calgary surface — parent hub -->
   <url><loc>https://dirtlink.ca/calgary</loc><lastmod>2026-04-30</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
 
+  <!-- Calgary suppliers directory (Stage 3 will add per-profile URLs) -->
+  <url><loc>https://dirtlink.ca/calgary/suppliers</loc><lastmod>2026-05-03</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+
   <!-- Calgary material pages (priority 0.7) -->
   <url><loc>https://dirtlink.ca/calgary/topsoil</loc><lastmod>2026-04-30</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://dirtlink.ca/calgary/gravel</loc><lastmod>2026-04-30</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
