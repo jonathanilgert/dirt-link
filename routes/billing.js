@@ -268,6 +268,9 @@ router.post('/webhook', async (req, res) => {
            new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toISOString(), userId]);
         run(`INSERT INTO billing_history (id, user_id, type, description, amount, stripe_id, status) VALUES (?, ?, 'subscription', ?, ?, ?, 'completed')`,
           [uuidv4(), userId, `Subscribed to ${PLANS[plan]?.name || plan} plan`, session.amount_total, subscriptionId]);
+        // Mirror tier to every supplier listing this user owns.
+        try { require('../lib/tier-sync').syncTierForUser(userId, plan); }
+        catch (e) { console.error('[billing] tier sync after subscribe failed:', e.message); }
       }
       break;
     }
@@ -296,6 +299,8 @@ router.post('/webhook', async (req, res) => {
       run(`UPDATE users SET user_type = 'free', stripe_subscription_id = NULL, priority_notifications = 0, updated_at = datetime('now') WHERE id = ?`, [user.id]);
       run(`INSERT INTO billing_history (id, user_id, type, description, amount, stripe_id, status) VALUES (?, ?, 'subscription_cancelled', 'Downgraded to Free plan', 0, ?, 'completed')`,
         [uuidv4(), user.id, subscription.id]);
+      try { require('../lib/tier-sync').syncTierForUser(user.id, 'free'); }
+      catch (e) { console.error('[billing] tier sync after cancel failed:', e.message); }
       break;
     }
 
