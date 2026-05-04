@@ -253,7 +253,13 @@ window.addPermanentPinToMap = function(pin) {
   const marker = L.marker([pin.latitude, pin.longitude], { icon });
   const cfg = getSiteConfig(pin.site_type);
 
-  // Compact popup with "View Details" link
+  // Compact popup with "View Details" link.
+  // Directory listings (entity_kind='supplier' AND directory_listing=1) also
+  // surface a "View full profile" link to the SEO profile page at
+  // /calgary/suppliers/:slug.
+  const profileLink = (pin.directory_listing && pin.slug)
+    ? `<a class="pp-action" href="/calgary/suppliers/${encodeURIComponent(pin.slug)}" style="color:${cfg.color}">View full profile &#8594;</a>`
+    : '';
   marker.bindPopup(`
     <div class="pin-popup">
       <div class="pp-header" style="background:${cfg.color}">
@@ -265,6 +271,7 @@ window.addPermanentPinToMap = function(pin) {
         ${pin.accepted_materials ? `<div class="pp-qty" style="margin-top:4px">${DirtLink.escapeHtml(pin.accepted_materials)}</div>` : ''}
         ${pin.claimed_company ? `<div style="margin-top:4px;font-size:11px;color:var(--success);font-weight:600;">Claimed by ${DirtLink.escapeHtml(pin.claimed_company)}</div>` : ''}
         <a class="pp-action" href="#" onclick="event.preventDefault(); DirtLink.showPermanentPinDetail('${pin.id}')" style="color:${cfg.color}">View Details &#8594;</a>
+        ${profileLink}
       </div>
     </div>
   `, { maxWidth: 280, className: 'dl-popup' });

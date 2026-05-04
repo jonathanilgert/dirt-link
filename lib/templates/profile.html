@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{TITLE}}</title>
+  <meta name="description" content="{{META_DESCRIPTION}}">
+  <link rel="canonical" href="{{CANONICAL_URL}}">
+
+  <meta property="og:title" content="{{OG_TITLE}}">
+  <meta property="og:description" content="{{META_DESCRIPTION}}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{CANONICAL_URL}}">
+  <meta property="og:image" content="{{OG_IMAGE}}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{OG_TITLE}}">
+  <meta name="twitter:description" content="{{META_DESCRIPTION}}">
+  <meta name="twitter:image" content="{{OG_IMAGE}}">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/css/calgary.css">
+  <link rel="icon" href="/logo-triangle.svg" type="image/svg+xml">
+  <!-- Leaflet is lazy-loaded by /js/profile.js when the map div enters
+       the viewport, so it never blocks initial paint. -->
+  <link rel="dns-prefetch" href="//unpkg.com">
+
+  <meta name="ga-measurement-id" content="{{GA_MEASUREMENT_ID}}">
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    (function(){
+      var meta = document.querySelector('meta[name="ga-measurement-id"]');
+      var id = meta && meta.getAttribute('content');
+      if (!id) return;
+      var s = document.createElement('script'); s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(id);
+      document.head.appendChild(s);
+      gtag('js', new Date()); gtag('config', id);
+    })();
+  </script>
+
+  <script type="application/ld+json">{{BREADCRUMB_SCHEMA}}</script>
+  <script type="application/ld+json">{{LOCALBUSINESS_SCHEMA}}</script>
+  <script type="application/ld+json">{{PLACE_SCHEMA}}</script>
+</head>
+<body>
+{{HEADER}}
+
+<main>
+{{PROFILE_BODY}}
+</main>
+
+{{FOOTER}}
+<script src="/js/calgary-ctas.js" defer></script>
+<script src="/js/profile.js" defer></script>
+</body>
+</html>
