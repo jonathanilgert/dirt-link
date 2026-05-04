@@ -2809,7 +2809,7 @@ main {
     padding: 20px 16px 32px;
   }
   .account-form { width: 100% !important; }
-  .profile-form { gap: 10px; }
+  .profile-form { gap: 17px; }
   .profile-form .auth-error:empty,
   .profile-form .profile-success:empty { display: none; }
 
