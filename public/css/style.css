@@ -2926,7 +2926,7 @@ main {
   .panel-content    { padding: 16px; }
   .modal { width: 95%; padding: 20px 16px; margin: 0 auto; }
   .modal-plan-picker { padding: 20px 12px 16px; }
-  .mpp-plans { grid-template-columns: 1fr 1fr; }
+  .mpp-plans { grid-template-columns: 1fr; }
 
   /* ── Filter sidebar — bigger tap targets on mobile ── */
   .mat-filter-item {
