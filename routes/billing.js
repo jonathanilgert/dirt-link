@@ -140,6 +140,17 @@ router.post('/buy-reveal', requireAuth, async (req, res) => {
   const totalCents = unitCents * qty;
   const s = getStripe();
 
+  // Free plan: use the pre-built Stripe payment link (qty=1 only — link is priced per reveal)
+  // For multi-reveal packs on free, fall through to dynamic checkout
+  if (user.user_type === 'free' && qty === 1) {
+    const STRIPE_FREE_REVEAL_LINK = 'https://buy.stripe.com/7sY8wOfN06Lk51S4BM3ZK0h';
+    const params = new URLSearchParams({
+      client_reference_id: user.id,
+      prefilled_email: user.email
+    });
+    return res.json({ url: `${STRIPE_FREE_REVEAL_LINK}?${params.toString()}` });
+  }
+
   if (!s) {
     // Dev mode: grant reveals without payment
     run(`INSERT INTO reveal_purchases (id, user_id, amount, quantity, status) VALUES (?, ?, ?, ?, 'completed')`,
@@ -251,12 +262,15 @@ router.post('/webhook', async (req, res) => {
   switch (event.type) {
     case 'checkout.session.completed': {
       const session = event.data.object;
-      const userId = session.metadata?.dirtlink_user_id;
+      // client_reference_id is set by the static payment link flow
+      const userId = session.metadata?.dirtlink_user_id || session.client_reference_id;
       if (!userId) break;
 
-      if (session.metadata.type === 'reveal_purchase') {
+      // Static payment link purchases: mode=payment, no type metadata → treat as 1 reveal
+      const isPaymentLink = !session.metadata?.type && session.mode === 'payment' && session.client_reference_id;
+      if (session.metadata?.type === 'reveal_purchase' || isPaymentLink) {
         // One-time reveal purchase completed
-        const qty = parseInt(session.metadata.quantity, 10) || 1;
+        const qty = parseInt(session.metadata?.quantity, 10) || 1;
         const id = uuidv4();
         run(`INSERT INTO reveal_purchases (id, user_id, amount, quantity, stripe_payment_intent_id, status) VALUES (?, ?, ?, ?, ?, 'completed')`,
           [id, userId, session.amount_total, qty, session.payment_intent]);
