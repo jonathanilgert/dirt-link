@@ -3,6 +3,7 @@ const { v4: uuidv4 } = require('uuid');
 const { all, get, run } = require('../database/init');
 const { requireAuth } = require('../middleware/auth');
 const { queueNotification, scheduleFlush } = require('../services/notifications');
+const { getRevealStatus, PLANS } = require('../config/pricing');
 
 const router = express.Router();
 
@@ -25,6 +26,20 @@ router.post('/conversations', requireAuth, (req, res) => {
   );
 
   if (!conversation) {
+    // New conversation — check and deduct a reveal
+    const user = get('SELECT * FROM users WHERE id = ?', [req.session.userId]);
+    const plan = PLANS[user.user_type] || PLANS.free;
+
+    if (plan.revealsPerMonth !== -1) {
+      // Not unlimited — check remaining reveals
+      const reveals = getRevealStatus(user, { all, run });
+      if (reveals.remaining <= 0) {
+        return res.status(402).json({ error: 'No reveals remaining. Purchase a reveal to contact this site.' });
+      }
+      // Deduct 1 reveal
+      run(`UPDATE users SET reveals_used = reveals_used + 1, updated_at = datetime('now') WHERE id = ?`, [req.session.userId]);
+    }
+
     const id = uuidv4();
     run(
       `INSERT INTO conversations (id, pin_id, initiator_id, owner_id) VALUES (?, ?, ?, ?)`,

@@ -1254,7 +1254,7 @@ window.DirtLink = {
       const empty = reveals.remaining === 0;
       const color2 = empty ? '#DC2626' : low ? '#B45309' : 'var(--text-muted)';
       const buyBtn = (low || empty)
-        ? `<a href="https://buy.stripe.com/7sY6oGcAO3z8amc3xI3ZK0e" target="_blank" class="btn btn-outline btn-sm" style="font-size:11px;padding:3px 10px;height:auto;line-height:1.4">Buy more</a>`
+        ? `<button onclick="DirtLink.buyReveal()" class="btn btn-outline btn-sm" style="font-size:11px;padding:3px 10px;height:auto;line-height:1.4">Buy reveal</button>`
         : '';
       revealsNote = `<div style="display:flex;align-items:center;justify-content:center;gap:8px">
         <span style="font-size:11px;color:${color2}">${empty ? '0 reveals left' : `${reveals.remaining} reveal${reveals.remaining !== 1 ? 's' : ''} left`}</span>
@@ -1431,22 +1431,58 @@ window.DirtLink = {
   },
 
   async startConversation(pinId) {
+    const res = await fetch('/api/messages/conversations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pin_id: pinId })
+    });
+
+    if (res.status === 402) {
+      // No reveals — show gate
+      this._showRevealGate();
+      return;
+    }
+
+    if (!res.ok) {
+      const err = await res.json();
+      alert(err.error || 'Failed to start conversation');
+      return;
+    }
+
+    // Close any open panels/modals
     document.getElementById('modal-pin-detail').style.display = 'none';
+    document.getElementById('pin-panel').classList.remove('open');
+
     // Switch to messages view
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.querySelector('[data-view="messages"]').classList.add('active');
     document.getElementById('view-messages').classList.add('active');
 
-    const res = await fetch('/api/messages/conversations', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pin_id: pinId })
-    });
-    if (res.ok) {
-      const data = await res.json();
-      await this.loadConversations();
-      window.Messaging.openConversation(data.conversation.id);
+    const data = await res.json();
+    await this.loadConversations();
+    window.Messaging.openConversation(data.conversation.id);
+  },
+
+  async _showRevealGate() {
+    // Fetch current reveal status for the gate UI
+    let reveals = { overageRate: 4.99, plan: this.user?.user_type || 'free', remaining: 0 };
+    try {
+      const r = await fetch('/api/billing/status');
+      if (r.ok) { const s = await r.json(); reveals = s.reveals; }
+    } catch (e) {}
+
+    const modal = document.getElementById('modal-reveal-gate');
+    if (modal) {
+      const container = document.getElementById('reveal-gate-content');
+      if (container) {
+        container.innerHTML = `
+          <h3 style="margin:0 0 8px">No Reveals Left</h3>
+          <p style="color:var(--text-muted);margin:0 0 20px;font-size:0.95rem">You need a reveal to contact this site. Each reveal unlocks one new connection.</p>
+          <div id="reveal-gate-options-inner"></div>`;
+        this._buildRevealGateOptions(document.getElementById('reveal-gate-options-inner'), reveals);
+      }
+      modal.style.display = 'flex';
     }
   },
 
