@@ -152,15 +152,7 @@ router.post('/buy-reveal', requireAuth, async (req, res) => {
   }
 
   if (!s) {
-    // Dev mode: grant reveals without payment
-    run(`INSERT INTO reveal_purchases (id, user_id, amount, quantity, status) VALUES (?, ?, ?, ?, 'completed')`,
-      [uuidv4(), user.id, totalCents, qty]);
-    run(`INSERT INTO billing_history (id, user_id, type, description, amount, status) VALUES (?, ?, 'reveal_purchase', ?, ?, 'completed')`,
-      [uuidv4(), user.id, `${qty} additional reveal${qty > 1 ? 's' : ''} (${plan.name} rate)`, totalCents]);
-
-    const updatedUser = get('SELECT * FROM users WHERE id = ?', [user.id]);
-    const reveals = getRevealStatus(updatedUser, { all, run });
-    return res.json({ success: true, reveals, devMode: true });
+    return res.status(503).json({ error: 'Payment is not configured yet. Please contact support.' });
   }
 
   try {
