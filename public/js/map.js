@@ -89,10 +89,11 @@ function initMap() {
   updateNaturalLayers();
 
   // Show location prompt on first visit, or use saved location
+  const DEFAULT_ZOOM = 16;
   const savedLocation = localStorage.getItem('dirtlink_location');
   if (savedLocation) {
     const loc = JSON.parse(savedLocation);
-    map.setView([loc.lat, loc.lng], loc.zoom || 12);
+    map.setView([loc.lat, loc.lng], DEFAULT_ZOOM);
   } else {
     document.getElementById('modal-location').style.display = 'flex';
   }
