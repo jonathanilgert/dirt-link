@@ -25,13 +25,13 @@
 // change once implemented.
 //
 // Tier policy (per the brief, with the C3 confirmation):
-//   - Enterprise   notified at 0 min
-//   - Powerhouse   at 15 min
-//   - Pro          at 45 min
+//   - Enterprise   notified at 0 min (instant)
+//   - Powerhouse   at 240 min (4 hours, same business day)
+//   - Pro          at 1440 min (24 hours, next business day)
 //   - Free         NEVER receives auto-routed leads (this is the entire
 //                  monetization mechanic — see C3).
 //   - If no Enterprise present, Powerhouse becomes the 0-min tier and
-//     Pro becomes 15-min. Same collapse if Powerhouse is also absent.
+//     Pro stays at 24h. Same collapse if Powerhouse is also absent.
 //   - If no paid suppliers match, lead is routed to admin only.
 
 const { v4: uuidv4 } = require('uuid');
@@ -44,9 +44,11 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'jonathanilgert@gmail.com';
 const APP_URL     = process.env.APP_URL     || 'http://localhost:3000';
 
 // Delay table — minutes, by tier, when the top tier present is enterprise.
+// Spread is intentional: Enterprise gets a morning-window first-look,
+// Powerhouse gets the rest of the same day, Pro picks up next business day.
 const DELAYS_BY_TOP_TIER = {
-  enterprise: { enterprise: 0, powerhouse: 15, pro: 45 },
-  powerhouse: { powerhouse: 0, pro: 15 },
+  enterprise: { enterprise: 0, powerhouse: 240, pro: 1440 },
+  powerhouse: { powerhouse: 0, pro: 1440 },
   pro:        { pro: 0 }
 };
 const TIER_RANK = { enterprise: 0, powerhouse: 1, pro: 2, free: 3 };
@@ -113,7 +115,7 @@ function selectMatchingSuppliers({ lead, suppliers }) {
   return byTier;
 }
 
-// Compute the 0/15/45-min schedule, collapsing one tier upward when a
+// Compute the 0/240/1440-min schedule, collapsing one tier upward when a
 // higher tier is empty. Pure — exported for tests.
 function planDelays(byTier) {
   if (byTier.enterprise.length) return DELAYS_BY_TOP_TIER.enterprise;
@@ -191,7 +193,7 @@ function routeLead(lead) {
 const _scheduledTimers = new Map();
 
 function scheduleSendNotification(notificationId, delayMs) {
-  const cap = Math.min(delayMs, 6 * 60 * 60 * 1000); // 6h cap so a runaway can't pin a process
+  const cap = Math.min(delayMs, 26 * 60 * 60 * 1000); // 26h cap — accommodates the 24h Pro delay; recoverPendingNotifications() handles process restarts
   const handle = setTimeout(() => {
     _scheduledTimers.delete(notificationId);
     sendNotification(notificationId).catch(err => console.error('[scheduler] send failed:', err.message));

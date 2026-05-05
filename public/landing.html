@@ -611,20 +611,20 @@ const UseCases = () => {
 const Pricing = () => {
   const tiers = [
     { id:'free', name:'Free', tagline:'Get started — post pins and browse the map for free.', price:'$0', unit:'/ mo', cta:'Get Started', ctaStyle:'secondary',
-      features:[['Post unlimited pins',true],['Browse the full map',true],['3 reveals / month',true],['Extra reveal: $4.99 each',true],['Proximity alerts',false],['Monitoring radius',false],['Private map view',false],['Unlimited outreach',false]] },
+      features:[['Post unlimited pins',true],['Browse the full map',true],['3 reveals / month',true],['Extra reveal: $4.99 each',true],['Proximity alerts',false],['Monitoring radius',false],['Private map view',false],['Unlimited outreach',false],['Basic directory listing',true],['Auto-routed buyer leads',false]] },
     { id:'pro', name:'Pro', tagline:'More reveals per month and a lower per-reveal cost.', price:'$29', unit:'/ mo', cta:'Get Started', ctaStyle:'secondary', href:'https://buy.stripe.com/7sY6oGcAO3z8amc3xI3ZK0e',
-      features:[['Post unlimited pins',true],['Browse the full map',true],['10 reveals / month',true],['Extra reveal: $2.99 each',true],['Proximity alerts',false],['Monitoring radius',false],['Private map view',false],['Unlimited outreach',false]] },
+      features:[['Post unlimited pins',true],['Browse the full map',true],['10 reveals / month',true],['Extra reveal: $2.99 each',true],['Proximity alerts',false],['Monitoring radius',false],['Private map view',false],['Unlimited outreach',false],['Full directory profile + photos',true],['Buyer leads — next business day',true]] },
     { id:'powerhouse', name:'Powerhouse', tagline:'Built for active sites that need real-time awareness.', price:'$59', unit:'/ mo', cta:'Get Started', ctaStyle:'primary', featured:true, href:'https://buy.stripe.com/00w4gy0S6fhQ8e45FQ3ZK0f',
-      features:[['Post unlimited pins',true],['Browse the full map',true],['40 reveals / month',true],['Extra reveal: $1.49 each',true],['Proximity alerts',true],['5–50 km monitoring radius',true],['Email / SMS notifications',true],['Private map view',false]] },
+      features:[['Post unlimited pins',true],['Browse the full map',true],['40 reveals / month',true],['Extra reveal: $1.49 each',true],['Proximity alerts',true],['5–50 km monitoring radius',true],['Email / SMS notifications',true],['Private map view',false],['Featured directory placement',true],['Buyer leads — same-day priority',true]] },
     { id:'enterprise', name:'Enterprise', tagline:'Full control for large contractors and fleet operations.', price:'$149', unit:'/ mo', cta:'Get Started', ctaStyle:'secondary', href:'https://buy.stripe.com/00w8wO30e8Tsamcecm3ZK0g',
-      features:[['Post unlimited pins',true],['Browse the full map',true],['Unlimited reveals',true],['No extra reveal cost',true],['Proximity alerts',true],['5–50 km monitoring radius',true],['Priority SMS / in-app alerts',true],['Private map view',true]] },
+      features:[['Post unlimited pins',true],['Browse the full map',true],['Unlimited reveals',true],['No extra reveal cost',true],['Proximity alerts',true],['5–50 km monitoring radius',true],['Priority SMS / in-app alerts',true],['Private map view',true],['Premier directory placement',true],['Buyer leads — first look (instant)',true]] },
   ];
   return (
     <section id="pricing" className="section">
       <div className="container">
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:40, alignItems:'end', marginBottom:40 }} className="sec-head">
           <div><div className="eyebrow">Pricing</div><h2 style={{ marginTop:16 }}>Free to post. Scale up when you're ready.</h2></div>
-          <p className="lede" style={{ justifySelf:'end' }}>Every tier includes unlimited pin posting and full map browsing. Upgrade for more reveals, proximity alerts, monitoring radius, and private map views as your operation grows.</p>
+          <p className="lede" style={{ justifySelf:'end' }}>Every tier includes unlimited pin posting, full map browsing, and a listing in the <a href="/calgary/suppliers" style={{ color:'inherit', textDecoration:'underline', textUnderlineOffset:'2px' }}>Calgary suppliers directory</a>. Upgrade for more reveals, proximity alerts, monitoring radius, private map views, and priority on routed buyer leads.</p>
         </div>
         <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:0, border:'1px solid var(--hairline)', borderRadius:14, overflow:'hidden', background:'var(--surface)' }} className="price-grid">
           {tiers.map((t,i) => (
