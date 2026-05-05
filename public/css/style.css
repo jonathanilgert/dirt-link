@@ -3920,7 +3920,7 @@ main {
 /* Bell button */
 .proximity-bell-wrapper {
   position: relative;
-  margin-right: 8px;
+  margin-right: 0;
 }
 
 .btn-proximity-bell {
