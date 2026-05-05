@@ -226,4 +226,197 @@ router.get('/permanent-pins', (req, res) => {
   res.json(all(query, params));
 });
 
+// --- Hubert ingestion endpoint (E3) ---
+//
+// POST /suppliers/ingest — bulk upsert of supplier rows into permanent_pins.
+// Idempotent on (name + address) or (name + phone) when address is missing.
+// Scope-guarded: caller's API key must include "external:supplier-ingest"
+// (or have NULL scopes for backwards-compat).
+//
+// Every ingested record lands with entity_kind='supplier',
+// directory_listing=0, tier='free', claimed=false. They stay invisible to
+// public users until Jonathan reviews the pin-classification CSV and
+// flips directory_listing manually. This is the safety net against bad
+// data going live.
+const { requireApiKeyScope } = require('../middleware/apiKey');
+const { CATEGORIES } = require('../lib/directory-categories');
+const { normalizeAreas } = require('../lib/area-vocab');
+
+const VALID_CATEGORY = new Set(CATEGORIES.map(c => c.slug));
+const MAX_INGEST_BATCH = 100;
+
+function validateSupplier(rec) {
+  const errors = [];
+  if (!rec || typeof rec !== 'object') return ['record must be an object'];
+  if (!rec.name || typeof rec.name !== 'string' || !rec.name.trim()) errors.push('name is required');
+  if (!rec.category || !VALID_CATEGORY.has(rec.category)) {
+    errors.push(`category must be one of: ${[...VALID_CATEGORY].join(', ')}`);
+  }
+  const areas = normalizeAreas(rec.serviceArea || rec.service_area);
+  if (!areas.ok) errors.push(...areas.errors.map(e => 'serviceArea: ' + e));
+  if (rec.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(rec.email).trim())) {
+    errors.push('email is malformed');
+  }
+  if (rec.website && typeof rec.website === 'string' && !/^https?:\/\//i.test(rec.website.trim())) {
+    errors.push('website must start with http(s)://');
+  }
+  if (rec.latitude != null && (typeof rec.latitude !== 'number' || rec.latitude < -90 || rec.latitude > 90)) {
+    errors.push('latitude out of range');
+  }
+  if (rec.longitude != null && (typeof rec.longitude !== 'number' || rec.longitude < -180 || rec.longitude > 180)) {
+    errors.push('longitude out of range');
+  }
+  return errors;
+}
+
+function findExistingSupplier(rec) {
+  const name = rec.name.trim();
+  const address = (rec.address || '').trim();
+  const phone   = (rec.phone   || '').trim();
+  if (address) {
+    const byAddr = get(
+      `SELECT * FROM permanent_pins WHERE site_name = ? AND address = ?`,
+      [name, address]
+    );
+    if (byAddr) return byAddr;
+  }
+  if (phone) {
+    const byPhone = get(
+      `SELECT * FROM permanent_pins WHERE site_name = ? AND contact_phone = ?`,
+      [name, phone]
+    );
+    if (byPhone) return byPhone;
+  }
+  return null;
+}
+
+router.post('/suppliers/ingest', requireApiKeyScope('external:supplier-ingest'), (req, res) => {
+  const records = Array.isArray(req.body) ? req.body : (req.body && req.body.suppliers);
+  if (!Array.isArray(records)) {
+    return res.status(400).json({ error: 'Body must be an array (or {suppliers: [...]})' });
+  }
+  if (records.length === 0) return res.json({ summary: { created: 0, updated: 0, rejected: 0 }, results: [] });
+  if (records.length > MAX_INGEST_BATCH) {
+    return res.status(413).json({ error: `Too many records — cap is ${MAX_INGEST_BATCH} per request` });
+  }
+
+  const results = [];
+  let created = 0, updated = 0, rejected = 0;
+
+  for (let i = 0; i < records.length; i++) {
+    const rec = records[i];
+    const errors = validateSupplier(rec);
+    if (errors.length) {
+      rejected++;
+      results.push({ index: i, action: 'rejected', name: (rec && rec.name) || null, errors });
+      continue;
+    }
+
+    const areasNorm = normalizeAreas(rec.serviceArea || rec.service_area);
+    const serviceAreaJson = JSON.stringify(areasNorm.areas);
+    const name = rec.name.trim();
+    const existing = findExistingSupplier(rec);
+
+    if (existing) {
+      run(
+        `UPDATE permanent_pins
+            SET site_type      = COALESCE(?, site_type),
+                category       = ?,
+                service_area   = ?,
+                contact_phone  = COALESCE(NULLIF(?, ''), contact_phone),
+                contact_email  = COALESCE(NULLIF(?, ''), contact_email),
+                website_url    = COALESCE(NULLIF(?, ''), website_url),
+                description    = COALESCE(NULLIF(?, ''), description),
+                address        = COALESCE(NULLIF(?, ''), address),
+                latitude       = COALESCE(?, latitude),
+                longitude      = COALESCE(?, longitude),
+                entity_kind    = 'supplier',
+                updated_at     = datetime('now')
+          WHERE id = ?`,
+        [
+          rec.site_type || 'supplier',
+          rec.category,
+          serviceAreaJson,
+          (rec.phone || '').trim(),
+          (rec.email || '').trim(),
+          (rec.website || '').trim(),
+          (rec.description || '').trim(),
+          (rec.address || '').trim(),
+          typeof rec.latitude  === 'number' ? rec.latitude  : null,
+          typeof rec.longitude === 'number' ? rec.longitude : null,
+          existing.id
+        ]
+      );
+      updated++;
+      results.push({ index: i, action: 'updated', pin_id: existing.id, name });
+    } else {
+      const id = uuidv4();
+      run(
+        `INSERT INTO permanent_pins
+           (id, latitude, longitude, site_name, site_type, address,
+            contact_phone, contact_email, website_url, description,
+            category, service_area, is_active, entity_kind, directory_listing,
+            tier, public_phone, public_address, created_by_key)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 'supplier', 0, 'free', 0, 0, ?)`,
+        [
+          id,
+          typeof rec.latitude  === 'number' ? rec.latitude  : 51.0447,  // Calgary centroid fallback
+          typeof rec.longitude === 'number' ? rec.longitude : -114.0719,
+          name,
+          rec.site_type || 'supplier',
+          (rec.address || '').trim(),
+          (rec.phone   || '').trim() || null,
+          (rec.email   || '').trim() || null,
+          (rec.website || '').trim() || null,
+          (rec.description || '').trim() || null,
+          rec.category,
+          serviceAreaJson,
+          req.apiKey.id
+        ]
+      );
+      created++;
+      results.push({ index: i, action: 'created', pin_id: id, name });
+    }
+  }
+
+  res.json({ summary: { created, updated, rejected }, results });
+});
+
+// --- Read-only inspector (D1, Stage 6) ---
+//
+// GET /admin/inspect-pins — dump permanent_pins + permit_pins so the user
+// can regenerate the pin-classification CSV without granting SSH or
+// pulling a DB file. Mounted on the same router so it inherits the same
+// requireApiKey + rateLimit + auditLog. Scope: 'admin:read' (or NULL
+// scopes for back-compat).
+//
+// Querystring filters:
+//   ?entity_kind=supplier   — only directory-eligible rows
+//   ?include_permits=true   — also include permit_pins
+router.get('/admin/inspect-pins', requireApiKeyScope('admin:read'), (req, res) => {
+  const conditions = [`is_active = 1`];
+  const params = [];
+  if (req.query.entity_kind) {
+    conditions.push(`entity_kind = ?`);
+    params.push(String(req.query.entity_kind));
+  }
+  const permanent = all(
+    `SELECT * FROM permanent_pins WHERE ${conditions.join(' AND ')} ORDER BY site_name`,
+    params
+  );
+  const includePermits = String(req.query.include_permits || '').toLowerCase() === 'true';
+  const permits = includePermits
+    ? all(`SELECT * FROM permit_pins WHERE is_active = 1 ORDER BY permit_date DESC`)
+    : [];
+  res.json({
+    permanent_pins: permanent,
+    permit_pins:    permits,
+    counts: {
+      permanent_pins: permanent.length,
+      permit_pins:    permits.length
+    },
+    generated_at: new Date().toISOString()
+  });
+});
+
 module.exports = router;

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{TITLE}}</title>
+  <meta name="description" content="{{META_DESCRIPTION}}">
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="/css/calgary.css">
+  <link rel="icon" href="/logo-triangle.svg" type="image/svg+xml">
+
+  <meta name="ga-measurement-id" content="{{GA_MEASUREMENT_ID}}">
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    (function(){
+      var meta = document.querySelector('meta[name="ga-measurement-id"]');
+      var id = meta && meta.getAttribute('content');
+      if (!id) return;
+      var s = document.createElement('script'); s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(id);
+      document.head.appendChild(s);
+      gtag('js', new Date()); gtag('config', id);
+    })();
+  </script>
+</head>
+<body>
+{{HEADER}}
+<main>
+{{BODY}}
+</main>
+{{FOOTER}}
+<script src="/js/calgary-ctas.js" defer></script>
+<script src="/js/claim.js" defer></script>
+</body>
+</html>

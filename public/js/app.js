@@ -1480,6 +1480,7 @@ window.DirtLink = {
       </div>` : ''}
 
       <div class="pp-panel-actions" style="flex-direction:column;gap:8px">
+        ${pin.directory_listing && pin.slug ? `<a class="btn btn-outline btn-full" href="/calgary/suppliers/${encodeURIComponent(pin.slug)}" style="text-align:center">View full profile &#8594;</a>` : ''}
         ${canClaim ? `<button class="btn btn-primary btn-full" onclick="DirtLink.claimPermanentPin('${pin.id}')">Claim This Listing</button>` : ''}
         ${isMine ? `<button class="btn btn-outline btn-full" onclick="DirtLink.editPermanentPin('${pin.id}')">Edit Listing</button>` : ''}
         ${!pin.claimed_by && !this.user ? `<button class="btn btn-primary btn-full" onclick="DirtLink.showAuthModal('register')">Log in to claim</button>` : ''}

@@ -44,4 +44,21 @@ function requireApiKey(req, res, next) {
   next();
 }
 
-module.exports = { hashKey, generateApiKey, requireApiKey };
+// Scope guard. Use AFTER requireApiKey so req.apiKey is populated.
+// A NULL/missing scopes column is treated as "any scope" — preserves
+// backwards-compat for keys issued before scoping landed.
+function requireApiKeyScope(scope) {
+  return function (req, res, next) {
+    if (!req.apiKey) return res.status(401).json({ error: 'requireApiKeyScope must run after requireApiKey' });
+    const record = get(`SELECT scopes FROM api_keys WHERE id = ?`, [req.apiKey.id]);
+    if (!record || record.scopes == null) return next(); // no restriction
+    let granted = [];
+    try { granted = JSON.parse(record.scopes); } catch {}
+    if (!Array.isArray(granted)) granted = [];
+    if (granted.length === 0) return next(); // empty array also = no restriction
+    if (granted.includes(scope) || granted.includes('*')) return next();
+    return res.status(403).json({ error: 'API key missing required scope', required: scope });
+  };
+}
+
+module.exports = { hashKey, generateApiKey, requireApiKey, requireApiKeyScope };
