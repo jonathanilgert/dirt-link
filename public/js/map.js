@@ -14,7 +14,7 @@ window.clearActiveMarker = function() {
 function initMap() {
   map = L.map('map', {
     center: [51.0447, -114.0719], // Default: Calgary, AB
-    zoom: 14,
+    zoom: 16,
     zoomControl: false
   });
 
