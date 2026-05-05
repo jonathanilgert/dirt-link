@@ -1,4 +1,5 @@
 const express = require('express');
+const bcrypt = require('bcryptjs');
 const router = express.Router();
 const { all, get, run } = require('../database/init');
 const { PLANS, getRevealStatus } = require('../config/pricing');
@@ -182,6 +183,16 @@ function dashboardPage(d) {
       <td class="num">${u.messages_sent}</td>
       <td class="num">${fmtMoney(u.total_spent)}</td>
       <td class="muted small">${fmtDate(u.created_at)}</td>
+      <td>
+        <button onclick="resetPassword('${esc(u.id)}','${esc(u.email)}')" style="font-size:11px;padding:4px 10px;border:1px solid #E2D9CF;border-radius:6px;background:#fff;cursor:pointer;white-space:nowrap">Reset PW</button>
+        <select onchange="setPlan('${esc(u.id)}','${esc(u.email)}',this.value);this.value=''" style="font-size:11px;padding:4px 6px;border:1px solid #E2D9CF;border-radius:6px;margin-top:4px;width:100%;cursor:pointer">
+          <option value="">Set plan…</option>
+          <option value="free">Free</option>
+          <option value="pro">Pro</option>
+          <option value="powerhouse">Powerhouse</option>
+          <option value="enterprise">Enterprise</option>
+        </select>
+      </td>
     </tr>`;
   }).join('');
 
@@ -319,7 +330,7 @@ function dashboardPage(d) {
           <th>Company</th><th>Contact</th><th>Plan</th>
           <th class="num">Active Pins</th><th>Reveals Remaining</th>
           <th class="num">Convos</th><th class="num">Msgs</th>
-          <th class="num">Spent</th><th>Joined</th>
+          <th class="num">Spent</th><th>Joined</th><th>Actions</th>
         </tr></thead>
         <tbody>${usersRows || '<tr><td colspan="10" style="text-align:center;padding:24px;color:#8A7E74">No members yet</td></tr>'}</tbody>
       </table>
@@ -391,6 +402,31 @@ function dashboardPage(d) {
 </div>
 
 <script>
+  async function resetPassword(userId, email) {
+    const newPw = prompt(`New password for ${email}:`);
+    if (!newPw) return;
+    if (newPw.length < 6) { alert('Password must be at least 6 characters'); return; }
+    const res = await fetch('/admin/reset-user-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, password: newPw })
+    });
+    const data = await res.json();
+    alert(res.ok ? `Done — password updated for ${email}` : (data.error || 'Failed'));
+  }
+
+  async function setPlan(userId, email, plan) {
+    if (!plan) return;
+    const res = await fetch('/admin/set-plan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, plan })
+    });
+    const data = await res.json();
+    if (res.ok) { alert(`${email} → ${plan}`); location.reload(); }
+    else alert(data.error || 'Failed');
+  }
+
   function showTab(name, el) {
     document.querySelectorAll('[id^="tab-"]').forEach(t => t.style.display = 'none');
     document.getElementById('tab-' + name).style.display = 'block';
@@ -403,18 +439,35 @@ function dashboardPage(d) {
 
 // ── POST /admin/set-plan — update a user's plan ──────────────────────────────
 router.post('/set-plan', requireAdmin, (req, res) => {
-  const { email, plan } = req.body;
-  if (!email || !['free', 'pro', 'powerhouse', 'enterprise'].includes(plan)) {
-    return res.status(400).json({ error: 'Invalid email or plan' });
+  const { email, userId, plan } = req.body;
+  if (!['free', 'pro', 'powerhouse', 'enterprise'].includes(plan)) {
+    return res.status(400).json({ error: 'Invalid plan' });
   }
-  const user = get('SELECT id FROM users WHERE email = ?', [email]);
+  const user = userId
+    ? get('SELECT id FROM users WHERE id = ?', [userId])
+    : get('SELECT id FROM users WHERE email = ?', [email]);
   if (!user) return res.status(404).json({ error: 'User not found' });
 
   const priority = plan === 'powerhouse' || plan === 'enterprise' ? 1 : 0;
   run(`UPDATE users SET user_type = ?, priority_notifications = ?, updated_at = datetime('now') WHERE id = ?`,
     [plan, priority, user.id]);
 
-  res.json({ ok: true, email, plan });
+  res.json({ ok: true, plan });
+});
+
+// ── POST /admin/reset-user-password ─────────────────────────────────────────
+router.post('/reset-user-password', requireAdmin, (req, res) => {
+  const { userId, password } = req.body;
+  if (!userId || !password) return res.status(400).json({ error: 'userId and password are required' });
+  if (password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
+
+  const user = get('SELECT id FROM users WHERE id = ?', [userId]);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+
+  const hash = bcrypt.hashSync(password, 10);
+  run(`UPDATE users SET password_hash = ?, updated_at = datetime('now') WHERE id = ?`, [hash, userId]);
+
+  res.json({ ok: true });
 });
 
 module.exports = router;
