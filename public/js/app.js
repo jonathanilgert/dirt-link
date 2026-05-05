@@ -561,6 +561,81 @@ window.DirtLink = {
     document.getElementById('filter-my-company').addEventListener('change', () => this.applyFilters());
   },
 
+  _showResetPasswordModal(token) {
+    const modal = document.getElementById('modal-reset-password');
+    modal.style.display = 'flex';
+    document.getElementById('reset-pw-error').textContent = '';
+    document.getElementById('reset-pw-success').style.display = 'none';
+    document.getElementById('reset-pw-new').value = '';
+    document.getElementById('reset-pw-confirm').value = '';
+
+    document.getElementById('form-reset-password').onsubmit = async (e) => {
+      e.preventDefault();
+      const password = document.getElementById('reset-pw-new').value;
+      const confirm = document.getElementById('reset-pw-confirm').value;
+      if (password !== confirm) {
+        document.getElementById('reset-pw-error').textContent = 'Passwords do not match';
+        return;
+      }
+      const btn = e.target.querySelector('button[type=submit]');
+      btn.disabled = true; btn.textContent = 'Saving…';
+
+      try {
+        const res = await fetch('/api/auth/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, password })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          document.getElementById('form-reset-password').style.display = 'none';
+          const success = document.getElementById('reset-pw-success');
+          success.style.display = 'block';
+          success.textContent = 'Password updated! You can now log in.';
+          setTimeout(() => {
+            modal.style.display = 'none';
+            document.getElementById('form-reset-password').style.display = 'flex';
+            this.showAuthModal('login');
+          }, 2000);
+        } else {
+          document.getElementById('reset-pw-error').textContent = data.error || 'Failed to reset password';
+        }
+      } catch (e) {
+        document.getElementById('reset-pw-error').textContent = 'Something went wrong. Please try again.';
+      }
+      btn.disabled = false; btn.textContent = 'Set New Password';
+    };
+  },
+
+  showForgotPassword() {
+    document.getElementById('modal-auth').style.display = 'none';
+    document.getElementById('modal-forgot-password').style.display = 'flex';
+    document.getElementById('forgot-step-request').style.display = 'block';
+    document.getElementById('forgot-step-sent').style.display = 'none';
+    document.getElementById('forgot-error').textContent = '';
+    document.getElementById('forgot-email').value = '';
+
+    document.getElementById('form-forgot').onsubmit = async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('forgot-email').value.trim();
+      const btn = e.target.querySelector('button[type=submit]');
+      btn.disabled = true; btn.textContent = 'Sending…';
+      try {
+        await fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        // Always show success (don't reveal if email exists)
+        document.getElementById('forgot-step-request').style.display = 'none';
+        document.getElementById('forgot-step-sent').style.display = 'block';
+      } catch (e) {
+        document.getElementById('forgot-error').textContent = 'Something went wrong. Please try again.';
+      }
+      btn.disabled = false; btn.textContent = 'Send Reset Link';
+    };
+  },
+
   // Auth
   showAuthModal(tab) {
     document.getElementById('modal-auth').style.display = 'flex';
@@ -2380,4 +2455,15 @@ window.DirtLink = {
 };
 
 // Initialize on load
-document.addEventListener('DOMContentLoaded', () => DirtLink.init());
+document.addEventListener('DOMContentLoaded', () => {
+  DirtLink.init();
+
+  // Handle password reset link — /reset-password?token=xxx
+  const params = new URLSearchParams(window.location.search);
+  const resetToken = params.get('token');
+  if (resetToken && window.location.pathname === '/reset-password') {
+    DirtLink._showResetPasswordModal(resetToken);
+    // Clean up URL
+    history.replaceState(null, '', '/app');
+  }
+});

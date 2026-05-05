@@ -238,6 +238,10 @@ app.get('*', (req, res) => {
   if (req.path.startsWith('/api/') || req.path.startsWith('/legal/') || req.path.startsWith('/admin')) {
     return res.status(404).send('Not found');
   }
+  // Password reset links land here — serve the app so JS can pick up the token
+  if (req.path === '/reset-password') {
+    return res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  }
   res.redirect('/');
 });
 

@@ -260,4 +260,8 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
-module.exports = { queueNotification, scheduleFlush, flushNotifications };
+function getTransporterAndFrom() {
+  return { transport: getTransporter(), from: FROM_EMAIL };
+}
+
+module.exports = { queueNotification, scheduleFlush, flushNotifications, getTransporterAndFrom };
