@@ -403,7 +403,7 @@ function dashboardPage(d) {
 
 <script>
   async function resetPassword(userId, email) {
-    const newPw = prompt(`New password for ${email}:`);
+    const newPw = prompt('New password for ' + email + ':');
     if (!newPw) return;
     if (newPw.length < 6) { alert('Password must be at least 6 characters'); return; }
     const res = await fetch('/admin/reset-user-password', {
@@ -412,7 +412,7 @@ function dashboardPage(d) {
       body: JSON.stringify({ userId, password: newPw })
     });
     const data = await res.json();
-    alert(res.ok ? `Done — password updated for ${email}` : (data.error || 'Failed'));
+    alert(res.ok ? 'Done — password updated for ' + email : (data.error || 'Failed'));
   }
 
   async function setPlan(userId, email, plan) {
@@ -423,7 +423,7 @@ function dashboardPage(d) {
       body: JSON.stringify({ userId, plan })
     });
     const data = await res.json();
-    if (res.ok) { alert(`${email} → ${plan}`); location.reload(); }
+    if (res.ok) { alert(email + ' → ' + plan); location.reload(); }
     else alert(data.error || 'Failed');
   }
 
