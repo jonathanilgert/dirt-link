@@ -142,8 +142,9 @@ router.post('/buy-reveal', requireAuth, async (req, res) => {
 
   // Use pre-built Stripe payment links per plan (no Stripe keys needed)
   const REVEAL_LINKS = {
-    free: 'https://buy.stripe.com/8x27sK6gObpF0wDaT45wI00',
-    pro:  'https://buy.stripe.com/3cI5kC9t0alBcflgdo5wI01'
+    free:       'https://buy.stripe.com/8x27sK6gObpF0wDaT45wI00',
+    pro:        'https://buy.stripe.com/3cI5kC9t0alBcflgdo5wI01',
+    powerhouse: 'https://buy.stripe.com/9B600i6gO9hx6V1aT45wI02'
   };
   const revealLink = REVEAL_LINKS[user.user_type];
   if (revealLink) {
