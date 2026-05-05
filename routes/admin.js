@@ -174,16 +174,16 @@ function dashboardPage(d) {
         })();
     return `
     <tr>
-      <td><strong>${esc(u.company_name)}</strong><br><span class="muted">${esc(u.contact_name)}</span></td>
-      <td><a href="mailto:${esc(u.email)}">${esc(u.email)}</a>${u.phone ? `<br><span class="muted">${esc(u.phone)}</span>` : ''}</td>
-      <td>${planBadge(u.user_type)}</td>
-      <td class="num">${u.active_pins} <span class="muted">/ ${u.total_pins}</span></td>
-      <td style="min-width:160px">${revealBar}</td>
-      <td class="num">${u.conversations}</td>
-      <td class="num">${u.messages_sent}</td>
-      <td class="num">${fmtMoney(u.total_spent)}</td>
-      <td class="muted small">${fmtDate(u.created_at)}</td>
-      <td>
+      <td data-label="Company"><strong>${esc(u.company_name)}</strong><br><span class="muted">${esc(u.contact_name)}</span></td>
+      <td data-label="Contact"><a href="mailto:${esc(u.email)}">${esc(u.email)}</a>${u.phone ? `<br><span class="muted">${esc(u.phone)}</span>` : ''}</td>
+      <td data-label="Plan">${planBadge(u.user_type)}</td>
+      <td data-label="Active Pins" class="num">${u.active_pins} <span class="muted">/ ${u.total_pins}</span></td>
+      <td data-label="Reveals" style="min-width:160px">${revealBar}</td>
+      <td data-label="Convos" class="num">${u.conversations}</td>
+      <td data-label="Msgs" class="num">${u.messages_sent}</td>
+      <td data-label="Spent" class="num">${fmtMoney(u.total_spent)}</td>
+      <td data-label="Joined" class="muted small">${fmtDate(u.created_at)}</td>
+      <td data-label="Actions">
         <button onclick="resetPassword('${esc(u.id)}','${esc(u.email)}')" style="font-size:11px;padding:4px 10px;border:1px solid #E2D9CF;border-radius:6px;background:#fff;cursor:pointer;white-space:nowrap">Reset PW</button>
         <select onchange="setPlan('${esc(u.id)}','${esc(u.email)}',this.value);this.value=''" style="font-size:11px;padding:4px 6px;border:1px solid #E2D9CF;border-radius:6px;margin-top:4px;width:100%;cursor:pointer">
           <option value="">Set plan…</option>
@@ -286,7 +286,44 @@ function dashboardPage(d) {
   .tab{padding:6px 16px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;color:#8A7E74;transition:all .15s}
   .tab.active{background:#fff;color:#1A1410;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
 
-  @media(max-width:768px){.page{padding:16px 12px}.stats-grid{grid-template-columns:1fr 1fr}.top-nav nav{display:none}}
+  @media(max-width:768px){
+    .page{padding:16px 12px}
+    .stats-grid{grid-template-columns:1fr 1fr}
+    .top-nav nav{display:none}
+    .permit-summary{flex-direction:column}
+
+    /* Members table → cards on mobile */
+    #tab-members .table-wrap{background:transparent;border:none;overflow:visible}
+    #tab-members table,
+    #tab-members thead,
+    #tab-members tbody,
+    #tab-members th,
+    #tab-members td,
+    #tab-members tr{display:block;width:100%}
+    #tab-members thead{display:none}
+    #tab-members tbody tr{
+      background:#fff;border:1px solid #E2D9CF;border-radius:12px;
+      margin-bottom:12px;padding:4px 0;overflow:hidden
+    }
+    #tab-members tbody tr:hover td{background:transparent}
+    #tab-members td{
+      display:flex;align-items:flex-start;justify-content:space-between;
+      gap:10px;padding:8px 14px;border-bottom:1px solid #F3F0EB;
+      text-align:left !important
+    }
+    #tab-members td:last-child{border-bottom:none}
+    #tab-members td::before{
+      content:attr(data-label);
+      font-size:10px;font-weight:600;color:#8A7E74;
+      text-transform:uppercase;letter-spacing:.05em;
+      white-space:nowrap;flex-shrink:0;padding-top:2px;min-width:80px
+    }
+    #tab-members td[data-label="Reveals"]{flex-direction:column;align-items:flex-start}
+    #tab-members td[data-label="Reveals"]::before{margin-bottom:4px}
+    #tab-members td[data-label="Actions"]{flex-direction:column;align-items:flex-start;gap:6px}
+    #tab-members td[data-label="Actions"]::before{margin-bottom:2px}
+    #tab-members td[data-label="Actions"] select{width:100%}
+  }
 </style>
 </head>
 <body>
