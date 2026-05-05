@@ -143,7 +143,7 @@ router.post('/buy-reveal', requireAuth, async (req, res) => {
   // Free plan: use the pre-built Stripe payment link (qty=1 only — link is priced per reveal)
   // For multi-reveal packs on free, fall through to dynamic checkout
   if (user.user_type === 'free' && qty === 1) {
-    const STRIPE_FREE_REVEAL_LINK = 'https://buy.stripe.com/7sY8wOfN06Lk51S4BM3ZK0h';
+    const STRIPE_FREE_REVEAL_LINK = 'https://buy.stripe.com/8x27sK6gObpF0wDaT45wI00';
     const params = new URLSearchParams({
       client_reference_id: user.id,
       prefilled_email: user.email
