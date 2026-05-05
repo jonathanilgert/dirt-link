@@ -14,7 +14,7 @@ window.clearActiveMarker = function() {
 function initMap() {
   map = L.map('map', {
     center: [51.0447, -114.0719], // Default: Calgary, AB
-    zoom: 16,
+    zoom: 13,
     zoomControl: false
   });
 
@@ -89,7 +89,7 @@ function initMap() {
   updateNaturalLayers();
 
   // Show location prompt on first visit, or use saved location
-  const DEFAULT_ZOOM = 16;
+  const DEFAULT_ZOOM = 13;
   const savedLocation = localStorage.getItem('dirtlink_location');
   if (savedLocation) {
     const loc = JSON.parse(savedLocation);
