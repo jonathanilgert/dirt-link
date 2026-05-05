@@ -152,4 +152,48 @@ router.post('/forgot-password', (req, res) => {
   res.json({ ok: true });
 });
 
+// ── DELETE /api/auth/account — permanently delete the authenticated user's account ──
+router.delete('/account', requireAuth, (req, res) => {
+  const userId = req.session.userId;
+  const user = get('SELECT id, email FROM users WHERE id = ?', [userId]);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+
+  // Delete all user data in dependency order
+  run(`DELETE FROM proximity_notifications   WHERE recipient_id = ?`, [userId]);
+  run(`DELETE FROM proximity_alert_settings  WHERE user_id = ?`,      [userId]);
+  run(`DELETE FROM notification_queue        WHERE user_id = ?`,       [userId]);
+  run(`DELETE FROM reveal_purchases          WHERE user_id = ?`,       [userId]);
+  run(`DELETE FROM billing_history           WHERE user_id = ?`,       [userId]);
+  run(`DELETE FROM password_reset_tokens     WHERE user_id = ?`,       [userId]);
+
+  // Messages and conversations — remove threads where user is a participant
+  const convIds = all(
+    `SELECT id FROM conversations WHERE pin_owner_id = ? OR requester_id = ?`,
+    [userId, userId]
+  ).map(c => c.id);
+  if (convIds.length) {
+    const ph = convIds.map(() => '?').join(',');
+    run(`DELETE FROM messages WHERE conversation_id IN (${ph})`, convIds);
+    run(`DELETE FROM conversations WHERE id IN (${ph})`,         convIds);
+  }
+
+  // Pins and associated data
+  const pinIds = all(`SELECT id FROM pins WHERE user_id = ?`, [userId]).map(p => p.id);
+  if (pinIds.length) {
+    const ph = pinIds.map(() => '?').join(',');
+    run(`DELETE FROM pin_photos WHERE pin_id IN (${ph})`, pinIds);
+    run(`DELETE FROM proximity_notifications WHERE trigger_pin_id IN (${ph})`, pinIds);
+    run(`DELETE FROM proximity_alert_settings WHERE pin_id IN (${ph})`,        pinIds);
+    run(`DELETE FROM pins WHERE id IN (${ph})`,                                pinIds);
+  }
+
+  // Finally remove the user record
+  run(`DELETE FROM users WHERE id = ?`, [userId]);
+
+  // Destroy session
+  req.session.destroy(() => {});
+
+  res.json({ ok: true });
+});
+
 module.exports = router;

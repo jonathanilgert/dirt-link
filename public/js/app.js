@@ -1601,6 +1601,34 @@ window.DirtLink = {
     this.loadProximitySettings();
   },
 
+  async deleteAccount() {
+    const confirmed = confirm(
+      'Are you sure you want to permanently delete your account?\n\nThis will remove all your pins, messages, and data. This cannot be undone.'
+    );
+    if (!confirmed) return;
+
+    const btn = document.getElementById('btn-delete-account');
+    btn.textContent = 'Deleting…';
+    btn.disabled = true;
+
+    try {
+      const res = await fetch('/api/auth/account', { method: 'DELETE' });
+      if (res.ok) {
+        alert('Your account has been deleted. You will now be redirected.');
+        window.location.href = '/';
+      } else {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || 'Failed to delete account. Please try again.');
+        btn.textContent = 'Delete My Account';
+        btn.disabled = false;
+      }
+    } catch {
+      alert('Network error. Please try again.');
+      btn.textContent = 'Delete My Account';
+      btn.disabled = false;
+    }
+  },
+
   async saveNotificationPrefs() {
     const emailOn = document.getElementById('pref-email-notifications').checked;
     const smsOn = document.getElementById('pref-sms-notifications').checked;

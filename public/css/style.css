@@ -3845,6 +3845,24 @@ main {
   margin-top: 8px;
 }
 
+.btn-delete-account {
+  padding: 8px 18px;
+  border: 1.5px solid #DC2626;
+  border-radius: var(--radius);
+  background: transparent;
+  color: #DC2626;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-delete-account:hover {
+  background: #DC2626;
+  color: #fff;
+}
+
 .notification-settings {
   background: var(--bg-card);
   border: 1px solid var(--border);
