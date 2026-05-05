@@ -181,9 +181,8 @@ function createPinIcon(pinType, materialType, isTested, isNow) {
 // Create icon for opaque (unclaimed) permit pins — semi-transparent upright triangle
 function createPermitPinIcon() {
   const size = 38;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="filter:drop-shadow(0 2px 4px rgba(0,0,0,0.2));display:block;">
-    <polygon points="19,4 35,34 3,34" fill="rgba(120,120,120,0.45)" stroke="rgba(80,80,80,0.6)" stroke-width="2" stroke-linejoin="round"/>
-    <text x="19" y="26" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="rgba(60,60,60,0.7)" font-weight="700" font-family="Inter,sans-serif">?</text>
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="filter:drop-shadow(0 2px 4px rgba(0,0,0,0.15));display:block;">
+    <polygon points="19,4 35,34 3,34" fill="rgba(180,175,168,0.55)" stroke="rgba(140,132,124,0.7)" stroke-width="1.5" stroke-linejoin="round"/>
   </svg>`;
   return L.divIcon({
     className: 'custom-pin permit-pin',
