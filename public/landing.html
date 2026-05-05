@@ -275,17 +275,17 @@ const Hero = () => {
         <div className="hero-tile hero-workspace" style={{ background:'var(--surface)', boxShadow:'var(--shadow-lg)', padding:0, overflow:'hidden', borderRadius:14, border:'1px solid var(--hairline)' }}>
           <div style={{ display:'flex', alignItems:'center', gap:14, padding:'12px 16px', borderBottom:'1px solid var(--hairline)', background:'var(--bg-elev)' }}>
             <div style={{ display:'flex', gap:6 }}>
-              <span style={{ width:10, height:10, borderRadius:99, background:'var(--hairline)' }}/>
-              <span style={{ width:10, height:10, borderRadius:99, background:'var(--hairline)' }}/>
-              <span style={{ width:10, height:10, borderRadius:99, background:'var(--hairline)' }}/>
+              <span style={{ width:10, height:10, borderRadius:99, background:'#FF5F57' }}/>
+              <span style={{ width:10, height:10, borderRadius:99, background:'#FFBD2E' }}/>
+              <span style={{ width:10, height:10, borderRadius:99, background:'#28CA41' }}/>
             </div>
-            <div className="mono" style={{ fontSize:12, color:'var(--ink-3)', padding:'4px 10px', background:'var(--surface)', border:'1px solid var(--hairline)', borderRadius:5, flex:1, maxWidth:440 }}>app.dirtlink.ca / map · 51.0447° N, 114.0719° W</div>
+            <div className="mono" style={{ fontSize:12, color:'var(--ink-3)', padding:'4px 10px', background:'var(--surface)', border:'1px solid var(--hairline)', borderRadius:5, flex:1, maxWidth:440 }}>dirtlink.ca / app · Calgary, AB</div>
             <div className="row gap-4 mono" style={{ fontSize:11, color:'var(--ink-3)' }}>
               <span><span className="dot" style={{ color:'#3FB27F' }}/> &nbsp;live</span>
-              <span>Calgary, AB</span>
             </div>
           </div>
-          <div style={{ display:'grid', gridTemplateColumns:'280px 1fr 320px', height:560 }} className="hero-grid">
+          <img src="/images/dashboard.png" alt="DirtLink app" style={{ width:'100%', display:'block' }}/>
+          <div style={{ display:'none', gridTemplateColumns:'280px 1fr 320px', height:560 }} className="hero-grid">
             {/* Filter rail */}
             <div style={{ borderRight:'1px solid var(--hairline)', padding:'18px 16px', overflow:'auto' }} className="hero-rail">
               <div className="mono" style={{ fontSize:11, color:'var(--ink-3)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:12 }}>Filters</div>
