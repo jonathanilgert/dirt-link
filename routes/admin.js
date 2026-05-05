@@ -401,4 +401,20 @@ function dashboardPage(d) {
 </body></html>`;
 }
 
+// ── POST /admin/set-plan — update a user's plan ──────────────────────────────
+router.post('/set-plan', requireAdmin, (req, res) => {
+  const { email, plan } = req.body;
+  if (!email || !['free', 'pro', 'powerhouse', 'enterprise'].includes(plan)) {
+    return res.status(400).json({ error: 'Invalid email or plan' });
+  }
+  const user = get('SELECT id FROM users WHERE email = ?', [email]);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+
+  const priority = plan === 'powerhouse' || plan === 'enterprise' ? 1 : 0;
+  run(`UPDATE users SET user_type = ?, priority_notifications = ?, updated_at = datetime('now') WHERE id = ?`,
+    [plan, priority, user.id]);
+
+  res.json({ ok: true, email, plan });
+});
+
 module.exports = router;
