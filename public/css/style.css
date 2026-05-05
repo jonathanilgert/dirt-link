@@ -3784,6 +3784,67 @@ main {
 }
 
 /* ── Notification Settings ── */
+/* Notifications upgrade gate */
+.notif-upgrade-gate {
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--surface);
+}
+
+.notif-gate-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: var(--primary-light);
+  color: var(--primary);
+  display: grid;
+  place-items: center;
+  margin-bottom: 4px;
+}
+
+.notif-gate-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.notif-gate-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  max-width: 480px;
+}
+
+.notif-gate-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.notif-gate-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.notif-gate-list li svg {
+  color: var(--success);
+  flex-shrink: 0;
+}
+
+.notif-gate-btn {
+  margin-top: 8px;
+}
+
 .notification-settings {
   background: var(--bg-card);
   border: 1px solid var(--border);

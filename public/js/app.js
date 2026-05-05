@@ -1569,6 +1569,26 @@ window.DirtLink = {
   // ── Notification Preferences ──
   loadNotificationPrefs() {
     if (!this.user) return;
+    const plan = this.user.user_type || 'free';
+    const hasAccess = plan === 'powerhouse' || plan === 'enterprise';
+
+    const gate = document.getElementById('notifications-upgrade-gate');
+    const body = document.getElementById('notifications-settings-body');
+    const saveBtn = document.getElementById('btn-save-notifications');
+
+    if (!hasAccess) {
+      gate.style.display = 'block';
+      body.style.display = 'none';
+      saveBtn.style.display = 'none';
+      return;
+    }
+
+    gate.style.display = 'none';
+    body.style.display = 'flex';
+    body.style.flexDirection = 'column';
+    body.style.gap = '16px';
+    saveBtn.style.display = '';
+
     document.getElementById('pref-email-notifications').checked = !!this.user.email_notifications;
     document.getElementById('pref-sms-notifications').checked = !!this.user.sms_notifications;
     const phoneHint = document.getElementById('sms-phone-hint');
