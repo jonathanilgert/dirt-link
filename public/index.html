@@ -356,7 +356,7 @@
           <input type="password" name="password" placeholder="Password" required>
           <button type="submit" class="btn btn-primary btn-full">Log In</button>
           <p class="auth-error" id="login-error"></p>
-          <p style="text-align:center;margin:4px 0 0"><span style="font-size:0.85rem;color:var(--text-muted)">Forgot password? <a href="mailto:hello@dirtlink.ca" style="color:var(--text-muted)">Contact support</a></span></p>
+          <p style="text-align:center;margin:4px 0 0"><a href="#" onclick="event.preventDefault();DirtLink.showForgotPassword()" style="font-size:0.85rem;color:var(--text-muted)">Forgot password?</a></p>
         </form>
         <form id="form-register" class="auth-form" style="display:none">
           <input type="text" name="company_name" placeholder="Company Name" required>
@@ -681,20 +681,14 @@
   <div class="modal-overlay" id="modal-forgot-password" style="display:none">
     <div class="modal" style="max-width:400px;width:92%">
       <button class="modal-close" onclick="document.getElementById('modal-forgot-password').style.display='none'">&times;</button>
-      <div id="forgot-step-request">
-        <h3 style="margin:0 0 6px">Reset Password</h3>
-        <p style="color:var(--text-muted);font-size:0.9rem;margin:0 0 18px">Enter your email and we'll send you a reset link.</p>
-        <form id="form-forgot" class="auth-form" style="gap:12px">
-          <input type="email" id="forgot-email" placeholder="Email address" required style="width:100%;box-sizing:border-box">
-          <button type="submit" class="btn btn-primary btn-full">Send Reset Link</button>
-          <p class="auth-error" id="forgot-error"></p>
-        </form>
-      </div>
-      <div id="forgot-step-sent" style="display:none;text-align:center;padding:10px 0">
-        <div style="font-size:2rem;margin-bottom:12px">✉️</div>
-        <h3 style="margin:0 0 8px">Check your email</h3>
-        <p style="color:var(--text-muted);font-size:0.9rem;margin:0">If that email is registered, a reset link is on its way. Check your inbox (and spam folder).</p>
-      </div>
+      <h3 style="margin:0 0 6px">Reset Password</h3>
+      <p style="color:var(--text-muted);font-size:0.9rem;margin:0 0 18px">Enter your email and a new password.</p>
+      <form id="form-forgot" class="auth-form" style="gap:12px">
+        <input type="email" id="forgot-email" placeholder="Email address" required>
+        <input type="password" id="forgot-new-password" placeholder="New password (min 6 chars)" required minlength="6">
+        <button type="submit" class="btn btn-primary btn-full">Set New Password</button>
+        <p class="auth-error" id="forgot-error"></p>
+      </form>
     </div>
   </div>
 

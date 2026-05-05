@@ -610,29 +610,33 @@ window.DirtLink = {
   showForgotPassword() {
     document.getElementById('modal-auth').style.display = 'none';
     document.getElementById('modal-forgot-password').style.display = 'flex';
-    document.getElementById('forgot-step-request').style.display = 'block';
-    document.getElementById('forgot-step-sent').style.display = 'none';
     document.getElementById('forgot-error').textContent = '';
     document.getElementById('forgot-email').value = '';
+    document.getElementById('forgot-new-password').value = '';
 
     document.getElementById('form-forgot').onsubmit = async (e) => {
       e.preventDefault();
       const email = document.getElementById('forgot-email').value.trim();
+      const password = document.getElementById('forgot-new-password').value;
       const btn = e.target.querySelector('button[type=submit]');
-      btn.disabled = true; btn.textContent = 'Sending…';
+      btn.disabled = true; btn.textContent = 'Saving…';
       try {
-        await fetch('/api/auth/forgot-password', {
+        const res = await fetch('/api/auth/forgot-password', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email })
+          body: JSON.stringify({ email, password })
         });
-        // Always show success (don't reveal if email exists)
-        document.getElementById('forgot-step-request').style.display = 'none';
-        document.getElementById('forgot-step-sent').style.display = 'block';
+        const data = await res.json();
+        if (res.ok) {
+          document.getElementById('modal-forgot-password').style.display = 'none';
+          this.showAuthModal('login');
+        } else {
+          document.getElementById('forgot-error').textContent = data.error || 'Something went wrong.';
+        }
       } catch (e) {
         document.getElementById('forgot-error').textContent = 'Something went wrong. Please try again.';
       }
-      btn.disabled = false; btn.textContent = 'Send Reset Link';
+      btn.disabled = false; btn.textContent = 'Set New Password';
     };
   },
 
