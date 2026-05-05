@@ -90,6 +90,10 @@ function initMap() {
 
   // Show location prompt on first visit, or use saved location
   const DEFAULT_ZOOM = 13;
+  // ?go param skips modal (used for screenshots/previews)
+  if (new URLSearchParams(window.location.search).has('go')) {
+    localStorage.setItem('dirtlink_location', JSON.stringify({lat:51.0447,lng:-114.0719,zoom:DEFAULT_ZOOM}));
+  }
   const savedLocation = localStorage.getItem('dirtlink_location');
   if (savedLocation) {
     const loc = JSON.parse(savedLocation);
