@@ -737,8 +737,8 @@ const FAQ_SECTIONS = [
     label: 'Account and technical',
     items: [
       { q: 'I forgot my password.', a: 'Click "Forgot password" on the sign-in page and we\'ll send a reset link to your registered email.' },
-      { q: 'I can\'t find my development site on the map.', a: 'A few possibilities: the permit may not have been approved yet (only approved permits appear), it may have been approved very recently and not yet pulled, or you may be searching by an address that doesn\'t match the City\'s record. Try searching by permit number or contact us at support@dirtlink.ca.' },
-      { q: 'The map isn\'t loading.', a: 'Refresh first. If it still doesn\'t work, try a different browser or check your internet. For ongoing issues, email support@dirtlink.ca.' },
+      { q: 'I can\'t find my development site on the map.', a: 'A few possibilities: the permit may not have been approved yet (only approved permits appear), it may have been approved very recently and not yet pulled, or you may be searching by an address that doesn\'t match the City\'s record. Try searching by permit number or contact us at hello@dirtlink.ca.' },
+      { q: 'The map isn\'t loading.', a: 'Refresh first. If it still doesn\'t work, try a different browser or check your internet. For ongoing issues, email hello@dirtlink.ca.' },
       { q: 'I want to change my email address.', a: 'Account Settings → Profile → Update email. We\'ll send a confirmation to the new address.' },
       { q: 'How do I delete my account?', a: 'Account Settings → Privacy → Delete Account. This removes your contact info, listings, and personal data. Email logs and payment records are retained for the periods required by law.' },
     ]
@@ -764,7 +764,7 @@ const FAQ = () => {
           </div>
           <p className="lede" style={{ justifySelf:'end' }}>
             DirtLink connects Calgary's development sites with the people who move earth. Don't see your question?{' '}
-            <a href="mailto:support@dirtlink.ca" style={{ color:'var(--ink)', borderBottom:'1px solid var(--hairline)' }}>Email us</a> and we'll add it.
+            <a href="mailto:hello@dirtlink.ca" style={{ color:'var(--ink)', borderBottom:'1px solid var(--hairline)' }}>Email us</a> and we'll add it.
           </p>
         </div>
 
@@ -819,8 +819,8 @@ const FAQ = () => {
 
         <div style={{ marginTop:56, paddingTop:32, borderTop:'1px solid var(--hairline)', display:'flex', gap:12, alignItems:'center', justifyContent:'center', flexWrap:'wrap' }}>
           <span style={{ fontSize:14, color:'var(--ink-3)' }}>Still have questions?</span>
-          <a href="mailto:support@dirtlink.ca" className="btn btn-secondary" style={{ fontSize:13 }}>
-            <Icon name="message" size={13}/> support@dirtlink.ca
+          <a href="mailto:hello@dirtlink.ca" className="btn btn-secondary" style={{ fontSize:13 }}>
+            <Icon name="message" size={13}/> hello@dirtlink.ca
           </a>
         </div>
       </div>
@@ -847,7 +847,7 @@ const Contact = () => (
           <p className="lede" style={{ marginBottom:40 }}>Questions about the platform, your listing, a partnership, or anything else — reach us directly.</p>
           <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
             {[
-              { label:'General & support', value:'support@dirtlink.ca', href:'mailto:support@dirtlink.ca' },
+              { label:'General & support', value:'hello@dirtlink.ca', href:'mailto:hello@dirtlink.ca' },
               { label:'Legal & privacy',   value:'legal@dirtlink.ca',   href:'mailto:legal@dirtlink.ca' },
               { label:'Website',           value:'dirtlink.ca',         href:'/' },
               { label:'Location',          value:'Calgary, Alberta, Canada', href:null },
@@ -869,7 +869,7 @@ const Contact = () => (
           <form onSubmit={e => {
             e.preventDefault();
             const fd = new FormData(e.target);
-            window.location.href = `mailto:support@dirtlink.ca?subject=DirtLink inquiry from ${encodeURIComponent(fd.get('name'))}&body=${encodeURIComponent(`Name: ${fd.get('name')}\nCompany: ${fd.get('company')}\nEmail: ${fd.get('email')}\n\n${fd.get('message')}`)}`;
+            window.location.href = `mailto:hello@dirtlink.ca?subject=DirtLink inquiry from ${encodeURIComponent(fd.get('name'))}&body=${encodeURIComponent(`Name: ${fd.get('name')}\nCompany: ${fd.get('company')}\nEmail: ${fd.get('email')}\n\n${fd.get('message')}`)}`;
           }} style={{ display:'flex', flexDirection:'column', gap:14 }}>
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
               <div>
