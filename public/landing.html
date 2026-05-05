@@ -216,11 +216,11 @@ const Placeholder = ({ label='site photo', aspect='4 / 3', radius=8 }) => (
 const Nav = () => (
   <div className="nav">
     <div className="container nav-inner">
-      <div className="logo" style={{ cursor:'default' }}>
+      <a href="#" onClick={(e)=>{e.preventDefault();window.scrollTo({top:0,behavior:'smooth'});}} className="logo" style={{ cursor:'pointer', textDecoration:'none', color:'inherit' }}>
         <Logo/>
         <span>DirtLink</span>
         <span className="mono" style={{ fontSize:10, color:'var(--ink-4)', letterSpacing:'0.12em', padding:'2px 6px', border:'1px solid var(--hairline)', borderRadius:3, marginLeft:4 }}>BETA</span>
-      </div>
+      </a>
       <div className="nav-links" style={{ alignItems:'center' }}>
         <a href="#how">How it works</a>
         <a href="#features">Features</a>
