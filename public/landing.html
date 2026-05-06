@@ -422,7 +422,7 @@ const HowItWorks = () => {
         <div className="grid-4 how-grid">
           {steps.map(s => (
             <div key={s.n} className="tile how-card">
-              <img src={s.img} alt={s.title} className="how-img"/>
+              <div className="how-img" style={{ backgroundImage:`url(${s.img})` }}/>
               <div className="how-text">
                 <div className="mono" style={{ fontSize:11, color:'var(--ink-3)', letterSpacing:'0.14em' }}>STEP {s.n}</div>
                 <h3>{s.title}</h3>
@@ -433,9 +433,8 @@ const HowItWorks = () => {
         </div>
       </div>
       <style>{`
-        .how-grid { align-items: start !important; }
-        .how-card { overflow: hidden; align-self: start !important; }
-        .how-img { width: 100%; display: block; }
+        .how-card { overflow: hidden; }
+        .how-img { width: 100%; padding-bottom: 56.67%; background-size: cover; background-position: top left; background-repeat: no-repeat; }
         .how-text { border-top: 1px solid var(--hairline); padding: 18px 20px 22px; display: flex; flex-direction: column; gap: 6px; }
         @media (max-width: 900px) { .how-grid { grid-template-columns: 1fr 1fr !important; } .sec-head { grid-template-columns: 1fr !important; } }
         @media (max-width: 600px) { .how-grid { grid-template-columns: 1fr !important; } }
