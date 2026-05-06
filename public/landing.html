@@ -419,7 +419,7 @@ const HowItWorks = () => {
           <div><div className="eyebrow">How it works</div><h2 style={{ marginTop:16 }}>Four steps from pile to placement.</h2></div>
           <p className="lede" style={{ justifySelf:'end' }}>DirtLink replaces the text-thread-and-spreadsheet loop with a single map of every active site in your area.</p>
         </div>
-        <div className="grid-4 how-grid">
+        <div className="grid-4 how-grid" style={{ alignItems:'start' }}>
           {steps.map(s => (
             <div key={s.n} className="tile" style={{ overflow:'hidden' }}>
               <img src={s.img} alt={s.title} style={{ width:'100%', display:'block' }}/>
