@@ -126,23 +126,32 @@ function loginPage(error) {
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>DirtLink Admin</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:-apple-system,sans-serif;background:#F3F0EB;display:flex;align-items:center;justify-content:center;min-height:100vh}
-  .card{background:#fff;border-radius:12px;padding:40px;width:360px;box-shadow:0 4px 24px rgba(0,0,0,0.08)}
-  h1{font-size:20px;font-weight:700;margin-bottom:4px;color:#1A1410}
-  .sub{font-size:13px;color:#8A7E74;margin-bottom:28px}
-  label{font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px}
-  input{width:100%;border:1.5px solid #E2D9CF;border-radius:8px;padding:10px 12px;font-size:15px;outline:none;transition:border .15s}
-  input:focus{border-color:#F59E0B}
-  button{width:100%;margin-top:16px;background:#F59E0B;color:#fff;border:none;border-radius:8px;padding:12px;font-size:15px;font-weight:600;cursor:pointer}
-  button:hover{background:#D97706}
-  .error{color:#DC2626;font-size:13px;margin-top:12px}
+  body{font-family:-apple-system,'Segoe UI',sans-serif;background:#F7F7F8;display:flex;align-items:center;justify-content:center;min-height:100vh}
+  .card{background:#fff;border-radius:16px;padding:44px 40px;width:380px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 8px 32px rgba(0,0,0,.08)}
+  .brand{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+  .brand-dot{width:32px;height:32px;background:#F59E0B;border-radius:8px;display:flex;align-items:center;justify-content:center}
+  .brand-dot svg{width:18px;height:18px;fill:#fff}
+  .brand-name{font-size:16px;font-weight:700;color:#111;letter-spacing:-.3px}
+  .brand-name span{color:#9ca3af;font-weight:400;font-size:13px;margin-left:4px}
+  h1{font-size:22px;font-weight:700;color:#111;letter-spacing:-.4px;margin-bottom:6px}
+  .sub{font-size:14px;color:#6b7280;margin-bottom:28px}
+  label{font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:6px}
+  input{width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 14px;font-size:14px;color:#111;outline:none;transition:border .15s,box-shadow .15s}
+  input:focus{border-color:#F59E0B;box-shadow:0 0 0 3px rgba(245,158,11,.12)}
+  button{width:100%;margin-top:20px;background:#111;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s}
+  button:hover{background:#222}
+  .error{color:#DC2626;font-size:13px;margin-top:12px;padding:10px 14px;background:#fef2f2;border-radius:8px}
 </style></head><body>
 <div class="card">
-  <h1>DirtLink Admin</h1>
-  <p class="sub">Sign in to access the dashboard</p>
+  <div class="brand">
+    <div class="brand-dot"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg></div>
+    <div class="brand-name">DirtLink <span>Admin</span></div>
+  </div>
+  <h1>Welcome back</h1>
+  <p class="sub">Sign in to access the admin panel</p>
   <form method="POST" action="/admin/login">
-    <label>Admin Password</label>
-    <input type="password" name="password" autofocus required>
+    <label>Password</label>
+    <input type="password" name="password" autofocus required placeholder="Enter admin password">
     <button type="submit">Sign In</button>
     ${error ? `<p class="error">${esc(error)}</p>` : ''}
   </form>
@@ -151,8 +160,8 @@ function loginPage(error) {
 }
 
 function dashboardPage(d) {
-  const statCard = (label, value, color = '#F59E0B') =>
-    `<div class="stat-card"><div class="stat-value" style="color:${color}">${value}</div><div class="stat-label">${label}</div></div>`;
+  const statCard = (label, value, icon, accent = '#F59E0B') =>
+    `<div class="stat-card"><div class="stat-top"><span class="stat-icon" style="background:${accent}18;color:${accent}">${icon}</span></div><div class="stat-value">${value}</div><div class="stat-label">${label}</div></div>`;
 
   const usersRows = d.users.map(u => {
     const rv = u._reveals;
@@ -164,12 +173,12 @@ function dashboardPage(d) {
           const barColor = rv.remaining === 0 ? '#DC2626' : rv.remaining <= Math.ceil(rv.limit * 0.3) ? '#F59E0B' : '#059669';
           return `
             <div style="display:flex;align-items:center;gap:8px">
-              <div style="flex:1;min-width:60px;background:#F3F0EB;border-radius:99px;height:6px;overflow:hidden">
+              <div style="flex:1;min-width:60px;background:#f3f4f6;border-radius:99px;height:6px;overflow:hidden">
                 <div style="width:${pct}%;height:100%;background:${barColor};border-radius:99px"></div>
               </div>
               <span style="color:${barColor};font-weight:600;white-space:nowrap">${rv.remaining} / ${rv.limit}</span>
             </div>
-            <div style="font-size:11px;color:#8A7E74;margin-top:2px">Used ${rv.used} · ${rv.overagePurchasedThisCycle} overage bought</div>
+            <div style="font-size:11px;color:#9ca3af;margin-top:2px">Used ${rv.used} · ${rv.overagePurchasedThisCycle} overage bought</div>
           `;
         })();
     return `
@@ -184,7 +193,7 @@ function dashboardPage(d) {
       <td data-label="Spent" class="num">${fmtMoney(u.total_spent)}</td>
       <td data-label="Joined" class="muted small">${fmtDate(u.created_at)}</td>
       <td data-label="Actions">
-        <select onchange="setPlan('${esc(u.id)}','${esc(u.email)}',this.value);this.value=''" style="font-size:11px;padding:4px 6px;border:1px solid #E2D9CF;border-radius:6px;width:100%;cursor:pointer">
+        <select onchange="setPlan('${esc(u.id)}','${esc(u.email)}',this.value);this.value=''" class="plan-select" style="width:100%">
           <option value="">Set plan…</option>
           <option value="free">Free</option>
           <option value="pro">Pro</option>
@@ -229,146 +238,142 @@ function dashboardPage(d) {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F3F0EB;color:#1A1410;font-size:13px}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F7F7F8;color:#111;font-size:13px;line-height:1.5}
 
-  /* Nav */
-  .top-nav{background:#1A1410;color:#fff;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:100}
-  .top-nav .logo{font-weight:700;font-size:16px;letter-spacing:-.3px}
-  .top-nav .logo span{color:#F59E0B}
-  .top-nav nav{display:flex;gap:4px}
-  .top-nav nav a{color:rgba(255,255,255,.7);text-decoration:none;padding:6px 12px;border-radius:6px;font-size:13px;font-weight:500;transition:all .15s}
-  .top-nav nav a:hover,.top-nav nav a.active{background:rgba(255,255,255,.1);color:#fff}
-  .top-nav .logout{color:rgba(255,255,255,.5);text-decoration:none;font-size:12px}
-  .top-nav .logout:hover{color:#fff}
+  /* ── Nav ── */
+  .nav{background:#fff;border-bottom:1px solid #e5e7eb;padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
+  .nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+  .nav-dot{width:28px;height:28px;background:#F59E0B;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .nav-dot svg{width:15px;height:15px;fill:#fff}
+  .nav-name{font-size:15px;font-weight:700;color:#111;letter-spacing:-.3px}
+  .nav-name em{color:#9ca3af;font-style:normal;font-weight:400;font-size:12px;margin-left:5px}
+  .nav-tabs{display:flex;gap:2px}
+  .nav-tabs a{color:#6b7280;text-decoration:none;padding:6px 13px;border-radius:7px;font-size:13px;font-weight:500;transition:all .15s;white-space:nowrap}
+  .nav-tabs a:hover{background:#f3f4f6;color:#111}
+  .nav-tabs a.active{background:#111;color:#fff}
+  .nav-right{display:flex;align-items:center;gap:12px}
+  .nav-refresh{font-size:12px;color:#9ca3af}
+  .nav-logout{font-size:12px;color:#6b7280;text-decoration:none;padding:5px 12px;border:1px solid #e5e7eb;border-radius:7px;transition:all .15s}
+  .nav-logout:hover{background:#f3f4f6;color:#111}
 
-  /* Layout */
-  .page{max-width:1400px;margin:0 auto;padding:28px 24px}
-  h2{font-size:20px;font-weight:700;margin-bottom:4px}
-  .page-sub{color:#8A7E74;font-size:13px;margin-bottom:24px}
+  /* ── Layout ── */
+  .page{max-width:1440px;margin:0 auto;padding:28px}
 
-  /* Stat cards */
-  .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:32px}
-  .stat-card{background:#fff;border-radius:12px;padding:18px 20px;border:1px solid #E2D9CF}
-  .stat-value{font-size:28px;font-weight:700;line-height:1}
-  .stat-label{font-size:12px;color:#8A7E74;margin-top:6px;font-weight:500}
+  /* ── Stats ── */
+  .stats-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:12px;margin-bottom:28px}
+  .stat-card{background:#fff;border-radius:12px;padding:16px 18px;border:1px solid #e5e7eb;transition:box-shadow .15s}
+  .stat-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.06)}
+  .stat-top{margin-bottom:12px}
+  .stat-icon{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;font-size:15px}
+  .stat-value{font-size:24px;font-weight:700;letter-spacing:-.5px;line-height:1;color:#111}
+  .stat-label{font-size:11px;color:#9ca3af;margin-top:5px;font-weight:500;text-transform:uppercase;letter-spacing:.04em}
 
-  /* Sections */
-  .section{margin-bottom:36px}
+  /* ── Section ── */
+  .section{margin-bottom:28px}
   .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-  .section-title{font-size:15px;font-weight:700}
-  .section-count{font-size:12px;color:#8A7E74;background:#F3F0EB;padding:2px 10px;border-radius:99px}
+  .section-title{font-size:14px;font-weight:600;color:#111}
+  .section-meta{font-size:12px;color:#9ca3af}
 
-  /* Table */
-  .table-wrap{background:#fff;border-radius:12px;border:1px solid #E2D9CF;overflow:auto}
+  /* ── Table ── */
+  .table-wrap{background:#fff;border-radius:12px;border:1px solid #e5e7eb;overflow:auto}
   table{width:100%;border-collapse:collapse}
-  th{text-align:left;padding:10px 14px;font-size:11px;font-weight:600;color:#8A7E74;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #E2D9CF;white-space:nowrap;background:#fff;position:sticky;top:0}
-  td{padding:10px 14px;border-bottom:1px solid #F3F0EB;vertical-align:top;line-height:1.4}
+  th{text-align:left;padding:11px 16px;font-size:11px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f3f4f6;white-space:nowrap;background:#fff}
+  td{padding:11px 16px;border-bottom:1px solid #f9fafb;vertical-align:middle;line-height:1.4;color:#111}
   tr:last-child td{border-bottom:none}
-  tr:hover td{background:#FAFAF8}
+  tr:hover td{background:#fafafa}
   .num{text-align:right;font-variant-numeric:tabular-nums}
-  .muted{color:#8A7E74}
+  .muted{color:#9ca3af}
   .small{font-size:11px}
   a{color:#D97706;text-decoration:none}
   a:hover{text-decoration:underline}
+  strong{font-weight:600}
 
-  /* Badges */
-  .badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;color:#fff;white-space:nowrap}
+  /* ── Badges ── */
+  .badge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:600;color:#fff;white-space:nowrap}
 
-  /* Permit summary */
-  .permit-summary{display:flex;gap:12px;margin-bottom:32px}
-  .permit-card{background:#fff;border-radius:12px;padding:16px 20px;border:1px solid #E2D9CF;flex:1}
-  .permit-card .n{font-size:22px;font-weight:700}
-  .permit-card .l{font-size:12px;color:#8A7E74;margin-top:4px}
+  /* ── Permit cards ── */
+  .permit-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .permit-card{background:#fff;border-radius:12px;padding:20px 22px;border:1px solid #e5e7eb}
+  .permit-card .n{font-size:26px;font-weight:700;letter-spacing:-.5px;line-height:1}
+  .permit-card .l{font-size:11px;color:#9ca3af;margin-top:6px;text-transform:uppercase;letter-spacing:.04em;font-weight:500}
 
-  /* Tabs */
-  .tabs{display:flex;gap:2px;background:#E2D9CF;border-radius:8px;padding:3px;margin-bottom:20px;width:fit-content}
-  .tab{padding:6px 16px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;color:#8A7E74;transition:all .15s}
-  .tab.active{background:#fff;color:#1A1410;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  /* ── Empty state ── */
+  .empty{text-align:center;padding:40px 24px;color:#9ca3af;font-size:13px}
 
+  /* ── Plan select ── */
+  .plan-select{font-size:12px;padding:5px 8px;border:1px solid #e5e7eb;border-radius:7px;background:#fff;color:#374151;cursor:pointer;outline:none;transition:border .15s}
+  .plan-select:hover{border-color:#d1d5db}
+  .plan-select:focus{border-color:#F59E0B;box-shadow:0 0 0 3px rgba(245,158,11,.1)}
+
+  @media(max-width:1100px){.stats-grid{grid-template-columns:repeat(4,1fr)}}
   @media(max-width:768px){
-    .page{padding:16px 12px}
-    .stats-grid{grid-template-columns:1fr 1fr}
-    .top-nav nav{display:none}
-    .permit-summary{flex-direction:column}
-
-    /* Members table → cards on mobile */
+    .page{padding:16px}
+    .stats-grid{grid-template-columns:repeat(2,1fr)}
+    .nav-tabs{display:none}
+    .permit-grid{grid-template-columns:repeat(2,1fr)}
     #tab-members .table-wrap{background:transparent;border:none;overflow:visible}
-    #tab-members table,
-    #tab-members thead,
-    #tab-members tbody,
-    #tab-members th,
-    #tab-members td,
-    #tab-members tr{display:block;width:100%}
+    #tab-members table,#tab-members thead,#tab-members tbody,
+    #tab-members th,#tab-members td,#tab-members tr{display:block;width:100%}
     #tab-members thead{display:none}
-    #tab-members tbody tr{
-      background:#fff;border:1px solid #E2D9CF;border-radius:12px;
-      margin-bottom:12px;padding:4px 0;overflow:hidden
-    }
+    #tab-members tbody tr{background:#fff;border:1px solid #e5e7eb;border-radius:12px;margin-bottom:10px;padding:4px 0;overflow:hidden}
     #tab-members tbody tr:hover td{background:transparent}
-    #tab-members td{
-      display:flex;align-items:flex-start;justify-content:space-between;
-      gap:10px;padding:8px 14px;border-bottom:1px solid #F3F0EB;
-      text-align:left !important
-    }
+    #tab-members td{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:8px 14px;border-bottom:1px solid #f9fafb;text-align:left!important}
     #tab-members td:last-child{border-bottom:none}
-    #tab-members td::before{
-      content:attr(data-label);
-      font-size:10px;font-weight:600;color:#8A7E74;
-      text-transform:uppercase;letter-spacing:.05em;
-      white-space:nowrap;flex-shrink:0;padding-top:2px;min-width:80px
-    }
+    #tab-members td::before{content:attr(data-label);font-size:10px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;flex-shrink:0;padding-top:2px;min-width:80px}
     #tab-members td[data-label="Reveals"]{flex-direction:column;align-items:flex-start}
-    #tab-members td[data-label="Reveals"]::before{margin-bottom:4px}
     #tab-members td[data-label="Actions"]{flex-direction:column;align-items:flex-start;gap:6px}
-    #tab-members td[data-label="Actions"]::before{margin-bottom:2px}
     #tab-members td[data-label="Actions"] select{width:100%}
   }
 </style>
 </head>
 <body>
 
-<nav class="top-nav">
-  <div class="logo">Dirt<span>Link</span> <span style="font-size:11px;color:rgba(255,255,255,.4);font-weight:400;margin-left:4px">Admin</span></div>
-  <nav>
-    <a href="#members" class="active" onclick="showTab('members',this)">Members</a>
-    <a href="#pins" onclick="showTab('pins',this)">Pins</a>
-    <a href="#billing" onclick="showTab('billing',this)">Billing</a>
-    <a href="#leads" onclick="showTab('leads',this)">Leads</a>
-    <a href="#permits" onclick="showTab('permits',this)">Permits</a>
-  </nav>
-  <a href="/admin/logout" class="logout">Sign out</a>
+<nav class="nav">
+  <a class="nav-brand" href="/admin">
+    <div class="nav-dot"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg></div>
+    <span class="nav-name">DirtLink <em>Admin</em></span>
+  </a>
+  <div class="nav-tabs">
+    <a href="#" class="active" onclick="showTab('members',this);return false">Members</a>
+    <a href="#" onclick="showTab('pins',this);return false">Pins</a>
+    <a href="#" onclick="showTab('billing',this);return false">Billing</a>
+    <a href="#" onclick="showTab('leads',this);return false">Leads</a>
+    <a href="#" onclick="showTab('permits',this);return false">Permits</a>
+  </div>
+  <div class="nav-right">
+    <span class="nav-refresh">Live data</span>
+    <a href="/admin/logout" class="nav-logout">Sign out</a>
+  </div>
 </nav>
 
 <div class="page">
-  <h2>Dashboard</h2>
-  <p class="page-sub">Live data · Refreshes on page load</p>
 
   <div class="stats-grid">
-    ${statCard('Total Members', d.totalUsers, '#1A1410')}
-    ${statCard('Paid Members', d.proUsers, '#F59E0B')}
-    ${statCard('Active Pins', d.totalPins, '#DC2626')}
-    ${statCard('Permit Sites', d.totalPermit, '#6B7280')}
-    ${statCard('Perm. Sites', d.totalPermanent, '#059669')}
-    ${statCard('Messages Sent', d.totalMessages, '#2563EB')}
-    ${statCard('Calculator Leads', d.totalLeads, '#8b5cf6')}
-    ${statCard('Total Revenue', fmtMoney(d.totalRevenues), '#059669')}
+    ${statCard('Total Members',   d.totalUsers,              '👥', '#6366f1')}
+    ${statCard('Paid Members',    d.proUsers,                '⭐', '#F59E0B')}
+    ${statCard('Active Pins',     d.totalPins,               '📍', '#DC2626')}
+    ${statCard('Permit Sites',    d.totalPermit,             '🏗️', '#6b7280')}
+    ${statCard('Perm. Sites',     d.totalPermanent,          '🏔️', '#059669')}
+    ${statCard('Messages Sent',   d.totalMessages,           '💬', '#2563EB')}
+    ${statCard('Calc. Leads',     d.totalLeads,              '📊', '#8b5cf6')}
+    ${statCard('Revenue',         fmtMoney(d.totalRevenues), '💰', '#059669')}
   </div>
 
   <!-- Members -->
   <div class="section" id="tab-members">
     <div class="section-header">
       <span class="section-title">Members</span>
-      <span class="section-count">${d.totalUsers} total</span>
+      <span class="section-meta">${d.totalUsers} total</span>
     </div>
     <div class="table-wrap">
       <table>
         <thead><tr>
           <th>Company</th><th>Contact</th><th>Plan</th>
-          <th class="num">Active Pins</th><th>Reveals Remaining</th>
+          <th class="num">Pins</th><th>Reveals</th>
           <th class="num">Convos</th><th class="num">Msgs</th>
           <th class="num">Spent</th><th>Joined</th><th>Actions</th>
         </tr></thead>
-        <tbody>${usersRows || '<tr><td colspan="10" style="text-align:center;padding:24px;color:#8A7E74">No members yet</td></tr>'}</tbody>
+        <tbody>${usersRows || '<tr><td colspan="10"><div class="empty">No members yet</div></td></tr>'}</tbody>
       </table>
     </div>
   </div>
@@ -377,14 +382,14 @@ function dashboardPage(d) {
   <div class="section" id="tab-pins" style="display:none">
     <div class="section-header">
       <span class="section-title">Recent Pins</span>
-      <span class="section-count">${d.totalPins} active</span>
+      <span class="section-meta">${d.totalPins} active</span>
     </div>
     <div class="table-wrap">
       <table>
         <thead><tr>
           <th>Member</th><th>Type</th><th>Material</th><th>Address</th><th class="num">Quantity</th><th>Date</th>
         </tr></thead>
-        <tbody>${pinRows || '<tr><td colspan="6" style="text-align:center;padding:24px;color:#8A7E74">No pins yet</td></tr>'}</tbody>
+        <tbody>${pinRows || '<tr><td colspan="6"><div class="empty">No pins yet</div></td></tr>'}</tbody>
       </table>
     </div>
   </div>
@@ -393,14 +398,14 @@ function dashboardPage(d) {
   <div class="section" id="tab-billing" style="display:none">
     <div class="section-header">
       <span class="section-title">Billing History</span>
-      <span class="section-count">${fmtMoney(d.totalRevenues)} total</span>
+      <span class="section-meta">${fmtMoney(d.totalRevenues)} total</span>
     </div>
     <div class="table-wrap">
       <table>
         <thead><tr>
           <th>Member</th><th>Description</th><th>Type</th><th class="num">Amount</th><th>Status</th><th>Date</th>
         </tr></thead>
-        <tbody>${billingRows || '<tr><td colspan="6" style="text-align:center;padding:24px;color:#8A7E74">No billing records yet</td></tr>'}</tbody>
+        <tbody>${billingRows || '<tr><td colspan="6"><div class="empty">No billing records yet</div></td></tr>'}</tbody>
       </table>
     </div>
   </div>
@@ -409,14 +414,14 @@ function dashboardPage(d) {
   <div class="section" id="tab-leads" style="display:none">
     <div class="section-header">
       <span class="section-title">Calculator Leads</span>
-      <span class="section-count">${d.totalLeads} total</span>
+      <span class="section-meta">${d.totalLeads} total</span>
     </div>
     <div class="table-wrap">
       <table>
         <thead><tr>
           <th>Name</th><th>Email</th><th>Source</th><th>Status</th><th>Date</th>
         </tr></thead>
-        <tbody>${leadRows || '<tr><td colspan="5" style="text-align:center;padding:24px;color:#8A7E74">No leads yet</td></tr>'}</tbody>
+        <tbody>${leadRows || '<tr><td colspan="5"><div class="empty">No leads yet</div></td></tr>'}</tbody>
       </table>
     </div>
   </div>
@@ -425,12 +430,12 @@ function dashboardPage(d) {
   <div class="section" id="tab-permits" style="display:none">
     <div class="section-header">
       <span class="section-title">Development Permits</span>
-      <span class="section-count">${d.totalPermit} active</span>
+      <span class="section-meta">${d.totalPermit} active</span>
     </div>
-    <div class="permit-summary">
+    <div class="permit-grid">
       <div class="permit-card"><div class="n">${d.permitStats.total}</div><div class="l">Total permit pins</div></div>
       <div class="permit-card"><div class="n" style="color:#059669">${d.permitStats.claimed}</div><div class="l">Claimed</div></div>
-      <div class="permit-card"><div class="n" style="color:#F59E0B">${d.permitStats.unclaimed}</div><div class="l">Unclaimed (available)</div></div>
+      <div class="permit-card"><div class="n" style="color:#F59E0B">${d.permitStats.unclaimed}</div><div class="l">Unclaimed</div></div>
       <div class="permit-card"><div class="n">${d.totalPermanent}</div><div class="l">Permanent sites</div></div>
     </div>
   </div>
@@ -446,14 +451,14 @@ function dashboardPage(d) {
       body: JSON.stringify({ userId, plan })
     });
     const data = await res.json();
-    if (res.ok) { alert(email + ' → ' + plan); location.reload(); }
+    if (res.ok) { alert(email + ' \u2192 ' + plan); location.reload(); }
     else alert(data.error || 'Failed');
   }
 
   function showTab(name, el) {
     document.querySelectorAll('[id^="tab-"]').forEach(t => t.style.display = 'none');
     document.getElementById('tab-' + name).style.display = 'block';
-    document.querySelectorAll('.top-nav nav a').forEach(a => a.classList.remove('active'));
+    document.querySelectorAll('.nav-tabs a').forEach(a => a.classList.remove('active'));
     el.classList.add('active');
   }
 </script>
