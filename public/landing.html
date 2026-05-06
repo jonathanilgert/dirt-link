@@ -407,48 +407,24 @@ const Hero = () => {
 /* ── How It Works ── */
 const HowItWorks = () => {
   const steps = [
-    { n:'01', title:'Drop a pin', desc:'Mark your site on the map. Set boundaries, access notes, and truck routes in under a minute.', visual:'pin' },
-    { n:'02', title:'List what you have or need', desc:'Post material type, quantity, timing, and photos. Sites show up instantly on the regional map.', visual:'listing' },
-    { n:'03', title:'Connect with nearby sites', desc:'Filter by proximity, material, and availability. See who is ready to move dirt in your area.', visual:'radar' },
-    { n:'04', title:'Coordinate the move', desc:'Message operators, share reports, and track every conversation against a site — not a spreadsheet.', visual:'chat' },
+    { n:'01', title:'Drop a pin', desc:'Mark your site on the map. Set material type, quantity, and access notes in under a minute.', img:'/images/how-1-pin.png' },
+    { n:'02', title:'Browse nearby sites', desc:'Filter by proximity, material, and availability. Every active site in your area appears instantly.', img:'/images/how-2-browse.png' },
+    { n:'03', title:'Connect directly', desc:'Open the pin, review details and reports, then message the operator directly — no brokers.', img:'/images/how-3-connect.png' },
+    { n:'04', title:'Coordinate the move', desc:'Confirm quantities, schedule trucks, and share docs in one thread tied to the site — not a spreadsheet.', img:'/images/how-4-move.png' },
   ];
-  const Visual = ({ kind }) => {
-    if (kind==='pin') return <div style={{ position:'relative', height:'100%', width:'100%' }} className="map-surface"><Topo seed={2}/><Pin type="have" top="45%" left="50%" active pulse size="lg"/><MapCursor top="45%" left="50%"/><div style={{ position:'absolute', top:12, left:12, background:'var(--surface)', border:'1px solid var(--hairline)', borderRadius:5, padding:'5px 9px', fontSize:11, fontFamily:'JetBrains Mono,monospace', color:'var(--ink-2)', boxShadow:'var(--shadow-sm)' }}>51.0447° N, 114.0719° W</div></div>;
-    if (kind==='listing') return (
-      <div style={{ padding:18, display:'flex', flexDirection:'column', gap:10, height:'100%' }}>
-        <div style={{ display:'flex', gap:8, marginBottom:4 }}>
-          <div style={{ flex:1, padding:'7px 10px', border:'1px solid var(--ink)', borderRadius:5, fontSize:13, color:'var(--ink)', background:'var(--surface)' }}><span className="mono" style={{ fontSize:10, color:'var(--ink-3)', textTransform:'uppercase', letterSpacing:'0.1em' }}>Type</span><div>Have</div></div>
-          <div style={{ flex:1, padding:'7px 10px', border:'1px solid var(--hairline)', borderRadius:5, fontSize:13, color:'var(--ink-3)', background:'var(--surface)' }}><span className="mono" style={{ fontSize:10, textTransform:'uppercase', letterSpacing:'0.1em' }}>Type</span><div>Need</div></div>
-        </div>
-        <div style={{ padding:'9px 12px', border:'1px solid var(--hairline)', borderRadius:5, fontSize:13, color:'var(--ink)', background:'var(--surface)' }}><div className="mono" style={{ fontSize:10, color:'var(--ink-3)', textTransform:'uppercase', letterSpacing:'0.1em' }}>Material</div>Clean fill</div>
-        <div style={{ display:'flex', gap:8 }}>
-          <div style={{ flex:1, padding:'9px 12px', border:'1px solid var(--hairline)', borderRadius:5, background:'var(--surface)' }}><div className="mono" style={{ fontSize:10, color:'var(--ink-3)', textTransform:'uppercase', letterSpacing:'0.1em' }}>Qty</div><div className="mono" style={{ fontSize:13 }}>1,200 m³</div></div>
-          <div style={{ flex:1, padding:'9px 12px', border:'1px solid var(--hairline)', borderRadius:5, background:'var(--surface)' }}><div className="mono" style={{ fontSize:10, color:'var(--ink-3)', textTransform:'uppercase', letterSpacing:'0.1em' }}>Available</div><div className="mono" style={{ fontSize:13 }}>Apr 28 — Jun 10</div></div>
-        </div>
-        <a href="/app" className="btn btn-primary btn-sm" style={{ alignSelf:'flex-start', marginTop:4 }}>Publish listing <Icon name="arrow" size={13}/></a>
-      </div>
-    );
-    if (kind==='radar') return <div style={{ position:'relative', height:'100%', width:'100%' }} className="map-surface"><Topo seed={5}/><div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:240, height:240, borderRadius:'50%', border:'1.5px dashed color-mix(in oklab, var(--accent) 50%, transparent)' }}/><div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:140, height:140, borderRadius:'50%', border:'1px dashed color-mix(in oklab, var(--accent) 30%, transparent)' }}/><Pin type="have" top="50%" left="50%" size="md"/><Pin type="have" top="30%" left="35%" size="sm"/><Pin type="need" top="65%" left="68%" size="sm"/><Pin type="have" top="70%" left="30%" size="sm"/><Pin type="need" top="25%" left="70%" size="sm"/></div>;
-    if (kind==='chat') return (
-      <div style={{ padding:18, display:'flex', flexDirection:'column', gap:10, height:'100%', justifyContent:'flex-end' }}>
-        <div style={{ alignSelf:'flex-start', maxWidth:'82%', background:'var(--bg-elev)', border:'1px solid var(--hairline)', borderRadius:'10px 10px 10px 2px', padding:'8px 12px', fontSize:13, color:'var(--ink-2)' }}>Still have that clean fill available? I've got trucks Tuesday.</div>
-        <div style={{ alignSelf:'flex-end', maxWidth:'82%', background:'var(--accent)', color:'var(--accent-ink)', borderRadius:'10px 10px 2px 10px', padding:'8px 12px', fontSize:13 }}>Yes — 600 m³ left. Access from the south gate, I'll send the report.</div>
-        <div style={{ alignSelf:'flex-start', maxWidth:'70%', background:'var(--bg-elev)', border:'1px solid var(--hairline)', borderRadius:'10px 10px 10px 2px', padding:'8px 12px', fontSize:13, color:'var(--ink-2)', display:'flex', alignItems:'center', gap:8 }}><Icon name="doc" size={14}/><span className="mono" style={{ fontSize:11 }}>soils-report-r3.pdf</span></div>
-      </div>
-    );
-    return null;
-  };
   return (
     <section id="how" className="section">
       <div className="container">
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:40, alignItems:'end', marginBottom:48 }} className="sec-head">
           <div><div className="eyebrow">How it works</div><h2 style={{ marginTop:16 }}>Four steps from pile to placement.</h2></div>
-          <p className="lede" style={{ justifySelf:'end' }}>DirtLink replaces the text-thread-and-spreadsheet loop with a single map of every active site in the Calgary area.</p>
+          <p className="lede" style={{ justifySelf:'end' }}>DirtLink replaces the text-thread-and-spreadsheet loop with a single map of every active site in your area.</p>
         </div>
         <div className="grid-4 how-grid">
           {steps.map(s => (
-            <div key={s.n} className="tile" style={{ display:'flex', flexDirection:'column' }}>
-              <div style={{ height:180, borderBottom:'1px solid var(--hairline)', background:'var(--bg-elev)', position:'relative', overflow:'hidden' }}><Visual kind={s.visual}/></div>
+            <div key={s.n} className="tile" style={{ display:'flex', flexDirection:'column', overflow:'hidden' }}>
+              <div style={{ borderBottom:'1px solid var(--hairline)', overflow:'hidden', lineHeight:0 }}>
+                <img src={s.img} alt={s.title} style={{ width:'100%', display:'block', objectFit:'cover' }}/>
+              </div>
               <div style={{ padding:'20px 20px 22px', flex:1, display:'flex', flexDirection:'column', gap:6 }}>
                 <div className="mono" style={{ fontSize:11, color:'var(--ink-3)', letterSpacing:'0.14em' }}>STEP {s.n}</div>
                 <h3>{s.title}</h3>
