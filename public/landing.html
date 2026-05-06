@@ -419,11 +419,11 @@ const HowItWorks = () => {
           <div><div className="eyebrow">How it works</div><h2 style={{ marginTop:16 }}>Four steps from pile to placement.</h2></div>
           <p className="lede" style={{ justifySelf:'end' }}>DirtLink replaces the text-thread-and-spreadsheet loop with a single map of every active site in your area.</p>
         </div>
-        <div className="grid-4 how-grid" style={{ alignItems:'start' }}>
+        <div className="grid-4 how-grid">
           {steps.map(s => (
-            <div key={s.n} className="tile" style={{ overflow:'hidden' }}>
-              <img src={s.img} alt={s.title} style={{ width:'100%', display:'block' }}/>
-              <div style={{ borderTop:'1px solid var(--hairline)', padding:'20px 20px 22px', display:'flex', flexDirection:'column', gap:6 }}>
+            <div key={s.n} className="tile how-card">
+              <img src={s.img} alt={s.title} className="how-img"/>
+              <div className="how-text">
                 <div className="mono" style={{ fontSize:11, color:'var(--ink-3)', letterSpacing:'0.14em' }}>STEP {s.n}</div>
                 <h3>{s.title}</h3>
                 <p className="ink2" style={{ fontSize:14, marginTop:4 }}>{s.desc}</p>
@@ -432,7 +432,14 @@ const HowItWorks = () => {
           ))}
         </div>
       </div>
-      <style>{`@media (max-width: 900px) { .how-grid { grid-template-columns: 1fr 1fr !important; } .sec-head { grid-template-columns: 1fr !important; } } @media (max-width: 600px) { .how-grid { grid-template-columns: 1fr !important; } }`}</style>
+      <style>{`
+        .how-grid { align-items: start !important; }
+        .how-card { overflow: hidden; align-self: start !important; }
+        .how-img { width: 100%; display: block; }
+        .how-text { border-top: 1px solid var(--hairline); padding: 18px 20px 22px; display: flex; flex-direction: column; gap: 6px; }
+        @media (max-width: 900px) { .how-grid { grid-template-columns: 1fr 1fr !important; } .sec-head { grid-template-columns: 1fr !important; } }
+        @media (max-width: 600px) { .how-grid { grid-template-columns: 1fr !important; } }
+      `}</style>
     </section>
   );
 };
