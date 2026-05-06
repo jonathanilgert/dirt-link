@@ -160,8 +160,8 @@ function loginPage(error) {
 }
 
 function dashboardPage(d) {
-  const statCard = (label, value) =>
-    `<div class="stat-card"><div class="stat-value">${value}</div><div class="stat-label">${label}</div></div>`;
+  const statCard = (label, value, icon, accent = '#F59E0B') =>
+    `<div class="stat-card"><div class="stat-top"><span class="stat-icon" style="background:${accent}18;color:${accent}">${icon}</span></div><div class="stat-value">${value}</div><div class="stat-label">${label}</div></div>`;
 
   const usersRows = d.users.map(u => {
     const rv = u._reveals;
@@ -261,10 +261,12 @@ function dashboardPage(d) {
 
   /* ── Stats ── */
   .stats-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:12px;margin-bottom:28px}
-  .stat-card{background:#111;border-radius:14px;padding:18px 20px;box-shadow:0 2px 8px rgba(0,0,0,.10),0 8px 24px rgba(0,0,0,.08);transition:transform .15s,box-shadow .15s;cursor:default}
-  .stat-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.14),0 12px 32px rgba(0,0,0,.10)}
-  .stat-value{font-size:26px;font-weight:700;letter-spacing:-.6px;line-height:1;color:#fff}
-  .stat-label{font-size:11px;color:rgba(255,255,255,.45);margin-top:7px;font-weight:500;text-transform:uppercase;letter-spacing:.05em}
+  .stat-card{background:#fff;border-radius:12px;padding:16px 18px;border:1px solid #e5e7eb;transition:box-shadow .15s}
+  .stat-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.06)}
+  .stat-top{margin-bottom:12px}
+  .stat-icon{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;font-size:15px}
+  .stat-value{font-size:24px;font-weight:700;letter-spacing:-.5px;line-height:1;color:#111}
+  .stat-label{font-size:11px;color:#9ca3af;margin-top:5px;font-weight:500;text-transform:uppercase;letter-spacing:.04em}
 
   /* ── Section ── */
   .section{margin-bottom:28px}
@@ -347,14 +349,14 @@ function dashboardPage(d) {
 <div class="page">
 
   <div class="stats-grid">
-    ${statCard('Total Members',   d.totalUsers)}
-    ${statCard('Paid Members',    d.proUsers)}
-    ${statCard('Active Pins',     d.totalPins)}
-    ${statCard('Permit Sites',    d.totalPermit)}
-    ${statCard('Perm. Sites',     d.totalPermanent)}
-    ${statCard('Messages Sent',   d.totalMessages)}
-    ${statCard('Calc. Leads',     d.totalLeads)}
-    ${statCard('Revenue',         fmtMoney(d.totalRevenues))}
+    ${statCard('Total Members',   d.totalUsers,              '👥', '#6366f1')}
+    ${statCard('Paid Members',    d.proUsers,                '⭐', '#F59E0B')}
+    ${statCard('Active Pins',     d.totalPins,               '📍', '#DC2626')}
+    ${statCard('Permit Sites',    d.totalPermit,             '🏗️', '#6b7280')}
+    ${statCard('Perm. Sites',     d.totalPermanent,          '🏔️', '#059669')}
+    ${statCard('Messages Sent',   d.totalMessages,           '💬', '#2563EB')}
+    ${statCard('Calc. Leads',     d.totalLeads,              '📊', '#8b5cf6')}
+    ${statCard('Revenue',         fmtMoney(d.totalRevenues), '💰', '#059669')}
   </div>
 
   <!-- Members -->
