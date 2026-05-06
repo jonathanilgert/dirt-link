@@ -184,8 +184,7 @@ function dashboardPage(d) {
       <td data-label="Spent" class="num">${fmtMoney(u.total_spent)}</td>
       <td data-label="Joined" class="muted small">${fmtDate(u.created_at)}</td>
       <td data-label="Actions">
-        <button onclick="resetPassword('${esc(u.id)}','${esc(u.email)}')" style="font-size:11px;padding:4px 10px;border:1px solid #E2D9CF;border-radius:6px;background:#fff;cursor:pointer;white-space:nowrap">Reset PW</button>
-        <select onchange="setPlan('${esc(u.id)}','${esc(u.email)}',this.value);this.value=''" style="font-size:11px;padding:4px 6px;border:1px solid #E2D9CF;border-radius:6px;margin-top:4px;width:100%;cursor:pointer">
+        <select onchange="setPlan('${esc(u.id)}','${esc(u.email)}',this.value);this.value=''" style="font-size:11px;padding:4px 6px;border:1px solid #E2D9CF;border-radius:6px;width:100%;cursor:pointer">
           <option value="">Set plan…</option>
           <option value="free">Free</option>
           <option value="pro">Pro</option>
@@ -439,19 +438,6 @@ function dashboardPage(d) {
 </div>
 
 <script>
-  async function resetPassword(userId, email) {
-    const newPw = prompt('New password for ' + email + ':');
-    if (!newPw) return;
-    if (newPw.length < 6) { alert('Password must be at least 6 characters'); return; }
-    const res = await fetch('/admin/reset-user-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, password: newPw })
-    });
-    const data = await res.json();
-    alert(res.ok ? 'Done — password updated for ' + email : (data.error || 'Failed'));
-  }
-
   async function setPlan(userId, email, plan) {
     if (!plan) return;
     const res = await fetch('/admin/set-plan', {
@@ -492,19 +478,6 @@ router.post('/set-plan', requireAdmin, (req, res) => {
   res.json({ ok: true, plan });
 });
 
-// ── POST /admin/reset-user-password ─────────────────────────────────────────
-router.post('/reset-user-password', requireAdmin, (req, res) => {
-  const { userId, password } = req.body;
-  if (!userId || !password) return res.status(400).json({ error: 'userId and password are required' });
-  if (password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
 
-  const user = get('SELECT id FROM users WHERE id = ?', [userId]);
-  if (!user) return res.status(404).json({ error: 'User not found' });
-
-  const hash = bcrypt.hashSync(password, 10);
-  run(`UPDATE users SET password_hash = ?, updated_at = datetime('now') WHERE id = ?`, [hash, userId]);
-
-  res.json({ ok: true });
-});
 
 module.exports = router;
