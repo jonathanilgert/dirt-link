@@ -407,10 +407,10 @@ const Hero = () => {
 /* ── How It Works ── */
 const HowItWorks = () => {
   const steps = [
-    { n:'01', title:'Drop a pin', desc:'Mark your site on the map. Set material type, quantity, and access notes in under a minute.', img:'/images/how-1-pin.png' },
-    { n:'02', title:'Browse nearby sites', desc:'Filter by proximity, material, and availability. Every active site in your area appears instantly.', img:'/images/how-2-browse.png' },
-    { n:'03', title:'Connect directly', desc:'Open the pin, review details and reports, then message the operator directly — no brokers.', img:'/images/how-3-connect.png' },
-    { n:'04', title:'Coordinate the move', desc:'Confirm quantities, schedule trucks, and share docs in one thread tied to the site — not a spreadsheet.', img:'/images/how-4-move.png' },
+    { n:'01', title:'Drop a pin', desc:'Mark your site on the map. Set material type, quantity, and access notes in under a minute.', img:'/images/dashboard.png' },
+    { n:'02', title:'Browse nearby sites', desc:'Filter by proximity, material, and availability. Every active site in your area appears instantly.', img:'/images/screenshot-pin.png' },
+    { n:'03', title:'Connect directly', desc:'Open the pin, review details and reports, then message the operator directly — no brokers.', img:'/images/screenshot-msg.png', pos:'top left' },
+    { n:'04', title:'Coordinate the move', desc:'Confirm quantities, schedule trucks, and share docs in one thread tied to the site — not a spreadsheet.', img:'/images/screenshot-msg.png', pos:'top right' },
   ];
   return (
     <section id="how" className="section">
@@ -422,7 +422,7 @@ const HowItWorks = () => {
         <div className="grid-4 how-grid">
           {steps.map(s => (
             <div key={s.n} className="tile how-card">
-              <div className="how-img" style={{ backgroundImage:`url(${s.img})` }}/>
+              <div className="how-img" style={{ backgroundImage:`url(${s.img})`, backgroundPosition: s.pos || 'top center' }}/>
               <div className="how-text">
                 <div className="mono" style={{ fontSize:11, color:'var(--ink-3)', letterSpacing:'0.14em' }}>STEP {s.n}</div>
                 <h3>{s.title}</h3>
@@ -434,7 +434,7 @@ const HowItWorks = () => {
       </div>
       <style>{`
         .how-card { overflow: hidden; }
-        .how-img { width: 100%; padding-bottom: 56.67%; background-size: cover; background-position: top left; background-repeat: no-repeat; }
+        .how-img { width: 100%; padding-bottom: 62.5%; background-size: cover; background-position: top center; background-repeat: no-repeat; }
         .how-text { border-top: 1px solid var(--hairline); padding: 18px 20px 22px; display: flex; flex-direction: column; gap: 6px; }
         @media (max-width: 900px) { .how-grid { grid-template-columns: 1fr 1fr !important; } .sec-head { grid-template-columns: 1fr !important; } }
         @media (max-width: 600px) { .how-grid { grid-template-columns: 1fr !important; } }
