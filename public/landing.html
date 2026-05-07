@@ -537,8 +537,8 @@ const Showcase = () => {
           {tabs.map(t => <button key={t.id} onClick={() => setTab(t.id)} className="mono" style={{ padding:'8px 14px', fontSize:12, letterSpacing:'-0.01em', border:'none', borderRadius:5, cursor:'pointer', background:tab===t.id?'var(--surface)':'transparent', boxShadow:tab===t.id?'var(--shadow-sm)':'none', color:tab===t.id?'var(--ink)':'var(--ink-3)', fontFamily:'inherit', fontWeight:tab===t.id?500:400 }}>{t.label}</button>)}
         </div>
         {tab==='map'   && <ScreenFrame src="/images/dashboard.png"          alt="DirtLink map and pins view"/>}
-        {tab==='pin'   && <ScreenFrame src="/images/screenshot-pin.png"    alt="DirtLink pin detail panel"/>}
-        {tab==='msg'   && <ScreenFrame src="/images/screenshot-msg.png"    alt="DirtLink messaging view"/>}
+        {tab==='pin'   && <ScreenFrame src="/images/how-3-connect.png"    alt="DirtLink pin detail panel"/>}
+        {tab==='msg'   && <ScreenFrame src="/images/how-4-move.png"    alt="DirtLink messaging view"/>}
         {tab==='notif' && <ScreenFrame src="/images/screenshot-notif.png"  alt="DirtLink notification settings"/>}
       </div>
       <style>{`@media (max-width: 960px) { .show-grid { grid-template-columns: 1fr !important; } .show-aside { display: none !important; } }`}</style>
