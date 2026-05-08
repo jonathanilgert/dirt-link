@@ -98,6 +98,7 @@ p { margin: 0; color: var(--ink-2); }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
 .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 @media (max-width: 900px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } .section { padding: 64px 0; } }
+@media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr !important; } .section { padding: 48px 0; } h2 { font-size: 28px !important; } }
 .kv { display: grid; grid-template-columns: 112px 1fr; gap: 6px 14px; font-size: 13px; }
 .kv dt { font-family: 'JetBrains Mono', monospace; color: var(--ink-3); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; padding-top: 2px; }
 .kv dd { margin: 0; color: var(--ink); }
@@ -213,30 +214,65 @@ const Placeholder = ({ label='site photo', aspect='4 / 3', radius=8 }) => (
 );
 
 /* ── Nav ── */
-const Nav = () => (
-  <div className="nav">
-    <div className="container nav-inner">
-      <a href="#" onClick={(e)=>{e.preventDefault();window.scrollTo({top:0,behavior:'smooth'});}} className="logo" style={{ cursor:'pointer', textDecoration:'none', color:'inherit' }}>
-        <Logo/>
-        <span>DirtLink</span>
-        <span className="mono" style={{ fontSize:10, color:'var(--ink-4)', letterSpacing:'0.12em', padding:'2px 6px', border:'1px solid var(--hairline)', borderRadius:3, marginLeft:4 }}>BETA</span>
-      </a>
-      <div className="nav-links" style={{ alignItems:'center' }}>
-        <a href="#how">How it works</a>
-        <a href="#features">Features</a>
-        <a href="#showcase">Product</a>
-        <a href="#usecases">Use cases</a>
-        <a href="#pricing" className="muted">Pricing</a>
-        <a href="#faq" className="muted">FAQ</a>
-        <a href="#contact" className="muted">Contact</a>
+const Nav = () => {
+  const [open, setOpen] = React.useState(false);
+  const close = () => setOpen(false);
+  const links = [
+    ['How it works','#how'],['Features','#features'],['Product','#showcase'],
+    ['Use cases','#usecases'],['Pricing','#pricing'],['FAQ','#faq'],['Contact','#contact'],
+  ];
+  return (
+    <div className="nav">
+      <div className="container nav-inner">
+        <a href="#" onClick={(e)=>{e.preventDefault();window.scrollTo({top:0,behavior:'smooth'});}} className="logo" style={{ cursor:'pointer', textDecoration:'none', color:'inherit' }}>
+          <Logo/>
+          <span>DirtLink</span>
+          <span className="mono" style={{ fontSize:10, color:'var(--ink-4)', letterSpacing:'0.12em', padding:'2px 6px', border:'1px solid var(--hairline)', borderRadius:3, marginLeft:4 }}>BETA</span>
+        </a>
+        <div className="nav-links" style={{ alignItems:'center' }}>
+          {links.map(([label,href]) => <a key={href} href={href}>{label}</a>)}
+        </div>
+        <div className="row gap-4 nav-cta" style={{ alignItems:'center' }}>
+          <a href="/app" className="btn btn-ghost btn-sm">Log in</a>
+          <a href="/app" className="btn btn-primary btn-sm">Get started <Icon name="arrow" size={14}/></a>
+        </div>
+        <button className="burger" onClick={()=>setOpen(o=>!o)} aria-label="Menu">
+          <span className={open?'bline bline-top open':'bline bline-top'}/>
+          <span className={open?'bline bline-mid open':'bline bline-mid'}/>
+          <span className={open?'bline bline-bot open':'bline bline-bot'}/>
+        </button>
       </div>
-      <div className="row gap-4" style={{ alignItems:'center' }}>
-        <a href="/app" className="btn btn-ghost btn-sm">Log in</a>
-        <a href="/app" className="btn btn-primary btn-sm">Get started <Icon name="arrow" size={14}/></a>
-      </div>
+      {open && (
+        <div className="mobile-menu">
+          {links.map(([label,href]) => (
+            <a key={href} href={href} className="mobile-link" onClick={close}>{label}</a>
+          ))}
+          <div className="mobile-actions">
+            <a href="/app" className="btn btn-ghost btn-sm" style={{flex:1,justifyContent:'center'}} onClick={close}>Log in</a>
+            <a href="/app" className="btn btn-primary btn-sm" style={{flex:1,justifyContent:'center'}} onClick={close}>Get started</a>
+          </div>
+        </div>
+      )}
+      <style>{`
+        .burger { display:none; flex-direction:column; justify-content:center; gap:5px; width:36px; height:36px; background:none; border:none; cursor:pointer; padding:4px; }
+        .bline { display:block; width:22px; height:2px; background:var(--ink); border-radius:2px; transition:transform .22s ease, opacity .22s ease; transform-origin:center; }
+        .bline-top.open { transform:translateY(7px) rotate(45deg); }
+        .bline-mid.open { opacity:0; transform:scaleX(0); }
+        .bline-bot.open { transform:translateY(-7px) rotate(-45deg); }
+        .mobile-menu { display:none; flex-direction:column; background:var(--bg); border-top:1px solid var(--hairline); padding:16px 20px 24px; }
+        .mobile-link { font-size:16px; font-weight:500; color:var(--ink); text-decoration:none; padding:12px 0; border-bottom:1px solid var(--hairline); }
+        .mobile-link:last-of-type { border-bottom:none; }
+        .mobile-actions { display:flex; gap:10px; margin-top:20px; }
+        @media (max-width:768px) {
+          .nav-links { display:none !important; }
+          .nav-cta { display:none !important; }
+          .burger { display:flex !important; }
+          .mobile-menu { display:flex !important; }
+        }
+      `}</style>
     </div>
-  </div>
-);
+  );
+};
 
 /* ── Hero ── */
 const Hero = () => {
