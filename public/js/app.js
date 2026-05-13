@@ -1044,7 +1044,7 @@ window.DirtLink = {
           </button>`
         : '';
       return `
-      <div class="pin-card ${p.pin_type}">
+      <div class="pin-card ${p.pin_type}${archived ? ' archived' : ''}">
         <div class="pin-card-header">
           <span class="pin-type-badge" style="background:${getPinColor(p.pin_type, p.material_type)}">
             ${p.pin_type === 'have' ? '&#9650; HAVE' : '&#9660; NEED'}
