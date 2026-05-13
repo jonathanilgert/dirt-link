@@ -2,8 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>DirtLink — Connect Earth Material Sites</title>
+  <script>
+    // Prevent browser-level pinch-to-zoom so the app UI stays stable on mobile.
+    // iOS Safari ignores the viewport meta since iOS 10, so we block the gesture events directly.
+    // Pinching on the Leaflet map still works — Leaflet uses touchstart/touchmove internally
+    // and .leaflet-container is excluded from the touchmove block below.
+    (function() {
+      // iOS Safari: gesturestart / gesturechange are fired by the browser before it
+      // begins a pinch-zoom of the page. Preventing them stops page zoom entirely.
+      document.addEventListener('gesturestart',  function(e) { e.preventDefault(); }, { passive: false });
+      document.addEventListener('gesturechange', function(e) { e.preventDefault(); }, { passive: false });
+
+      // Android Chrome + fallback: block multi-touch touchmove outside the map.
+      document.addEventListener('touchmove', function(e) {
+        if (e.touches.length > 1 && !e.target.closest('.leaflet-container')) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap">

@@ -55,6 +55,15 @@
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 
+/* Prevent browser-level pinch-to-zoom on mobile — keeps the app UI stable.
+   The Leaflet map container overrides this with touch-action:none and handles
+   its own pinch-to-zoom internally, so map zoom is unaffected. */
+@media (max-width: 1024px) {
+  html, body {
+    touch-action: pan-x pan-y;
+  }
+}
+
 body {
   font-family: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: var(--bg);
