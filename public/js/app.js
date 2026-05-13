@@ -1035,8 +1035,8 @@ window.DirtLink = {
     const archivedPins = pins.filter(p => !p.is_active);
 
     const renderCard = (p, archived = false) => {
-      const timelineHtml = this._getTimelineBadgeHtml(p);
-      const staleHtml    = this._getStaleBadgeHtml(p);
+      const timelineHtml = archived ? '' : this._getTimelineBadgeHtml(p);
+      const staleHtml    = archived ? '' : this._getStaleBadgeHtml(p);
       const isMonitored  = monitoredPinIds.has(p.id);
       const monitorBtn   = this._isProximityEligible() && p.is_active
         ? `<button class="btn btn-sm ${isMonitored ? 'btn-monitor-active' : 'btn-outline'}" onclick="DirtLink.togglePinMonitoring('${p.id}', ${!isMonitored}).then(() => DirtLink.loadMyPins())" title="${isMonitored ? 'Stop monitoring' : 'Monitor for nearby sites'}">
