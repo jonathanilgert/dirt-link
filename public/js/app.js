@@ -851,6 +851,23 @@ window.DirtLink = {
     await fetch('/api/auth/logout', { method: 'POST' });
     this.user = null;
     this.updateAuthUI();
+
+    // Clear messaging UI so previous user's conversations aren't visible
+    const convList = document.getElementById('conv-list-items');
+    if (convList) convList.innerHTML = '<p class="empty-state">Log in to see your messages.</p>';
+    const thread = document.getElementById('thread-messages');
+    if (thread) thread.innerHTML = '';
+    const threadInput = document.getElementById('thread-input');
+    if (threadInput) threadInput.style.display = 'none';
+    if (window.Messaging) {
+      window.Messaging.currentConversationId = null;
+      clearInterval(window.Messaging.pollTimer);
+      window.Messaging.pollTimer = null;
+    }
+
+    // Clear My Pins view too
+    const pinsList = document.getElementById('my-pins-list');
+    if (pinsList) pinsList.innerHTML = '<p class="empty-state">Log in to see your pins.</p>';
   },
 
   // Load external pins (permit + permanent) from API
