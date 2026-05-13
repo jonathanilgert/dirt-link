@@ -1031,11 +1031,14 @@ window.DirtLink = {
       } catch (e) { /* ignore */ }
     }
 
-    container.innerHTML = pins.map(p => {
+    const activePins   = pins.filter(p =>  p.is_active);
+    const archivedPins = pins.filter(p => !p.is_active);
+
+    const renderCard = (p, archived = false) => {
       const timelineHtml = this._getTimelineBadgeHtml(p);
-      const staleHtml = this._getStaleBadgeHtml(p);
-      const isMonitored = monitoredPinIds.has(p.id);
-      const monitorBtn = this._isProximityEligible() && p.is_active
+      const staleHtml    = this._getStaleBadgeHtml(p);
+      const isMonitored  = monitoredPinIds.has(p.id);
+      const monitorBtn   = this._isProximityEligible() && p.is_active
         ? `<button class="btn btn-sm ${isMonitored ? 'btn-monitor-active' : 'btn-outline'}" onclick="DirtLink.togglePinMonitoring('${p.id}', ${!isMonitored}).then(() => DirtLink.loadMyPins())" title="${isMonitored ? 'Stop monitoring' : 'Monitor for nearby sites'}">
             ${isMonitored ? 'Monitoring' : 'Monitor'}
           </button>`
@@ -1049,7 +1052,7 @@ window.DirtLink = {
           <span class="pin-material">${MATERIALS[p.material_type]?.label || p.material_type}</span>
           ${p.is_tested ? '<span class="tested-badge">Tested</span>' : ''}
           ${timelineHtml}
-          <span class="pin-status ${p.is_active ? 'active' : 'inactive'}">${p.is_active ? 'Active' : 'Closed'}</span>
+          ${!archived ? `<span class="pin-status active">Active</span>` : ''}
         </div>
         ${staleHtml}
         <h4>${this.escapeHtml(p.title)}</h4>
@@ -1061,7 +1064,7 @@ window.DirtLink = {
           </div>
         ` : ''}
         <div class="pin-card-actions">
-          ${p.is_active ? `
+          ${!archived ? `
             <button class="btn btn-sm btn-primary" onclick="DirtLink.editPin('${p.id}')">Edit</button>
             <button class="btn btn-sm btn-outline" onclick="DirtLink.repositionPin('${p.id}')">Reposition</button>
             <button class="btn btn-sm btn-outline" onclick="DirtLink.deactivatePin('${p.id}')">Mark Complete</button>
@@ -1069,10 +1072,34 @@ window.DirtLink = {
           ` : `
             <button class="btn btn-sm btn-outline" onclick="DirtLink.reactivatePin('${p.id}')">Reactivate</button>
           `}
-          <button class="btn btn-sm btn-danger" onclick="DirtLink.deletePin('${p.id}')">Delete</button>
         </div>
       </div>
-    `}).join('');
+    `;
+    };
+
+    let html = '';
+
+    if (activePins.length === 0 && archivedPins.length === 0) {
+      html = '<p class="empty-state">You haven\'t dropped any pins yet.</p>';
+    } else {
+      if (activePins.length > 0) {
+        html += activePins.map(p => renderCard(p, false)).join('');
+      } else {
+        html += '<p class="empty-state" style="margin-bottom:32px">No active pins. Drop a pin on the map to get started.</p>';
+      }
+
+      if (archivedPins.length > 0) {
+        html += `
+          <div class="archive-section-header">
+            <span>Archive</span>
+            <span class="archive-count">${archivedPins.length}</span>
+          </div>
+          ${archivedPins.map(p => renderCard(p, true)).join('')}
+        `;
+      }
+    }
+
+    container.innerHTML = html;
   },
 
   // Edit pin — open form pre-filled with existing data
