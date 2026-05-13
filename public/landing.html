@@ -863,9 +863,10 @@ const Contact = () => (
           <p className="lede" style={{ marginBottom:40 }}>Questions about the platform, your listing, a partnership, or anything else — reach us directly.</p>
           <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
             {[
+              { label:'Phone',    value:'+1 587-328-8440',     href:'tel:+15873288440' },
               { label:'Email',    value:'hello@dirtlink.ca', href:'mailto:hello@dirtlink.ca' },
               { label:'Website',  value:'dirtlink.ca',        href:'/' },
-              { label:'Location',          value:'Calgary, Alberta, Canada', href:null },
+              { label:'Location', value:'Calgary, Alberta, Canada', href:null },
             ].map(({ label, value, href }) => (
               <div key={label} style={{ display:'flex', flexDirection:'column', gap:3 }}>
                 <span style={{ fontSize:11, fontWeight:600, letterSpacing:'0.1em', textTransform:'uppercase', color:'var(--ink-4)' }}>{label}</span>
