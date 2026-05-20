@@ -419,4 +419,143 @@ router.get('/admin/inspect-pins', requireApiKeyScope('admin:read'), (req, res) =
   });
 });
 
+// --- Permit pin management by permit_number (for Hubert relevance pruning) ---
+//
+// These three endpoints let Hubert manage permit_pins by the natural key
+// (permit_number) instead of the internal UUID. They never touch
+// permanent_pins. Soft-deactivation (is_active=0) is preferred over hard
+// delete so a misfire can be undone with /reactivate.
+//
+// permit_number is NOT unique in the schema, so a single number can match
+// multiple rows; all rows for a given permit_number are updated together.
+
+const MAX_PERMIT_NUMBER_BATCH = 1000;
+
+function parsePermitNumbers(req) {
+  const body = req.body || {};
+  const list = body.permit_numbers;
+  if (!Array.isArray(list)) {
+    return { error: 'permit_numbers must be an array of strings' };
+  }
+  if (list.length === 0) {
+    return { error: 'permit_numbers must not be empty' };
+  }
+  if (list.length > MAX_PERMIT_NUMBER_BATCH) {
+    return { error: `Maximum ${MAX_PERMIT_NUMBER_BATCH} permit_numbers per request` };
+  }
+  const seen = new Set();
+  const cleaned = [];
+  for (const v of list) {
+    if (typeof v !== 'string') return { error: 'permit_numbers must contain only strings' };
+    const t = v.trim();
+    if (!t) continue;
+    if (seen.has(t)) continue;
+    seen.add(t);
+    cleaned.push(t);
+  }
+  if (cleaned.length === 0) return { error: 'permit_numbers contained no non-empty values' };
+  return { permit_numbers: cleaned };
+}
+
+// POST /permit-pins/deactivate
+// Body: { "permit_numbers": ["DP2026-00196", ...] }
+// Sets is_active = 0 on every permit_pin matching any supplied permit_number.
+router.post('/permit-pins/deactivate', (req, res) => {
+  const parsed = parsePermitNumbers(req);
+  if (parsed.error) return res.status(400).json({ error: parsed.error });
+
+  let matched = 0, deactivated = 0, already_inactive = 0;
+  const missing = [];
+
+  for (const permitNumber of parsed.permit_numbers) {
+    const rows = all(
+      `SELECT id, is_active FROM permit_pins WHERE permit_number = ?`,
+      [permitNumber]
+    );
+    if (rows.length === 0) {
+      missing.push(permitNumber);
+      continue;
+    }
+    for (const row of rows) {
+      matched++;
+      if (row.is_active === 0) {
+        already_inactive++;
+      } else {
+        run(
+          `UPDATE permit_pins SET is_active = 0, updated_at = datetime('now') WHERE id = ?`,
+          [row.id]
+        );
+        deactivated++;
+      }
+    }
+  }
+
+  res.json({ matched, deactivated, already_inactive, missing });
+});
+
+// POST /permit-pins/reactivate
+// Body: { "permit_numbers": ["DP2026-00196", ...] }
+// Inverse of /deactivate — sets is_active = 1.
+router.post('/permit-pins/reactivate', (req, res) => {
+  const parsed = parsePermitNumbers(req);
+  if (parsed.error) return res.status(400).json({ error: parsed.error });
+
+  let matched = 0, reactivated = 0, already_active = 0;
+  const missing = [];
+
+  for (const permitNumber of parsed.permit_numbers) {
+    const rows = all(
+      `SELECT id, is_active FROM permit_pins WHERE permit_number = ?`,
+      [permitNumber]
+    );
+    if (rows.length === 0) {
+      missing.push(permitNumber);
+      continue;
+    }
+    for (const row of rows) {
+      matched++;
+      if (row.is_active === 1) {
+        already_active++;
+      } else {
+        run(
+          `UPDATE permit_pins SET is_active = 1, updated_at = datetime('now') WHERE id = ?`,
+          [row.id]
+        );
+        reactivated++;
+      }
+    }
+  }
+
+  res.json({ matched, reactivated, already_active, missing });
+});
+
+// POST /permit-pins/by-permit-numbers
+// Body: { "permit_numbers": ["DP2026-00196", ...] }
+// Lookup helper so Hubert can verify state without scraping the full list.
+// Returns full rows (both active and inactive) grouped by permit_number.
+router.post('/permit-pins/by-permit-numbers', (req, res) => {
+  const parsed = parsePermitNumbers(req);
+  if (parsed.error) return res.status(400).json({ error: parsed.error });
+
+  const results = {};
+  const missing = [];
+  for (const permitNumber of parsed.permit_numbers) {
+    const rows = all(
+      `SELECT * FROM permit_pins WHERE permit_number = ? ORDER BY created_at DESC`,
+      [permitNumber]
+    );
+    if (rows.length === 0) {
+      missing.push(permitNumber);
+    } else {
+      results[permitNumber] = rows;
+    }
+  }
+
+  res.json({
+    found: Object.keys(results).length,
+    missing,
+    permit_pins: results
+  });
+});
+
 module.exports = router;
