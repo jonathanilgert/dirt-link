@@ -1085,6 +1085,7 @@ window.DirtLink = {
             <button class="btn btn-sm btn-primary" onclick="DirtLink.editPin('${p.id}')">Edit</button>
             <button class="btn btn-sm btn-outline" onclick="DirtLink.repositionPin('${p.id}')">Reposition</button>
             <button class="btn btn-sm btn-outline" onclick="DirtLink.deactivatePin('${p.id}')">Mark Complete</button>
+            <button class="btn btn-sm btn-outline" style="color:#DC2626;border-color:#DC2626;" onclick="DirtLink.deletePin('${p.id}')">Delete</button>
             ${monitorBtn}
           ` : `
             <button class="btn btn-sm btn-outline" onclick="DirtLink.reactivatePin('${p.id}')">Reactivate</button>
