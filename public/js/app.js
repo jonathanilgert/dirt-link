@@ -1055,11 +1055,6 @@ window.DirtLink = {
       const timelineHtml = archived ? '' : this._getTimelineBadgeHtml(p);
       const staleHtml    = archived ? '' : this._getStaleBadgeHtml(p);
       const isMonitored  = monitoredPinIds.has(p.id);
-      const monitorBtn   = this._isProximityEligible() && p.is_active
-        ? `<button class="btn btn-sm ${isMonitored ? 'btn-monitor-active' : 'btn-outline'}" onclick="DirtLink.togglePinMonitoring('${p.id}', ${!isMonitored}).then(() => DirtLink.loadMyPins())" title="${isMonitored ? 'Stop monitoring' : 'Monitor for nearby sites'}">
-            ${isMonitored ? 'Monitoring' : 'Monitor'}
-          </button>`
-        : '';
       return `
       <div class="pin-card ${p.pin_type}${archived ? ' archived' : ''}">
         <div class="pin-card-header">
@@ -1086,7 +1081,6 @@ window.DirtLink = {
             <button class="btn btn-sm btn-outline" onclick="DirtLink.repositionPin('${p.id}')">Reposition</button>
             <button class="btn btn-sm btn-outline" onclick="DirtLink.deactivatePin('${p.id}')">Mark Complete</button>
             <button class="btn btn-sm btn-outline" style="color:#DC2626;border-color:#DC2626;" onclick="DirtLink.deletePin('${p.id}')">Delete</button>
-            ${monitorBtn}
           ` : `
             <button class="btn btn-sm btn-outline" onclick="DirtLink.reactivatePin('${p.id}')">Reactivate</button>
           `}
