@@ -275,7 +275,7 @@ const Nav = () => {
 };
 
 /* ── Hero ── */
-const Hero = () => {
+const Hero = ({ onBookVisit }) => {
   const [selected, setSelected] = useState(1);
   const listings = [
     { id:0, type:'have', title:'Topsoil — screened',  qty:'340 m³',   site:'Rocky View — Lot 7',       dist:'4.2 km', top:'42%', left:'22%' },
@@ -299,6 +299,7 @@ const Hero = () => {
             <div className="row gap-4" style={{ flexWrap:'wrap' }}>
               <a href="/app" className="btn btn-primary">Get started — it's free <Icon name="arrow" size={14}/></a>
               <a href="#how" className="btn btn-secondary"><Icon name="chevron" size={15}/> See how it works</a>
+              <button onClick={onBookVisit} className="btn btn-secondary" style={{ cursor:'pointer' }}>Book a visit</button>
             </div>
             <div className="row gap-6 mono" style={{ fontSize:12, color:'var(--ink-3)', flexWrap:'wrap' }}>
               <span><Icon name="check" size={12}/> &nbsp;No card required</span>
@@ -1017,8 +1018,90 @@ const Footer = () => (
   </footer>
 );
 
+/* ── Book a Visit Modal ── */
+const BookVisitModal = ({ open, onClose }) => {
+  const [submitted, setSubmitted] = React.useState(false);
+  const [sending, setSending] = React.useState(false);
+
+  if (!open) return null;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setSending(true);
+    const fd = new FormData(e.target);
+    const body = `Name: ${fd.get('name')}\nCompany: ${fd.get('company')}\nEmail: ${fd.get('email')}\nPhone: ${fd.get('phone')}\nPreferred Date: ${fd.get('date')}\n\nMessage:\n${fd.get('message')}`;
+    window.location.href = `mailto:hello@dirtlink.ca?subject=Book a Visit — ${encodeURIComponent(fd.get('name'))}&body=${encodeURIComponent(body)}`;
+    setSending(false);
+    setSubmitted(true);
+    setTimeout(() => { setSubmitted(false); onClose(); }, 3000);
+  };
+
+  const inputStyle = { width:'100%', padding:'10px 12px', border:'1px solid var(--hairline)', borderRadius:7, fontSize:14, background:'var(--bg)', outline:'none', fontFamily:'inherit' };
+  const labelStyle = { fontSize:12, fontWeight:500, color:'var(--ink-3)', display:'block', marginBottom:5 };
+
+  return (
+    <div onClick={onClose} style={{ position:'fixed', inset:0, zIndex:9999, background:'rgba(0,0,0,0.45)', display:'flex', alignItems:'center', justifyContent:'center', padding:20, backdropFilter:'blur(4px)' }}>
+      <div onClick={e => e.stopPropagation()} style={{ background:'var(--surface)', borderRadius:16, padding:'36px 32px', maxWidth:500, width:'100%', position:'relative', boxShadow:'0 24px 80px rgba(0,0,0,0.18)', maxHeight:'90vh', overflowY:'auto' }}>
+        <button onClick={onClose} style={{ position:'absolute', top:16, right:16, background:'none', border:'none', cursor:'pointer', fontSize:20, color:'var(--ink-3)', lineHeight:1 }} aria-label="Close">&times;</button>
+
+        {submitted ? (
+          <div style={{ textAlign:'center', padding:'40px 0' }}>
+            <div style={{ width:56, height:56, borderRadius:'50%', background:'#E8F5E9', display:'grid', placeItems:'center', margin:'0 auto 16px' }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2E7D32" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <h3 style={{ fontSize:20, marginBottom:8 }}>We got your request!</h3>
+            <p style={{ color:'var(--ink-3)', fontSize:14 }}>Our team will reach out within 1 business day to confirm your visit.</p>
+          </div>
+        ) : (
+          <React.Fragment>
+            <div style={{ marginBottom:24 }}>
+              <h3 style={{ fontSize:22, fontWeight:600, marginBottom:6 }}>Book a visit</h3>
+              <p style={{ color:'var(--ink-3)', fontSize:14, lineHeight:1.5 }}>Want to see DirtLink in action? Fill out the form below and our team will set up a walkthrough at your convenience.</p>
+            </div>
+            <form onSubmit={handleSubmit} style={{ display:'flex', flexDirection:'column', gap:14 }}>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+                <div>
+                  <label style={labelStyle}>Name *</label>
+                  <input name="name" required placeholder="Your name" style={inputStyle}/>
+                </div>
+                <div>
+                  <label style={labelStyle}>Company</label>
+                  <input name="company" placeholder="Company name" style={inputStyle}/>
+                </div>
+              </div>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+                <div>
+                  <label style={labelStyle}>Email *</label>
+                  <input name="email" type="email" required placeholder="your@email.com" style={inputStyle}/>
+                </div>
+                <div>
+                  <label style={labelStyle}>Phone</label>
+                  <input name="phone" type="tel" placeholder="+1 (___) ___-____" style={inputStyle}/>
+                </div>
+              </div>
+              <div>
+                <label style={labelStyle}>Preferred date / time</label>
+                <input name="date" placeholder="e.g. Next Tuesday afternoon" style={inputStyle}/>
+              </div>
+              <div>
+                <label style={labelStyle}>Message</label>
+                <textarea name="message" rows={3} placeholder="Anything we should know before the visit?" style={{ ...inputStyle, resize:'vertical' }}/>
+              </div>
+              <button type="submit" className="btn btn-primary" style={{ justifyContent:'center', marginTop:4 }} disabled={sending}>
+                {sending ? 'Sending...' : 'Request a visit'} <Icon name="arrow" size={14}/>
+              </button>
+              <p style={{ fontSize:12, color:'var(--ink-4)', textAlign:'center' }}>Opens your email client · We reply within 1 business day</p>
+            </form>
+          </React.Fragment>
+        )}
+      </div>
+    </div>
+  );
+};
+
 /* ── App ── */
 function App() {
+  const [bookOpen, setBookOpen] = React.useState(false);
   useEffect(() => {
     const targets = document.querySelectorAll('.hero-workspace');
     const io = new IntersectionObserver((entries) => {
@@ -1041,7 +1124,8 @@ function App() {
   return (
     <React.Fragment>
       <Nav/>
-      <Hero/>
+      <Hero onBookVisit={() => setBookOpen(true)}/>
+      <BookVisitModal open={bookOpen} onClose={() => setBookOpen(false)}/>
       <HowItWorks/>
       <Features/>
       <Why/>
