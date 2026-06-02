@@ -31,7 +31,8 @@ jobs:
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           source: DirtLink_Calgary_Directory.xlsx
           target: /tmp/dirtlink-calgary-import
-          strip_components: 1
+          rm: true
+          overwrite: true
 
       - name: Run importer on droplet
         uses: appleboy/ssh-action@v1
