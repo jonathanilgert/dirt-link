@@ -342,6 +342,23 @@ async function getDb() {
     db.run(`ALTER TABLE permanent_pins ADD COLUMN is_sponsored_slot INTEGER NOT NULL DEFAULT 0`);
   }
 
+  // Calculator leads — captured from the disposal-cost calculator (and
+  // future calculator widgets). DB is the system of record; admin email
+  // is the immediate alert. Create before Stage 5 ALTERs so a fresh DB can
+  // initialize from scratch.
+  db.run(`
+    CREATE TABLE IF NOT EXISTS leads (
+      id TEXT PRIMARY KEY,
+      email TEXT NOT NULL,
+      name TEXT,
+      source TEXT NOT NULL,
+      inputs TEXT,
+      result TEXT,
+      status TEXT NOT NULL DEFAULT 'new',
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `);
+
   // Extend leads for the Stage 5 routing scaffolding. The base table is
   // calculator-only today; these columns generalize it for any inbound lead.
   const leadCols = all(`PRAGMA table_info(leads)`).map(c => c.name);
