@@ -1,0 +1,597 @@
+{
+  "Heidelberg Materials (formerly Inland Aggregates)|222-885 42 Ave SE, Calgary, AB T2G 1Y8": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Cochrane Aggregates (Heidelberg Materials)|900 River Heights Dr, Cochrane, AB": {
+    "latitude": 51.1654655,
+    "longitude": -114.4510886,
+    "precision": "geocoded"
+  },
+  "address:900 River Heights Dr, Cochrane, AB": {
+    "latitude": 51.1654655,
+    "longitude": -114.4510886,
+    "precision": "geocoded"
+  },
+  "Lafarge Canada - Spy Hill Aggregate|13012 85 Street NW, Calgary, AB T3R 1J3": {
+    "latitude": 51.176201,
+    "longitude": -114.2110172,
+    "precision": "geocoded"
+  },
+  "address:13012 85 Street NW, Calgary, AB T3R 1J3": {
+    "latitude": 51.176201,
+    "longitude": -114.2110172,
+    "precision": "geocoded"
+  },
+  "McNair Sand & Gravel Ltd.|PO Box 205, Beiseker, AB T0M 0G0": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Hillstone Aggregates (formerly Big Hill Springs Gravel Pit)|40217 Big Hill Springs Road, Rocky View County, AB": {
+    "latitude": 51.2708421,
+    "longitude": -114.0811475,
+    "precision": "geocoded"
+  },
+  "address:40217 Big Hill Springs Road, Rocky View County, AB": {
+    "latitude": 51.2708421,
+    "longitude": -114.0811475,
+    "precision": "geocoded"
+  },
+  "deVries Bros Sand & Gravel|354201 128 Street W, Black Diamond, AB T1S 1B2": {
+    "latitude": 50.581,
+    "longitude": -113.874,
+    "precision": "service-area"
+  },
+  "Mountain Ash Summit Pit|Highway 567, NE of Cochrane, Rocky View County, AB": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Klippert Sand & Gravel Ltd. (Al Klippert Ltd.)|2004 Springbank Heights Way, Calgary, AB": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Goodstoney Aggregate Pit (Stoney Nakoda Nations)|Stoney Reserves 142/143/144, Mini Thni, AB": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Stoney Trail Aggregate Resource (Volker Stevin / BLV Group)|85 Street NW, Spy Hill, Calgary, AB": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Saby Trucking & Loading Ltd.|RR 2, Site 3, Box 9, Olds, AB T4H 1P3": {
+    "latitude": 51.2917,
+    "longitude": -114.0144,
+    "precision": "service-area"
+  },
+  "Guytec Industries Ltd.|Pine Lake, AB": {
+    "latitude": 52.1120895,
+    "longitude": -113.4808892,
+    "precision": "geocoded"
+  },
+  "address:Pine Lake, AB": {
+    "latitude": 52.1120895,
+    "longitude": -113.4808892,
+    "precision": "geocoded"
+  },
+  "J.D. Dirt Services Ltd|76th Ave & 68 St SE, Calgary, AB T2C 4S6": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Western Canada Garden Soil Ltd|748 Woodpark Blvd SW, Calgary, AB (yard in Aldersyde)": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Park Topsoil|Calgary (pit / delivery)": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Soil Central|Pickup via Bark Mulch Depot, 65 Commercial Dr, Calgary": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "The Gravel Guys|35008 52 St SE, Calgary, AB T2B 2N4": {
+    "latitude": 51.0217475,
+    "longitude": -113.958494,
+    "precision": "geocoded"
+  },
+  "address:35008 52 St SE, Calgary, AB T2B 2N4": {
+    "latitude": 51.0217475,
+    "longitude": -113.958494,
+    "precision": "geocoded"
+  },
+  "Landscape Supply Guys|7503 30 St SE, Calgary, AB": {
+    "latitude": 50.9867605,
+    "longitude": -113.9864585,
+    "precision": "geocoded"
+  },
+  "address:7503 30 St SE, Calgary, AB": {
+    "latitude": 50.9867605,
+    "longitude": -113.9864585,
+    "precision": "geocoded"
+  },
+  "New Standard Landscape Supplies|1919 84 St NE area, Calgary, AB": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Big Yellow Bag (Eagle Lake Turf)|Returns at Spruce It Up, Calgary": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Dirt Cheep Enterprises Inc|96106 2431 Drive E, Foothills (Aldersyde), AB T1S 4A8": {
+    "latitude": 50.6636512,
+    "longitude": -113.8502696,
+    "precision": "geocoded"
+  },
+  "address:96106 2431 Drive E, Foothills (Aldersyde), AB T1S 4A8": {
+    "latitude": 50.6636512,
+    "longitude": -113.8502696,
+    "precision": "geocoded"
+  },
+  "Greengate Garden Centres|14111 Macleod Trail S, Calgary, AB T2Y 1M6": {
+    "latitude": 50.9273352,
+    "longitude": -114.0725694,
+    "precision": "geocoded"
+  },
+  "address:14111 Macleod Trail S, Calgary, AB T2Y 1M6": {
+    "latitude": 50.9273352,
+    "longitude": -114.0725694,
+    "precision": "geocoded"
+  },
+  "BURNCO Landscape Centre|6924 13 St SE, Calgary, AB T2H 2P9": {
+    "latitude": 51.0398844,
+    "longitude": -114.0320055,
+    "precision": "geocoded"
+  },
+  "address:6924 13 St SE, Calgary, AB T2H 2P9": {
+    "latitude": 51.0398844,
+    "longitude": -114.0320055,
+    "precision": "geocoded"
+  },
+  "Ornamental Stone Inc|79 Prairie Place SE, Calgary, AB": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Direct Landscape Supply|209 Railway Ave, Carseland, AB": {
+    "latitude": 50.8510306,
+    "longitude": -113.47258,
+    "precision": "geocoded"
+  },
+  "address:209 Railway Ave, Carseland, AB": {
+    "latitude": 50.8510306,
+    "longitude": -113.47258,
+    "precision": "geocoded"
+  },
+  "Bark Mulch Depot|65 Commercial Dr, Calgary, AB T3Z 2A7": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "High River Landscape Products Ltd|411b 24 St SE, High River, AB": {
+    "latitude": 50.581,
+    "longitude": -113.874,
+    "precision": "service-area"
+  },
+  "Whitecap Supply (Calgary)|2703 61 Ave SE, Calgary, AB T2C 4X3": {
+    "latitude": 50.9985972,
+    "longitude": -113.9858455,
+    "precision": "geocoded"
+  },
+  "address:2703 61 Ave SE, Calgary, AB T2C 4X3": {
+    "latitude": 50.9985972,
+    "longitude": -113.9858455,
+    "precision": "geocoded"
+  },
+  "Mountain Bark Inc|100 Stockton Ave, Okotoks, AB T1S 1B4": {
+    "latitude": 50.7195416,
+    "longitude": -113.9556508,
+    "precision": "geocoded"
+  },
+  "address:100 Stockton Ave, Okotoks, AB T1S 1B4": {
+    "latitude": 50.7195416,
+    "longitude": -113.9556508,
+    "precision": "geocoded"
+  },
+  "Spruce It Up Garden Centre|159 210 Ave SW, Calgary, AB": {
+    "latitude": 50.8651006,
+    "longitude": -114.0393371,
+    "precision": "geocoded"
+  },
+  "address:159 210 Ave SW, Calgary, AB": {
+    "latitude": 50.8651006,
+    "longitude": -114.0393371,
+    "precision": "geocoded"
+  },
+  "Thunderstone Quarries|101 George Biggy Sr. Rd, Canmore, AB T1W 2W4": {
+    "latitude": 51.0378889,
+    "longitude": -115.2551102,
+    "precision": "geocoded"
+  },
+  "address:101 George Biggy Sr. Rd, Canmore, AB T1W 2W4": {
+    "latitude": 51.0378889,
+    "longitude": -115.2551102,
+    "precision": "geocoded"
+  },
+  "CLS Landscape Supply|Unit A, 4116 50 Ave SE, Calgary, AB T2B 2T7": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Koomen Contracting Ltd.|": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Prattco Excavating Ltd.|3714 67 Ave NE, Calgary, AB T3J 4H3": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "UG Excavating Ltd.|": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Helms Construction|Cremona, AB T0M 0R0": {
+    "latitude": 51.5446018,
+    "longitude": -114.4930074,
+    "precision": "geocoded"
+  },
+  "address:Cremona, AB T0M 0R0": {
+    "latitude": 51.5446018,
+    "longitude": -114.4930074,
+    "precision": "geocoded"
+  },
+  "Dragon Excavating Ltd.|#8, 10 Wrangler Place, Rocky View County, AB T1X 0L7": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Bear Excavating Ltd.|Box 64, Okotoks, AB T1S 1A4": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Bragg Creek Excavating Inc.|": {
+    "latitude": 50.9486,
+    "longitude": -114.5608,
+    "precision": "service-area"
+  },
+  "Fish Creek Excavating Ltd.|7515 84 St SE, Calgary, AB T2C 4Y1": {
+    "latitude": 51.0164251,
+    "longitude": -113.911972,
+    "precision": "geocoded"
+  },
+  "address:7515 84 St SE, Calgary, AB T2C 4Y1": {
+    "latitude": 51.0164251,
+    "longitude": -113.911972,
+    "precision": "geocoded"
+  },
+  "Professional Excavators & Construction Ltd.|10919 84th St SE, Calgary, AB T2C 5A6": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "ConSite Construction Ltd.|117 High Plains Place, Rocky View County, AB T4A 0W7": {
+    "latitude": 51.1992596,
+    "longitude": -113.9314949,
+    "precision": "geocoded"
+  },
+  "address:117 High Plains Place, Rocky View County, AB T4A 0W7": {
+    "latitude": 51.1992596,
+    "longitude": -113.9314949,
+    "precision": "geocoded"
+  },
+  "Chems & Sons Construction|3015 5 Avenue NE, unit 240N, Calgary, AB T2A 6T8": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "MGT Excavating Ltd.|": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "DanCo Trucking & Bobcat Services|": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Bow River Concrete and Excavation|5334 Copperfield Gate SE, Calgary, AB T2Z 4C4": {
+    "latitude": 50.911172,
+    "longitude": -113.9479808,
+    "precision": "geocoded"
+  },
+  "address:5334 Copperfield Gate SE, Calgary, AB T2Z 4C4": {
+    "latitude": 50.911172,
+    "longitude": -113.9479808,
+    "precision": "geocoded"
+  },
+  "AS/F Contracting|": {
+    "latitude": 50.7254,
+    "longitude": -113.9748,
+    "precision": "service-area"
+  },
+  "Foothills Excavation|": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Rockyview Roadworks - Excavation Ltd.|": {
+    "latitude": 51.1834,
+    "longitude": -114.16,
+    "precision": "service-area"
+  },
+  "Adept Landscape and Construction|": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "West Valley Contracting|": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "CanWest Concrete & Construction|": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Badger Daylighting (Calgary)|8615 44 St SE, Calgary, AB T2C 2P5": {
+    "latitude": 51.0020148,
+    "longitude": -113.9701325,
+    "precision": "geocoded"
+  },
+  "address:8615 44 St SE, Calgary, AB T2C 2P5": {
+    "latitude": 51.0020148,
+    "longitude": -113.9701325,
+    "precision": "geocoded"
+  },
+  "GB Brothers|15 Bluegrass Place, Rocky View County, AB": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Dirt Dump Inc.|9355 44 Street SE, Calgary, AB T2C 2P7": {
+    "latitude": 50.8743214,
+    "longitude": -113.9446494,
+    "precision": "geocoded"
+  },
+  "address:9355 44 Street SE, Calgary, AB T2C 2P7": {
+    "latitude": 50.8743214,
+    "longitude": -113.9446494,
+    "precision": "geocoded"
+  },
+  "Singh Bros Transport Ltd.|7721 40 St NE, Calgary, AB T3J 4H2": {
+    "latitude": 51.1183068,
+    "longitude": -113.9762596,
+    "precision": "geocoded"
+  },
+  "address:7721 40 St NE, Calgary, AB T3J 4H2": {
+    "latitude": 51.1183068,
+    "longitude": -113.9762596,
+    "precision": "geocoded"
+  },
+  "Mike Vail Trucking Ltd.|4531 32nd Street SE, Calgary, AB T2B 3P8": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "JTG Trucking|": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Dependable Maintenance Ltd.|Suite 2 - 3925 56 Ave SE, Calgary, AB T2C 2E4": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Koverall Industries|Box 27 Site 4 RR1, Airdrie, AB T4B 2A3": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Borger Group (Borger Transport)|261046 High Plains Blvd, Rocky View County, AB T4A 3L3": {
+    "latitude": 51.198449,
+    "longitude": -113.9225081,
+    "precision": "geocoded"
+  },
+  "address:261046 High Plains Blvd, Rocky View County, AB T4A 3L3": {
+    "latitude": 51.198449,
+    "longitude": -113.9225081,
+    "precision": "geocoded"
+  },
+  "Calgary Dump Trucks (Koomen Contracting)|215 9 Ave SW, Calgary, AB T2P 1K3": {
+    "latitude": 51.0444585,
+    "longitude": -114.0674164,
+    "precision": "geocoded"
+  },
+  "address:215 9 Ave SW, Calgary, AB T2P 1K3": {
+    "latitude": 51.0444585,
+    "longitude": -114.0674164,
+    "precision": "geocoded"
+  },
+  "CORE Industrial Services|": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Troy Demolition Inc.|": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "SLEDGE Demolition YYC|": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Krush Demolition Inc.|": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Makki Demolition|639 5 Ave SW, 25th floor, Calgary, AB T2P 0M9": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Besa Demolition Inc.|2557 10 Ave SE, Calgary, AB T2A 0C2": {
+    "latitude": 51.0432526,
+    "longitude": -114.0607385,
+    "precision": "geocoded"
+  },
+  "address:2557 10 Ave SE, Calgary, AB T2A 0C2": {
+    "latitude": 51.0432526,
+    "longitude": -114.0607385,
+    "precision": "geocoded"
+  },
+  "Visco Demolition Contractors Ltd.|48 Technology Way, Calgary, AB T3S 0B9": {
+    "latitude": 50.9656365,
+    "longitude": -113.9085722,
+    "precision": "geocoded"
+  },
+  "address:48 Technology Way, Calgary, AB T3S 0B9": {
+    "latitude": 50.9656365,
+    "longitude": -113.9085722,
+    "precision": "geocoded"
+  },
+  "Able Demolition Services Ltd.|3828 14th Street SE, Calgary, AB T2G 3K4": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Flintstone Demolition Contractors|6212 90 Ave SE, Calgary, AB T2C 2T3": {
+    "latitude": 50.9740341,
+    "longitude": -113.94624,
+    "precision": "geocoded"
+  },
+  "address:6212 90 Ave SE, Calgary, AB T2C 2T3": {
+    "latitude": 50.9740341,
+    "longitude": -113.94624,
+    "precision": "geocoded"
+  },
+  "All West Demolition|Calgary service area (HQ Edmonton)": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Evolution Demo|": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Calgary Aggregate Recycling Inc. (CAR)|6020 94 Avenue SE, Calgary, AB T2C 3Z3": {
+    "latitude": 50.968532,
+    "longitude": -114.0480277,
+    "precision": "geocoded"
+  },
+  "address:6020 94 Avenue SE, Calgary, AB T2C 3Z3": {
+    "latitude": 50.968532,
+    "longitude": -114.0480277,
+    "precision": "geocoded"
+  },
+  "Volker Stevin Contracting|Spyhill operation, Calgary NW": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Calgary Landscape Supplies|Calgary, AB": {
+    "latitude": 51.0456064,
+    "longitude": -114.057541,
+    "precision": "geocoded"
+  },
+  "address:Calgary, AB": {
+    "latitude": 51.0456064,
+    "longitude": -114.057541,
+    "precision": "geocoded"
+  },
+  "Bettenson's Sand & Gravel|Red Deer area, AB": {
+    "latitude": 50.9261423,
+    "longitude": -110.1729011,
+    "precision": "geocoded"
+  },
+  "address:Red Deer area, AB": {
+    "latitude": 50.9261423,
+    "longitude": -110.1729011,
+    "precision": "geocoded"
+  },
+  "Thurber Engineering Ltd.|350, 7330 Fisher Street SE, Calgary, AB T2H 2H8": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "ALS Environmental (Calgary)|2559 29th Street NE, Calgary, AB": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Bureau Veritas|2021 41 Ave NE, Calgary, AB T2E 6P2": {
+    "latitude": 51.0895901,
+    "longitude": -114.0109777,
+    "precision": "geocoded"
+  },
+  "address:2021 41 Ave NE, Calgary, AB T2E 6P2": {
+    "latitude": 51.0895901,
+    "longitude": -114.0109777,
+    "precision": "geocoded"
+  },
+  "AGAT Laboratories|2905 12th Street NE, Calgary, AB": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "PrairieGEO Engineering Ltd.|140, 38 Avenue NE, Calgary, AB T2E 2M3": {
+    "latitude": 51.0868568,
+    "longitude": -114.0520222,
+    "precision": "geocoded"
+  },
+  "address:140, 38 Avenue NE, Calgary, AB T2E 2M3": {
+    "latitude": 51.0868568,
+    "longitude": -114.0520222,
+    "precision": "geocoded"
+  },
+  "SE Design & Consulting|Alberta (multiple offices)": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Eagle Lake Turf Farm & Landscape Supply|285177 Frontier Rd, Calgary, AB T1X 0N2": {
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "precision": "service-area"
+  },
+  "Scott's Sod Sales & Installation Inc.|Airdrie, AB T4B 2N5": {
+    "latitude": 51.28597,
+    "longitude": -114.01062,
+    "precision": "geocoded"
+  },
+  "address:Airdrie, AB T4B 2N5": {
+    "latitude": 51.28597,
+    "longitude": -114.01062,
+    "precision": "geocoded"
+  },
+  "Calgary Sod Masters|290 Lake Rosen Cres SE, Calgary, AB": {
+    "latitude": 50.9466053,
+    "longitude": -114.061501,
+    "precision": "geocoded"
+  },
+  "address:290 Lake Rosen Cres SE, Calgary, AB": {
+    "latitude": 50.9466053,
+    "longitude": -114.061501,
+    "precision": "geocoded"
+  }
+}
