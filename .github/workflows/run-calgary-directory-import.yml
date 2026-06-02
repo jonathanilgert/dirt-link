@@ -1,0 +1,59 @@
+name: One-off Calgary Directory Import
+
+on:
+  repository_dispatch:
+    types: [calgary-directory-import]
+
+permissions:
+  contents: read
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Write workbook payload
+        env:
+          WORKBOOK_B64: ${{ github.event.client_payload.workbook_b64 }}
+        run: |
+          set -euo pipefail
+          test -n "$WORKBOOK_B64"
+          printf '%s' "$WORKBOOK_B64" | base64 -d > /tmp/DirtLink_Calgary_Directory.xlsx
+          test -s /tmp/DirtLink_Calgary_Directory.xlsx
+
+      - name: Upload workbook to droplet
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          source: /tmp/DirtLink_Calgary_Directory.xlsx
+          target: /tmp/dirtlink-calgary-import
+          strip_components: 1
+
+      - name: Run importer on droplet
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -euo pipefail
+            cd /root/dirt-link
+            git fetch origin master
+            git checkout master
+            git pull --ff-only origin master
+            npm install --production
+            node scripts/import-calgary-directory.js /tmp/dirtlink-calgary-import/DirtLink_Calgary_Directory.xlsx --cache scripts/data/calgary-directory-geocode-cache.json
+            pm2 restart dirtlink
+            node - <<'NODE'
+            const { getDb, all } = require('./database/init');
+            (async () => {
+              await getDb();
+              const rows = all("SELECT category, COUNT(*) AS count FROM permanent_pins WHERE directory_listing = 1 AND entity_kind = 'supplier' GROUP BY category ORDER BY category");
+              const total = rows.reduce((n, r) => n + Number(r.count || 0), 0);
+              console.log(JSON.stringify({ directorySupplierTotal: total, categories: rows }, null, 2));
+            })().catch(err => { console.error(err); process.exit(1); });
+            NODE
