@@ -20,8 +20,8 @@ jobs:
         run: |
           set -euo pipefail
           test -n "$WORKBOOK_B64"
-          printf '%s' "$WORKBOOK_B64" | base64 -d > /tmp/DirtLink_Calgary_Directory.xlsx
-          test -s /tmp/DirtLink_Calgary_Directory.xlsx
+          printf '%s' "$WORKBOOK_B64" | base64 -d > DirtLink_Calgary_Directory.xlsx
+          test -s DirtLink_Calgary_Directory.xlsx
 
       - name: Upload workbook to droplet
         uses: appleboy/scp-action@v0.1.7
@@ -29,7 +29,7 @@ jobs:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
-          source: /tmp/DirtLink_Calgary_Directory.xlsx
+          source: DirtLink_Calgary_Directory.xlsx
           target: /tmp/dirtlink-calgary-import
           strip_components: 1
 
