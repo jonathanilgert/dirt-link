@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;460;480;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
@@ -282,16 +284,112 @@ const Nav = () => {
   );
 };
 
+/* ── Hero Map (real Leaflet) ── */
+const HAVE_COLOR = '#D43E00';   // --accent
+const NEED_COLOR = '#3D5A48';   // --warn
+
+// Triangle divIcon matching the app: up = HAVE, down = NEED
+const makeHeroPinIcon = (type, active) => {
+  const color = type === 'have' ? HAVE_COLOR : NEED_COLOR;
+  const size = active ? 40 : 32;
+  const points = type === 'have' ? '19,4 35,34 3,34' : '19,34 35,4 3,4';
+  const shadow = active
+    ? 'drop-shadow(0 5px 12px rgba(28,31,34,0.45)) drop-shadow(0 1px 2px rgba(28,31,34,0.25))'
+    : 'drop-shadow(0 2px 5px rgba(28,31,34,0.30)) drop-shadow(0 1px 2px rgba(28,31,34,0.16))';
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 38 38" style="filter:${shadow};display:block;transition:all .15s ease;">
+    <polygon points="${points}" fill="${color}" stroke="white" stroke-width="2.5" stroke-linejoin="round"/>
+  </svg>`;
+  return L.divIcon({
+    className: 'hero-pin',
+    html: svg,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, type === 'have' ? size : 0],
+    popupAnchor: [0, type === 'have' ? -size : size],
+  });
+};
+
+const HeroMap = ({ listings, selected, onSelect }) => {
+  const elRef = useRef(null);
+  const mapRef = useRef(null);
+  const markersRef = useRef({});
+
+  // Init once
+  useEffect(() => {
+    if (mapRef.current || !elRef.current || !window.L) return;
+    const map = L.map(elRef.current, {
+      center: [51.0447, -114.0719], // Calgary, AB
+      zoom: 11,
+      zoomControl: false,
+      scrollWheelZoom: false,        // don't hijack page scroll
+      attributionControl: false,
+    });
+    mapRef.current = map;
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      subdomains: 'abcd',
+      maxZoom: 20,
+    }).addTo(map);
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+    L.control.attribution({ position: 'bottomleft', prefix: false })
+      .addAttribution('&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>')
+      .addTo(map);
+
+    listings.forEach(l => {
+      const marker = L.marker([l.lat, l.lng], { icon: makeHeroPinIcon(l.type, false) }).addTo(map);
+      const badge = l.type === 'have'
+        ? `<span style="color:${HAVE_COLOR};font-weight:600">HAVE</span>`
+        : `<span style="color:${NEED_COLOR};font-weight:600">NEED</span>`;
+      marker.bindPopup(
+        `<div style="font-family:'Inter Tight',sans-serif;min-width:170px">
+           <div style="font-size:10px;letter-spacing:0.1em;margin-bottom:4px">${badge}</div>
+           <div style="font-weight:600;font-size:14px;color:#1C1F22">${l.title}</div>
+           <div style="font-size:13px;color:#3A3F45;margin-top:2px">${l.qty} · ${l.site}</div>
+           <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6B7078;margin-top:6px">${l.dist} away</div>
+         </div>`,
+        { closeButton: false, offset: [0, l.type === 'have' ? -8 : 8] }
+      );
+      marker.on('click', () => onSelect(l.id));
+      markersRef.current[l.id] = marker;
+    });
+
+    // Fit all pins comfortably within the frame
+    const group = L.featureGroup(Object.values(markersRef.current));
+    map.fitBounds(group.getBounds().pad(0.25));
+
+    // Leaflet needs a size recalc once the tile is laid out
+    setTimeout(() => map.invalidateSize(), 100);
+
+    return () => { map.remove(); mapRef.current = null; markersRef.current = {}; };
+  }, []);
+
+  // Reflect external selection: swap icon emphasis, open popup, ease toward it
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    listings.forEach(l => {
+      const m = markersRef.current[l.id];
+      if (m) m.setIcon(makeHeroPinIcon(l.type, l.id === selected));
+    });
+    const active = markersRef.current[selected];
+    if (active) {
+      map.panTo(active.getLatLng(), { animate: true, duration: 0.4 });
+      active.openPopup();
+    }
+  }, [selected]);
+
+  return <div ref={elRef} className="hero-map" style={{ width:'100%', height:520 }} />;
+};
+
 /* ── Hero ── */
 const Hero = ({ onBookVisit }) => {
   const [selected, setSelected] = useState(1);
   const listings = [
-    { id:0, type:'have', title:'Topsoil — screened',  qty:'340 m³',   site:'Rocky View — Lot 7',       dist:'4.2 km', top:'42%', left:'22%' },
-    { id:1, type:'have', title:'Clean fill',          qty:'1,200 m³', site:'Foothills Development',    dist:'6.8 km', top:'28%', left:'44%', active:true },
-    { id:2, type:'need', title:'Structural fill',     qty:'800 m³',   site:'Bow River Foundations',    dist:'3.1 km', top:'55%', left:'58%' },
-    { id:3, type:'have', title:'Rock / boulders',     qty:'220 m³',   site:'Nose Hill Quarry',         dist:'12 km',  top:'38%', left:'74%' },
-    { id:4, type:'need', title:'Granular A/B',        qty:'450 t',    site:'Stoney Trail Infrastructure', dist:'9.5 km', top:'64%', left:'30%' },
-    { id:5, type:'have', title:'Concrete crush',      qty:'180 m³',   site:'East Calgary Yard',        dist:'7.2 km', top:'72%', left:'68%' },
+    { id:0, type:'have', title:'Topsoil — screened',  qty:'340 m³',   site:'Rocky View — Lot 7',          dist:'4.2 km', lat:51.1182, lng:-114.0210 },
+    { id:1, type:'have', title:'Clean fill',          qty:'1,200 m³', site:'Foothills Development',       dist:'6.8 km', lat:50.9985, lng:-114.0985, active:true },
+    { id:2, type:'need', title:'Structural fill',     qty:'800 m³',   site:'Bow River Foundations',       dist:'3.1 km', lat:51.0490, lng:-114.0510 },
+    { id:3, type:'have', title:'Rock / boulders',     qty:'220 m³',   site:'Nose Hill Quarry',            dist:'12 km',  lat:51.1095, lng:-114.1320 },
+    { id:4, type:'need', title:'Granular A/B',        qty:'450 t',    site:'Stoney Trail Infrastructure', dist:'9.5 km', lat:51.0805, lng:-114.1830 },
+    { id:5, type:'have', title:'Concrete crush',      qty:'180 m³',   site:'East Calgary Yard',           dist:'7.2 km', lat:51.0360, lng:-113.9540 },
   ];
   const current = listings[selected];
   return (
@@ -329,7 +427,7 @@ const Hero = ({ onBookVisit }) => {
               <span><span className="dot" style={{ color:'#3FB27F' }}/> &nbsp;live</span>
             </div>
           </div>
-          <img src="/images/dashboard.png" alt="DirtLink app" style={{ width:'100%', display:'block' }}/>
+          <HeroMap listings={listings} selected={selected} onSelect={setSelected}/>
           <div style={{ display:'none', gridTemplateColumns:'280px 1fr 320px', height:560 }} className="hero-grid">
             {/* Filter rail */}
             <div style={{ borderRight:'1px solid var(--hairline)', padding:'18px 16px', overflow:'auto' }} className="hero-rail">
@@ -442,8 +540,13 @@ const Hero = ({ onBookVisit }) => {
         </div>
       </div>
       <style>{`
+        .hero-map { background: var(--map-bg); }
+        .hero-map .leaflet-popup-content-wrapper { border-radius: 8px; box-shadow: var(--shadow-lg); border: 1px solid var(--hairline); }
+        .hero-map .leaflet-popup-content { margin: 12px 14px; }
+        .hero-map .leaflet-popup-tip { box-shadow: var(--shadow-sm); }
+        .hero-map .leaflet-bar a { border-radius: 0; color: var(--ink-2); }
         @media (max-width: 1100px) { .hero-grid { grid-template-columns: 260px 1fr !important; } .hero-detail { display: none !important; } }
-        @media (max-width: 820px) { .hero-head { grid-template-columns: 1fr !important; gap: 20px !important; } .hero-grid { grid-template-columns: 1fr !important; height: auto !important; } .hero-rail { display: none !important; } .hero-grid .map-surface { height: 360px; } .logo-row { grid-template-columns: repeat(3, 1fr) !important; } }
+        @media (max-width: 820px) { .hero-head { grid-template-columns: 1fr !important; gap: 20px !important; } .hero-grid { grid-template-columns: 1fr !important; height: auto !important; } .hero-rail { display: none !important; } .hero-grid .map-surface { height: 360px; } .logo-row { grid-template-columns: repeat(3, 1fr) !important; } .hero-map { height: 380px !important; } }
       `}</style>
     </section>
   );
