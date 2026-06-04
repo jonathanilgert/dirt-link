@@ -44,7 +44,7 @@ test('Calgary directory workbook parses all 96 reviewed supplier rows', () => {
   });
 });
 
-test('supplier records preserve review status and do not expose unverified contact fields', () => {
+test('supplier records preserve review status and expose supplied outreach contact fields', () => {
   const rows = normalizeDirectoryRows(parseWorkbook(WORKBOOK)['Calgary Directory']);
   const row = rows.find(r => r.businessName === 'Koomen Contracting Ltd.');
   const cache = loadGeocodeCache(path.join(__dirname, 'fixtures', 'calgary-directory-geocode-cache.sample.json'));
@@ -56,7 +56,7 @@ test('supplier records preserve review status and do not expose unverified conta
   assert.equal(supplier.review_status, 'needs_review');
   assert.equal(supplier.directory_listing, 1);
   assert.equal(supplier.entity_kind, 'supplier');
-  assert.equal(supplier.public_phone, 0);
+  assert.equal(supplier.public_phone, 1);
   assert.equal(supplier.public_address, 0);
   assert.equal(supplier.contact_phone, '587-333-3200');
   assert.equal(supplier.website_url, 'https://koomencontracting.ca');

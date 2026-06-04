@@ -359,7 +359,8 @@ function renderProfile(req, res, supplier) {
   const tpl = readProfileTemplate();
   const gaId = process.env.GA_MEASUREMENT_ID || '';
   const title = `${supplier.site_name} — Calgary Supplier Profile | DirtLink`;
-  const meta = supplier.description && profileRender.tierAtLeast(supplier.tier, 'pro')
+  const canUseDirectoryDescription = Number(supplier.directory_listing) === 1 || profileRender.tierAtLeast(supplier.tier, 'pro');
+  const meta = supplier.description && canUseDirectoryDescription
     ? supplier.description.slice(0, 200)
     : `${supplier.site_name} — Calgary supplier listing on DirtLink. View location, service area, and contact info.`;
   const out = tpl

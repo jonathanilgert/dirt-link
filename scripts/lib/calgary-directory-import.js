@@ -286,8 +286,11 @@ function buildSupplierRecord(row, { geocodeCache = new Map(), seenSlugs = new Se
     longitude: Number(coord.longitude),
     description: row.description || null,
     service_area: JSON.stringify(serviceAreas),
-    public_phone: 0,
-    public_address: 0,
+    // The outreach-ready Calgary directory listings remain marked
+    // needs_review in notes, but their supplied contact fields must be
+    // visible so businesses can confirm/correct them when claiming.
+    public_phone: row.phone ? 1 : 0,
+    public_address: row.address ? 1 : 0,
     contact_phone: row.phone || null,
     website_url: normalizeWebsite(row.website) || null,
     source_url: row.sourceUrl || null,
