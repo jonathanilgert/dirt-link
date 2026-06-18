@@ -308,6 +308,102 @@ const makeHeroPinIcon = (type, active) => {
   });
 };
 
+/* ── App-style pin icons (ported from /public/js/map.js + materials.js) ──
+   These let the hero map render REAL pins exactly as they appear inside /app. */
+
+// Material -> { label, have color, need color } — mirrors materials.js CATEGORIES
+const APP_MATERIALS = {
+  clean_fill:      { l:'Clean Fill',           h:'#e74c3c', n:'#2980b9' },
+  topsoil:         { l:'Topsoil',              h:'#e74c3c', n:'#2980b9' },
+  screened_fill:   { l:'Screened Fill',        h:'#e74c3c', n:'#2980b9' },
+  structural_fill: { l:'Structural Fill',      h:'#e74c3c', n:'#2980b9' },
+  clay:            { l:'Clay',                 h:'#e74c3c', n:'#2980b9' },
+  concrete_crush:  { l:'Concrete Crush',       h:'#e67e22', n:'#3498db' },
+  asphalt_millings:{ l:'Asphalt Millings',     h:'#e67e22', n:'#3498db' },
+  gravel:          { l:'Gravel / Crushed Stone', h:'#e67e22', n:'#3498db' },
+  sand:            { l:'Sand',                 h:'#e67e22', n:'#3498db' },
+  organic_material:{ l:'Organic Material',     h:'#27ae60', n:'#9b59b6' },
+  rock_boulders:   { l:'Rock / Boulders',      h:'#d35400', n:'#2c3e50' },
+  demolition_rubble:{ l:'Demolition Rubble',   h:'#d35400', n:'#2c3e50' },
+};
+const appPinColor = (pinType, materialType) => {
+  const m = APP_MATERIALS[materialType];
+  if (!m) return pinType === 'have' ? '#e74c3c' : '#2980b9';
+  return pinType === 'have' ? m.h : m.n;
+};
+const appMaterialLabel = (materialType) =>
+  APP_MATERIALS[materialType]?.l ||
+  (materialType || 'Material').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+// Live have/need triangle (material-colored) — mirrors map.js createPinIcon
+const createAppPinIcon = (pinType, materialType, isTested, isNow) => {
+  const color = appPinColor(pinType, materialType);
+  const isHave = pinType === 'have';
+  const size = 38;
+  const points = isHave ? '19,4 35,34 3,34' : '19,34 35,4 3,4';
+  const checkY = isHave ? '26' : '14';
+  const baseFilter = 'drop-shadow(0 2px 5px rgba(0,0,0,0.35)) drop-shadow(0 1px 2px rgba(0,0,0,0.18))';
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="filter:${baseFilter};display:block;">
+    <polygon points="${points}" fill="${color}" stroke="white" stroke-width="2.5" stroke-linejoin="round">${isNow ? `<animate attributeName="opacity" values="1;0.55;1" dur="1.8s" repeatCount="indefinite"/>` : ''}</polygon>
+    ${isTested ? `<text x="19" y="${checkY}" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="white" font-weight="700" font-family="Inter,sans-serif">✓</text>` : ''}
+  </svg>`;
+  return L.divIcon({
+    className: 'custom-pin' + (isNow ? ' pin-now' : ''),
+    html: svg,
+    iconSize:   [size, size],
+    iconAnchor: [size / 2, isHave ? size : 0],
+    popupAnchor:[0, isHave ? -size : size],
+  });
+};
+
+// Unclaimed development-permit pin — semi-transparent upright triangle (mirrors map.js)
+const createPermitPinIcon = () => {
+  const size = 38;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="filter:drop-shadow(0 2px 4px rgba(0,0,0,0.15));display:block;">
+    <polygon points="19,4 35,34 3,34" fill="rgba(180,175,168,0.55)" stroke="rgba(140,132,124,0.7)" stroke-width="1.5" stroke-linejoin="round"/>
+  </svg>`;
+  return L.divIcon({
+    className: 'custom-pin permit-pin',
+    html: `<div title="Development Permit">${svg}</div>`,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size],
+    popupAnchor: [0, -size],
+  });
+};
+
+// Permanent site config + square icon (mirrors map.js SITE_TYPE_CONFIG / createPermanentPinIcon)
+const APP_SITE_TYPES = {
+  landfill:         { color:'#7C3AED', label:'LF', tooltip:'Landfill' },
+  transfer_station: { color:'#0891B2', label:'TS', tooltip:'Transfer Station' },
+  processing_site:  { color:'#B45309', label:'PS', tooltip:'Processing Site' },
+  supplier:         { color:'#059669', label:'SP', tooltip:'Earth Material Supplier' },
+  recycler:         { color:'#0284C7', label:'RC', tooltip:'Metal Recycler' },
+  composting:       { color:'#65A30D', label:'CM', tooltip:'Composting Facility' },
+  concrete_plant:   { color:'#64748B', label:'CP', tooltip:'Concrete Plant' },
+  demolition:       { color:'#DC2626', label:'DM', tooltip:'Demolition Services' },
+};
+const getSiteConfig = (siteType) =>
+  APP_SITE_TYPES[siteType] || {
+    color: '#6B7280',
+    label: (siteType || '??').substring(0, 2).toUpperCase(),
+    tooltip: (siteType || 'Site').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+  };
+const createPermanentPinIcon = (siteType) => {
+  const size = 34;
+  const cfg = getSiteConfig(siteType);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));display:block;">
+    <rect x="2" y="2" width="30" height="30" rx="5" fill="${cfg.color}" stroke="white" stroke-width="2.5"/>
+    <text x="17" y="19" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="white" font-weight="700" font-family="Inter,sans-serif">${cfg.label}</text>
+  </svg>`;
+  return L.divIcon({
+    className: 'custom-pin permanent-pin',
+    html: `<div title="${cfg.tooltip}">${svg}</div>`,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size],
+    popupAnchor: [0, -size],
+  });
+};
+
 const HeroMap = ({ listings, selected, onSelect }) => {
   const elRef = useRef(null);
   const mapRef = useRef(null);
@@ -360,6 +456,81 @@ const HeroMap = ({ listings, selected, onSelect }) => {
     setTimeout(() => map.invalidateSize(), 100);
 
     return () => { map.remove(); mapRef.current = null; markersRef.current = {}; };
+  }, []);
+
+  // Overlay REAL pins from the live app API so the hero mirrors what visitors see
+  // inside /app — live have/need listings, development permits, and permanent sites.
+  useEffect(() => {
+    if (!mapRef.current) return;
+    let cancelled = false;
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+      ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+    const popup = inner =>
+      `<div style="font-family:'Inter Tight',sans-serif;min-width:180px">${inner}` +
+      `<a href="/app" style="display:inline-block;margin-top:8px;font-size:11px;font-weight:600;color:${HAVE_COLOR};text-decoration:none">Open in app →</a></div>`;
+
+    (async () => {
+      try {
+        const [pinsRes, permitRes, permRes] = await Promise.all([
+          fetch('/api/pins'),
+          fetch('/api/pins/permits'),
+          fetch('/api/pins/permanent'),
+        ]);
+        if (cancelled || !mapRef.current) return;
+        const live    = pinsRes.ok  ? await pinsRes.json()  : [];
+        const permits = permitRes.ok ? await permitRes.json() : [];
+        const perms   = permRes.ok  ? await permRes.json()  : [];
+        if (cancelled || !mapRef.current) return;
+        const map = mapRef.current;
+
+        // Live have/need listings
+        live.forEach(p => {
+          if (p.latitude == null || p.longitude == null) return;
+          const isNow = p.timeline_date === 'now';
+          const badge = p.pin_type === 'have'
+            ? `<span style="color:${HAVE_COLOR};font-weight:600">HAVE</span>`
+            : `<span style="color:${NEED_COLOR};font-weight:600">NEED</span>`;
+          const qty = [p.quantity_estimate, p.quantity_unit].filter(Boolean).join(' ');
+          L.marker([p.latitude, p.longitude], { icon: createAppPinIcon(p.pin_type, p.material_type, p.is_tested, isNow) })
+            .addTo(map)
+            .bindPopup(popup(
+              `<div style="font-size:10px;letter-spacing:0.1em;margin-bottom:4px">${badge}${p.is_tested ? ' · <span style="color:#3FB27F;font-weight:600">✓ TESTED</span>' : ''}</div>
+               <div style="font-weight:600;font-size:14px;color:#1C1F22">${esc(p.title || appMaterialLabel(p.material_type))}</div>
+               <div style="font-size:13px;color:#3A3F45;margin-top:2px">${esc(appMaterialLabel(p.material_type))}${qty ? ` · ${esc(qty)}` : ''}</div>`
+            ), { closeButton: false });
+        });
+
+        // Development permits (unclaimed) — the pins you wanted visible
+        permits.forEach(p => {
+          if (p.status === 'claimed' || p.latitude == null || p.longitude == null) return;
+          L.marker([p.latitude, p.longitude], { icon: createPermitPinIcon() })
+            .addTo(map)
+            .bindPopup(popup(
+              `<div style="font-size:10px;letter-spacing:0.1em;margin-bottom:4px;color:#8C847C;font-weight:600">DEVELOPMENT PERMIT</div>
+               <div style="font-weight:600;font-size:14px;color:#1C1F22">${esc(p.address || 'Permit site')}</div>
+               ${p.permit_type ? `<div style="font-size:13px;color:#3A3F45;margin-top:2px">${esc(p.permit_type)}</div>` : ''}
+               ${p.permit_date ? `<div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6B7078;margin-top:6px">Issued ${esc(p.permit_date)}</div>` : ''}`
+            ), { closeButton: false });
+        });
+
+        // Permanent sites (landfills, suppliers, transfer stations…)
+        perms.forEach(p => {
+          if (p.latitude == null || p.longitude == null) return;
+          const cfg = getSiteConfig(p.site_type);
+          L.marker([p.latitude, p.longitude], { icon: createPermanentPinIcon(p.site_type) })
+            .addTo(map)
+            .bindPopup(popup(
+              `<div style="font-size:10px;letter-spacing:0.1em;margin-bottom:4px;color:${cfg.color};font-weight:600">${esc(cfg.tooltip.toUpperCase())}</div>
+               <div style="font-weight:600;font-size:14px;color:#1C1F22">${esc(p.site_name || cfg.tooltip)}</div>
+               ${p.address ? `<div style="font-size:13px;color:#3A3F45;margin-top:2px">${esc(p.address)}</div>` : ''}`
+            ), { closeButton: false });
+        });
+      } catch (e) {
+        /* API unreachable — the hero still shows the curated demo pins */
+      }
+    })();
+
+    return () => { cancelled = true; };
   }, []);
 
   // Reflect external selection: swap icon emphasis, open popup, ease toward it
