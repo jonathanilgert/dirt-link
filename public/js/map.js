@@ -18,14 +18,21 @@ function initMap() {
     zoomControl: false
   });
 
+  const lightMapOptions = {
+    maxZoom: 19,
+    // Esri Light Gray returns “Map data not yet available” placeholder tiles
+    // above z16 in parts of Calgary; overzoom z16 instead of requesting them.
+    maxNativeZoom: 16
+  };
+
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ &copy; OpenStreetMap contributors',
-    maxZoom: 19
+    ...lightMapOptions,
+    attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ &copy; OpenStreetMap contributors'
   }).addTo(map);
 
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+    ...lightMapOptions,
     attribution: '',
-    maxZoom: 19,
     pane: 'tilePane'
   }).addTo(map);
 
