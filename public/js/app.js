@@ -470,8 +470,24 @@ window.DirtLink = {
     // Photo preview
     document.getElementById('pin-photos').addEventListener('change', e => {
       const preview = document.getElementById('photo-preview');
+      const status = document.getElementById('pin-submit-status');
       preview.innerHTML = '';
-      const files = Array.from(e.target.files).slice(0, 5);
+      const files = Array.from(e.target.files);
+      const oversized = files.find(file => file.size > 10 * 1024 * 1024);
+      const existingPhotoCount = this._editingPinId ? (this._editingPhotoCount || 0) : 0;
+      const tooManyPhotos = existingPhotoCount + files.length > 5;
+      if (tooManyPhotos || oversized) {
+        e.target.value = '';
+        status.className = 'form-submit-status is-error';
+        status.textContent = tooManyPhotos
+          ? (existingPhotoCount
+            ? `This listing already has ${existingPhotoCount} photo${existingPhotoCount === 1 ? '' : 's'}. Choose no more than ${Math.max(0, 5 - existingPhotoCount)} additional photo${5 - existingPhotoCount === 1 ? '' : 's'}.`
+            : 'Choose no more than 5 photos.')
+          : `${oversized.name} is larger than 10 MB. Choose a smaller photo.`;
+        return;
+      }
+      status.className = 'form-submit-status';
+      status.textContent = '';
       files.forEach(file => {
         const reader = new FileReader();
         reader.onload = (ev) => {
@@ -949,6 +965,11 @@ window.DirtLink = {
   confirmPinLocation() {
     const lat = parseFloat(document.getElementById('pin-lat').value);
     const lng = parseFloat(document.getElementById('pin-lng').value);
+    this._editingPinId = null;
+    this._editingPhotoCount = 0;
+    const submitStatus = document.getElementById('pin-submit-status');
+    submitStatus.className = 'form-submit-status';
+    submitStatus.textContent = '';
     document.getElementById('btn-submit-pin').disabled = false;
     document.getElementById('btn-submit-pin').textContent = 'Create Pin';
     document.getElementById('pin-location-hint').textContent = `Location: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
@@ -972,20 +993,41 @@ window.DirtLink = {
     e.preventDefault();
     const form = e.target;
     const formData = new FormData(form);
+    const submitButton = document.getElementById('btn-submit-pin');
+    const status = document.getElementById('pin-submit-status');
+    const editing = Boolean(this._editingPinId);
+    const idleLabel = editing ? 'Save Changes' : 'Create Pin';
 
-    let res;
-    if (this._editingPinId) {
-      // Update existing pin
-      res = await fetch(`/api/pins/${this._editingPinId}`, { method: 'PUT', body: formData });
-    } else {
-      // Create new pin
-      res = await fetch('/api/pins', { method: 'POST', body: formData });
-    }
+    submitButton.disabled = true;
+    submitButton.textContent = editing ? 'Saving…' : 'Creating Pin…';
+    status.className = 'form-submit-status is-active';
+    status.textContent = 'Uploading your listing. Please keep this window open.';
 
-    if (res.ok) {
+    try {
+      const url = editing ? `/api/pins/${this._editingPinId}` : '/api/pins';
+      const method = editing ? 'PUT' : 'POST';
+      const res = await fetch(url, { method, body: formData });
+
+      if (!res.ok) {
+        let message = '';
+        try {
+          const body = await res.json();
+          message = body.error || '';
+        } catch (_) {
+          // Nginx and other intermediaries may return an HTML error page.
+        }
+        if (res.status === 413 && !message) {
+          message = 'The upload is too large. Each file can be up to 10 MB (maximum 5 photos).';
+        } else if (res.status === 401) {
+          message = 'Your login expired. Please log in again, then retry.';
+        }
+        throw new Error(message || `Could not save the pin (error ${res.status}). Please try again.`);
+      }
+
       document.getElementById('modal-pin').style.display = 'none';
       this.cancelPinDrop();
       this._editingPinId = null;
+      this._editingPhotoCount = 0;
       form.reset();
       document.getElementById('test-report-row').style.display = 'none';
       document.getElementById('photo-preview').innerHTML = '';
@@ -993,12 +1035,20 @@ window.DirtLink = {
       document.getElementById('pin-timeline-hint').style.display = 'none';
       document.getElementById('pin-timeline-value').value = '';
       document.getElementById('btn-pin-timeline-now').classList.remove('active');
+      status.className = 'form-submit-status';
+      status.textContent = '';
       // Reload all pins to reflect changes
       await this.loadPins();
       this.loadMyPins();
-    } else {
-      const err = await res.json();
-      alert(err.error || 'Failed to save pin');
+    } catch (err) {
+      console.error('Failed to save pin:', err);
+      status.className = 'form-submit-status is-error';
+      status.textContent = err.message || 'Could not save the pin. Check your connection and try again.';
+    } finally {
+      if (document.getElementById('modal-pin').style.display !== 'none') {
+        submitButton.disabled = false;
+        submitButton.textContent = idleLabel;
+      }
     }
   },
 
@@ -1165,7 +1215,11 @@ window.DirtLink = {
     // Set submit to update mode
     document.getElementById('btn-submit-pin').disabled = false;
     document.getElementById('btn-submit-pin').textContent = 'Save Changes';
+    const submitStatus = document.getElementById('pin-submit-status');
+    submitStatus.className = 'form-submit-status';
+    submitStatus.textContent = '';
     this._editingPinId = id;
+    this._editingPhotoCount = Array.isArray(pin.photos) ? pin.photos.length : 0;
 
     document.getElementById('modal-pin').style.display = 'flex';
   },

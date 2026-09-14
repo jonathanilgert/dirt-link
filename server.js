@@ -518,6 +518,21 @@ app.get('*', (req, res) => {
   res.redirect('/');
 });
 
+// Keep API failures machine-readable so browser forms can show useful errors
+// instead of failing silently while trying to parse Express' default HTML page.
+app.use((err, req, res, next) => {
+  if (!req.path.startsWith('/api/')) return next(err);
+
+  if (err && (err.code === 'LIMIT_FILE_SIZE' || err.code === 'LIMIT_FILE_COUNT' || err.code === 'LIMIT_UNEXPECTED_FILE')) {
+    return res.status(413).json({
+      error: 'The upload is too large. Each file can be up to 10 MB (maximum 5 photos).'
+    });
+  }
+
+  console.error(`[api] ${req.method} ${req.path}:`, err);
+  res.status(err.status || 500).json({ error: 'Could not complete the request. Please try again.' });
+});
+
 // Initialize database then start server
 getDb().then(() => {
   app.listen(PORT, () => {

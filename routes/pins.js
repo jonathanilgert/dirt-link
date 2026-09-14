@@ -2,6 +2,7 @@ const express = require('express');
 const { v4: uuidv4 } = require('uuid');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 const { all, get, run } = require('../database/init');
 const { requireAuth } = require('../middleware/auth');
 
@@ -38,6 +39,12 @@ const pinUpload = upload.fields([
   { name: 'test_report', maxCount: 1 },
   { name: 'photos', maxCount: 5 }
 ]);
+
+function removeUploadedFiles(files = {}) {
+  Object.values(files).flat().forEach(file => {
+    try { fs.unlinkSync(file.path); } catch (_) { /* best-effort cleanup */ }
+  });
+}
 
 const { PLANS, getRevealStatus, calculateSavings } = require('../config/pricing');
 const { notifyForNewPin } = require('../services/proximity');
@@ -222,7 +229,19 @@ router.post('/', requireAuth, pinUpload, (req, res) => {
 // Update pin
 router.put('/:id', requireAuth, pinUpload, (req, res) => {
   const pin = get('SELECT * FROM pins WHERE id = ? AND user_id = ?', [req.params.id, req.session.userId]);
-  if (!pin) return res.status(404).json({ error: 'Pin not found or not yours' });
+  if (!pin) {
+    removeUploadedFiles(req.files);
+    return res.status(404).json({ error: 'Pin not found or not yours' });
+  }
+
+  const photoFiles = req.files?.photos || [];
+  const existingPhotoCount = get('SELECT COUNT(*) AS count FROM pin_photos WHERE pin_id = ?', [req.params.id])?.count || 0;
+  if (existingPhotoCount + photoFiles.length > 5) {
+    removeUploadedFiles(req.files);
+    return res.status(413).json({
+      error: `A listing can have at most 5 photos. This listing already has ${existingPhotoCount}.`
+    });
+  }
 
   const { title, description, quantity_estimate, quantity_unit, is_tested, is_active, material_type, latitude, longitude, pin_type, address, timeline_date } = req.body;
   const reportFile = req.files?.test_report?.[0];
@@ -245,7 +264,6 @@ router.put('/:id', requireAuth, pinUpload, (req, res) => {
   );
 
   // Save any new photos
-  const photoFiles = req.files?.photos || [];
   photoFiles.forEach(f => {
     run(
       `INSERT INTO pin_photos (id, pin_id, file_path) VALUES (?, ?, ?)`,
